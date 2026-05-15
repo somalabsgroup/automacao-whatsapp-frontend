@@ -9,6 +9,8 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.6.3",
+    "@clerk/react": "^6.6.3",
     "@react-router/node": "7.15.1",
     "@react-router/serve": "7.15.1",
     "@rolldown/binding-win32-x64-msvc": "^1.0.1",
