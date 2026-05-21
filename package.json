@@ -6,9 +6,10 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/backend": "^3.4.12",
     "@clerk/localizations": "^4.6.3",
     "@clerk/react": "^6.6.3",
     "@react-router/node": "7.15.1",
@@ -28,6 +29,6 @@
     "@types/react-dom": "^19.2.3",
     "@types/styled-components": "^5.1.36",
     "typescript": "^5.9.3",
-    "vite": "^8.0.3"
+    "vite": "^5.4.11"
   }
 }

@@ -1,42 +1,59 @@
 import { Show, SignInButton, UserButton } from "@clerk/react";
+import type { MetaFunction } from "react-router";
+import { Button, Flex } from "~/components/ui/styled";
+import {
+  Header,
+  HeaderTitle,
+  HeroSection,
+  HeroTitle,
+  HeroSubtitle,
+  FeatureCard,
+  FeatureIcon,
+  FeatureTitle,
+  FeatureDescription,
+} from "~/components/landing/styled";
+import { colors, spacing } from "~/styles/tokens";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "SomaClini - Sistema de Controle de Mensagens" },
+    { name: "description", content: "Sistema de controle de mensagens para clínicas via WhatsApp" },
+  ];
+};
+
+const features = [
+  {
+    icon: "📱",
+    title: "WhatsApp Integration",
+    description: "Integração nativa com WhatsApp para envio de mensagens",
+  },
+  {
+    icon: "📋",
+    title: "Gestão de Pacientes",
+    description: "Cadastre e organize seus pacientes em um só lugar",
+  },
+  {
+    icon: "⏰",
+    title: "Lembretes Automáticos",
+    description: "Envie lembretes de consultas automaticamente",
+  },
+];
 
 export default function Home() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-      }}
-    >
-      <header
-        style={{
-          padding: "1.5rem 2rem",
-          background: "rgba(255, 255, 255, 0.95)",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h1></h1>
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+    <div style={{ minHeight: "100vh", background: colors.background.gradient }}>
+      <Header>
+        <HeaderTitle>SomaClini</HeaderTitle>
+        
+        <Flex gap="md" align="center">
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button
-                style={{
-                  padding: "0.5rem 1.5rem",
-                  background: "white",
-                  border: "2px solid #10b981",
-                  borderRadius: "0.5rem",
-                  color: "#10b981",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-              >
+              <Button variant="outline" size="md">
                 Entrar
-              </button>
+              </Button>
             </SignInButton>
           </Show>
+          
           <Show when="signed-in">
             <UserButton
               appearance={{
@@ -46,9 +63,36 @@ export default function Home() {
               }}
             />
           </Show>
+        </Flex>
+      </Header>
+
+      <HeroSection>
+        <HeroTitle>
+          Controle de Mensagens<br />para Clínicas
+        </HeroTitle>
+        
+        <HeroSubtitle>
+          Gerencie comunicações com seus pacientes via WhatsApp de forma
+          simples e eficiente. Envie lembretes, confirmações e muito mais.
+        </HeroSubtitle>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: spacing.xl,
+            marginTop: spacing['3xl'],
+          }}
+        >
+          {features.map((feature) => (
+            <FeatureCard key={feature.title}>
+              <FeatureIcon>{feature.icon}</FeatureIcon>
+              <FeatureTitle>{feature.title}</FeatureTitle>
+              <FeatureDescription>{feature.description}</FeatureDescription>
+            </FeatureCard>
+          ))}
         </div>
-      </header>
-      <main></main>
+      </HeroSection>
     </div>
   );
 }
