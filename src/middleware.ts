@@ -12,23 +12,25 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
-  const { userId, orgSlug, orgRole, sessionClaims } = await auth();
+  const { userId, sessionClaims } = await auth();
   const url = req.nextUrl.clone();
   const hostname = req.headers.get("host") || "";
 
   // Extrai o subdomínio
   const subdomain = getSubdomain(hostname, BASE_DOMAIN);
 
-  console.log(`[Middleware] Hostname: ${hostname}, Subdomain: ${subdomain}, Path: ${url.pathname}, UserId: ${userId}`);
+  console.log(`[Middleware] ====================================`);
+  console.log(`[Middleware] Request: ${url.pathname}`);
+  console.log(`[Middleware] Hostname: ${hostname}`);
+  console.log(`[Middleware] Subdomain: ${subdomain}`);
+  console.log(`[Middleware] UserId: ${userId || "não logado"}`);
 
   // Se está no domínio principal (sem subdomínio)
   if (!subdomain) {
-    // Permite acesso à landing page e rotas públicas
     if (url.pathname === "/" || isPublicRoute(req)) {
       return NextResponse.next();
     }
 
-    // Se tentar acessar /dashboard sem subdomain, redireciona para home
     if (url.pathname.startsWith("/dashboard")) {
       url.pathname = "/";
       return NextResponse.redirect(url);
@@ -37,98 +39,91 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     return NextResponse.next();
   }
 
-  // Se está em um subdomínio (tenant-specific)
-  // Sempre permite acesso à página de unauthorized
+  // ============================================
+  // ESTÁ EM UM SUBDOMÍNIO - VALIDA ORGANIZAÇÃO
+  // ============================================
+
+  // Sempre permite /unauthorized
   if (url.pathname === "/unauthorized") {
     return NextResponse.next();
   }
 
-  // Se não está logado, permite apenas acesso ao sign-in
+  // Se NÃO está logado, permite apenas /sign-in
   if (!userId) {
     if (url.pathname.startsWith("/sign-in")) {
       return NextResponse.next();
     }
-    // Redireciona para login
+    console.log(`[Middleware] ❌ Não autenticado, redirecionando para /sign-in`);
     url.pathname = "/sign-in";
-    url.searchParams.set("redirect_url", req.url);
     return NextResponse.redirect(url);
   }
 
-  // USUÁRIO ESTÁ LOGADO - VALIDA ACESSO USANDO CLERK ORGANIZATIONS
-  console.log(`[Middleware] 🔍 Iniciando validação de acesso`);
-  console.log(`[Middleware] UserId: ${userId}`);
-  console.log(`[Middleware] Subdomain tentado: "${subdomain}"`);
-  
-  // Pega as organizações do usuário (memberships do sessionClaims)
+  // ============================================
+  // USUÁRIO LOGADO - VALIDA ACESSO À ORGANIZAÇÃO
+  // ============================================
+
   const orgMemberships = (sessionClaims?.org_memberships as any[]) || [];
   
-  console.log(`[Middleware] Organizations do usuário:`, JSON.stringify(orgMemberships, null, 2));
-  
-  // Se usuário não tem organizações, bloqueia acesso
-  if (!orgMemberships || orgMemberships.length === 0) {
-    console.log(`[Middleware] ❌ BLOQUEADO - Usuário não pertence a nenhuma organização`);
+  console.log(`[Middleware] Total de organizations: ${orgMemberships.length}`);
+  console.log(`[Middleware] Organizations:`, JSON.stringify(orgMemberships, null, 2));
+
+  // Bloqueia se não tem nenhuma organização
+  if (orgMemberships.length === 0) {
+    console.log(`[Middleware] ❌ BLOQUEADO - Sem organizações`);
     url.pathname = "/unauthorized";
     url.search = "";
     return NextResponse.redirect(url);
   }
-  
-  // Verifica se o usuário tem acesso a este tenant (slug da org EXATAMENTE igual)
-  console.log(`[Middleware] 🔎 Verificando match de slugs...`);
+
+  // Verifica se tem acesso ao subdomain específico
   const hasAccess = orgMemberships.some((membership) => {
     const orgSlug = membership.slug || membership.organization?.slug;
-    const match = orgSlug === subdomain;
-    console.log(`[Middleware]   - Org slug: "${orgSlug}" === Subdomain: "${subdomain}" ? ${match ? '✅' : '❌'}`);
-    return match;
+    console.log(`[Middleware] Checando: "${orgSlug}" === "${subdomain}" ?`);
+    
+    if (!orgSlug) {
+      console.log(`[Middleware] ⚠️ Organization sem slug definido!`);
+      return false;
+    }
+    
+    return orgSlug === subdomain;
   });
-  
-  console.log(`[Middleware] Resultado final: hasAccess = ${hasAccess}`);
-  
-  // SEMPRE bloqueia se não tem acesso
+
+  // BLOQUEIA se não tem acesso
   if (!hasAccess) {
-    console.log(`[Middleware] ❌❌❌ ACESSO NEGADO ❌❌❌`);
-    console.log(`[Middleware] Motivo: Nenhuma organização do usuário tem slug igual a "${subdomain}"`);
+    console.log(`[Middleware] ❌ BLOQUEADO - Sem acesso a "${subdomain}"`);
     console.log(`[Middleware] Redirecionando para /unauthorized`);
     url.pathname = "/unauthorized";
     url.search = "";
     return NextResponse.redirect(url);
   }
-  
-  console.log(`[Middleware] ✅✅✅ ACESSO PERMITIDO ✅✅✅`);
-  console.log(`[Middleware] Usuário ${userId} tem acesso à organização "${subdomain}"`);
-  
+
+  console.log(`[Middleware] ✅ ACESSO PERMITIDO`);
+
   // Se acessou a raiz do subdomínio, redireciona para dashboard
   if (url.pathname === "/") {
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
-  
+
   return NextResponse.next();
 });
 
 function getSubdomain(hostname: string, baseDomain: string): string | null {
-  console.log(`[getSubdomain] Input hostname: "${hostname}", baseDomain: "${baseDomain}"`);
-  
-  // Remove porta se existir
   const host = hostname.split(":")[0];
-  console.log(`[getSubdomain] Host sem porta: "${host}"`);
 
   // Casos de desenvolvimento
   if (host === "localhost" || host === "127.0.0.1") {
-    console.log(`[getSubdomain] Ambiente local detectado, retornando null`);
     return null;
   }
 
   // Remove base domain
   const subdomain = host.replace(`.${baseDomain}`, "");
-  console.log(`[getSubdomain] Após remover baseDomain: "${subdomain}"`);
 
   // Se for o próprio domain (sem subdomain)
   if (subdomain === baseDomain || subdomain === host) {
-    console.log(`[getSubdomain] É o domínio principal, retornando null`);
     return null;
   }
 
-  console.log(`[getSubdomain] ✅ Subdomain extraído: "${subdomain}"`);
   return subdomain;
 }
 
