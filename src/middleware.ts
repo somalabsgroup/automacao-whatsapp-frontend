@@ -85,6 +85,13 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     }
     
     console.log(`[Middleware] ✅ ACESSO PERMITIDO - Usuário ${userId} tem acesso ao tenant ${subdomain}`);
+    
+    // Se acessou a raiz do subdomínio, redireciona para dashboard
+    if (url.pathname === "/") {
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+    
     return NextResponse.next();
   } catch (error) {
     console.error("[Middleware] Erro ao verificar acesso ao tenant:", error);
