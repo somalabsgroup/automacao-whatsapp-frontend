@@ -47,7 +47,7 @@ export default async function DashboardPage() {
 
     return (
       <div style={{ padding: "2rem" }}>
-        <h1>Dashboard - {currentTenant.name}</h1>
+        <h1>Dashboard - {currentTenant.name || currentTenant.slug}</h1>
         <p style={{ color: "#6b7280", marginTop: "0.5rem" }}>
           Role: {currentTenant.role}
         </p>
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
               display: "block",
             }}
           >
-            <h3>{tenant.name}</h3>
+            <h3>{tenant.name || tenant.slug}</h3>
             <p style={{ color: "#6b7280", marginTop: "0.5rem" }}>
               Role: {tenant.role}
             </p>

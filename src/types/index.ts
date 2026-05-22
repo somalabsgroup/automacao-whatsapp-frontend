@@ -2,7 +2,7 @@ export interface TenantInfo {
   id: string;
   slug: string;
   role: "owner" | "admin" | "user";
-  name: string;
+  name?: string;
 }
 
 export interface UserWithTenants {
