@@ -45,12 +45,12 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
 
   // Se está em um subdomínio (tenant-specific)
-  // Permite rotas públicas de autenticação (sign-in, sign-up) mesmo em subdomínio
-  if (isPublicRoute(req)) {
+  // Permite apenas rotas de autenticação (não a raiz "/")
+  if (url.pathname.startsWith("/sign-in") || url.pathname === "/unauthorized") {
     return NextResponse.next();
   }
 
-  // Requer autenticação para todas as outras rotas
+  // Requer autenticação para todas as outras rotas (incluindo "/")
   if (!userId) {
     // Redireciona para login mantendo o mesmo hostname
     url.pathname = "/sign-in";
