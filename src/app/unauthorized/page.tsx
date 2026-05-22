@@ -116,11 +116,14 @@ const SecondaryButton = styled(Button)`
   }
 `;
 
-interface TenantInfo {
+interface OrgMembership {
   id: string;
-  slug: string;
+  slug?: string;
   role: string;
-  name?: string;
+  organization?: {
+    name?: string;
+    slug?: string;
+  };
 }
 
 export default function UnauthorizedPage() {
@@ -128,7 +131,7 @@ export default function UnauthorizedPage() {
   const { user } = useUser();
   const { isLoaded } = useAuth();
   const [subdomain, setSubdomain] = useState<string>("");
-  const [tenants, setTenants] = useState<TenantInfo[]>([]);
+  const [orgMemberships, setOrgMemberships] = useState<OrgMembership[]>([]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -144,8 +147,18 @@ export default function UnauthorizedPage() {
       }
     }
 
-    if (user?.publicMetadata?.tenants) {
-      setTenants(user.publicMetadata.tenants as TenantInfo[]);
+    // Pega as organizações do usuário via sessionClaims
+    if (user?.organizationMemberships) {
+      const memberships = user.organizationMemberships.map((m: any) => ({
+        id: m.id,
+        slug: m.organization.slug,
+        role: m.role,
+        organization: {
+          name: m.organization.name,
+          slug: m.organization.slug
+        }
+      }));
+      setOrgMemberships(memberships);
     }
   }, [user]);
 
@@ -165,31 +178,35 @@ export default function UnauthorizedPage() {
           </InfoBox>
         )}
 
-        {isLoaded && tenants.length > 0 && (
+        {isLoaded && orgMemberships.length > 0 && (
           <div>
             <Description style={{ marginBottom: "0.5rem" }}>
-              Seus acessos disponíveis:
+              Suas organizações disponíveis:
             </Description>
             <TenantList>
-              {tenants.map((tenant) => (
-                <TenantItem
-                  key={tenant.id}
-                  href={`https://${tenant.slug}.${process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br"}`}
-                >
-                  <strong>{tenant.name || tenant.slug}</strong>
-                  <div style={{ fontSize: "0.875rem", color: "#6b7280", marginTop: "0.25rem" }}>
-                    {tenant.slug} • {tenant.role}
-                  </div>
-                </TenantItem>
-              ))}
+              {orgMemberships.map((membership) => {
+                const slug = membership.slug || membership.organization?.slug;
+                const name = membership.organization?.name || slug;
+                return (
+                  <TenantItem
+                    key={membership.id}
+                    href={`https://${slug}.${process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br"}`}
+                  >
+                    <strong>{name}</strong>
+                    <div style={{ fontSize: "0.875rem", color: "#6b7280", marginTop: "0.25rem" }}>
+                      {slug} • {membership.role}
+                    </div>
+                  </TenantItem>
+                );
+              })}
             </TenantList>
           </div>
         )}
 
-        {isLoaded && tenants.length === 0 && (
+        {isLoaded && orgMemberships.length === 0 && (
           <InfoBox>
             <Description>
-              Você ainda não tem acesso a nenhuma clínica.
+              Você ainda não pertence a nenhuma organização.
               Entre em contato com o administrador para solicitar acesso.
             </Description>
           </InfoBox>

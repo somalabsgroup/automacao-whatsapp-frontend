@@ -4,12 +4,6 @@ import type { NextRequest } from "next/server";
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br";
 
-interface TenantInfo {
-  id: string;
-  slug: string;
-  role: string;
-}
-
 // Rotas públicas (não requerem autenticação)
 const isPublicRoute = createRouteMatcher([
   "/",
@@ -18,7 +12,7 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
-  const { userId, sessionClaims } = await auth();
+  const { userId, orgSlug, orgRole, sessionClaims } = await auth();
   const url = req.nextUrl.clone();
   const hostname = req.headers.get("host") || "";
 
@@ -60,39 +54,40 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     return NextResponse.redirect(url);
   }
 
-  // USUÁRIO ESTÁ LOGADO - AGORA VALIDA ACESSO AO TENANT
-  // Busca tenants do sessionClaims (public metadata)
-  const tenants = (sessionClaims?.tenants as TenantInfo[]) || [];
+  // USUÁRIO ESTÁ LOGADO - VALIDA ACESSO USANDO CLERK ORGANIZATIONS
+  // Pega as organizações do usuário (memberships do sessionClaims)
+  const orgMemberships = (sessionClaims?.org_memberships as any[]) || [];
   
-  console.log(`[Middleware] Tenants do usuário:`, JSON.stringify(tenants));
+  console.log(`[Middleware] Organizations do usuário:`, JSON.stringify(orgMemberships));
   console.log(`[Middleware] Subdomain atual: "${subdomain}"`);
   
-  // Se usuário não tem tenants configurados, bloqueia acesso
-  if (!tenants || tenants.length === 0) {
-    console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não possui tenants configurados`);
+  // Se usuário não tem organizações, bloqueia acesso
+  if (!orgMemberships || orgMemberships.length === 0) {
+    console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não pertence a nenhuma organização`);
     url.pathname = "/unauthorized";
     url.search = "";
     return NextResponse.redirect(url);
   }
   
-  // Verifica se o usuário tem acesso a este tenant (slug EXATAMENTE igual)
-  const hasAccess = tenants.some((tenant) => {
-    const match = tenant.slug === subdomain;
-    console.log(`[Middleware] Comparando "${tenant.slug}" === "${subdomain}": ${match}`);
+  // Verifica se o usuário tem acesso a este tenant (slug da org EXATAMENTE igual)
+  const hasAccess = orgMemberships.some((membership) => {
+    const orgSlug = membership.slug || membership.organization?.slug;
+    const match = orgSlug === subdomain;
+    console.log(`[Middleware] Comparando "${orgSlug}" === "${subdomain}": ${match}`);
     return match;
   });
   
   console.log(`[Middleware] hasAccess: ${hasAccess}`);
   
-  // Se usuário NÃO tem acesso ao tenant, bloqueia TUDO (incluindo /sign-in)
+  // Se usuário NÃO tem acesso, bloqueia
   if (!hasAccess) {
-    console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não tem acesso ao tenant ${subdomain}`);
+    console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não tem acesso à organização ${subdomain}`);
     url.pathname = "/unauthorized";
     url.search = "";
     return NextResponse.redirect(url);
   }
   
-  console.log(`[Middleware] ✅ ACESSO PERMITIDO - Usuário ${userId} tem acesso ao tenant ${subdomain}`);
+  console.log(`[Middleware] ✅ ACESSO PERMITIDO - Usuário ${userId} tem acesso à organização ${subdomain}`);
   
   // Se acessou a raiz do subdomínio, redireciona para dashboard
   if (url.pathname === "/") {

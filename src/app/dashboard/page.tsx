@@ -3,11 +3,14 @@ import { headers } from "next/headers";
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br";
 
-interface TenantInfo {
+interface OrgMembership {
   id: string;
   slug: string;
   role: string;
-  name?: string;
+  organization?: {
+    name: string;
+    slug: string;
+  };
 }
 
 function getSubdomain(hostname: string): string | null {
@@ -19,24 +22,28 @@ function getSubdomain(hostname: string): string | null {
 }
 
 export default async function DashboardPage() {
-  // Middleware já garantiu que o usuário está autenticado e tem acesso ao tenant
-  // Apenas pegamos os dados para exibir
-  const { sessionClaims } = await auth();
-  const tenants = (sessionClaims?.tenants as TenantInfo[]) || [];
+  // Middleware já garantiu que o usuário está autenticado e tem acesso
+  const { sessionClaims, orgSlug, orgRole } = await auth();
+  const orgMemberships = (sessionClaims?.org_memberships as OrgMembership[]) || [];
 
   const headersList = await headers();
   const hostname = headersList.get("host") || "";
   const subdomain = getSubdomain(hostname);
 
-  // Se está em um subdomínio, mostra o dashboard do tenant
+  // Se está em um subdomínio, mostra o dashboard da organização
   if (subdomain) {
-    const currentTenant = tenants.find((t) => t.slug === subdomain);
+    const currentOrg = orgMemberships.find((m) => 
+      (m.slug || m.organization?.slug) === subdomain
+    );
+    
+    const orgName = currentOrg?.organization?.name || subdomain;
+    const userRole = currentOrg?.role || orgRole || "member";
     
     return (
       <div style={{ padding: "2rem" }}>
-        <h1>Dashboard - {currentTenant?.name || subdomain}</h1>
+        <h1>Dashboard - {orgName}</h1>
         <p style={{ color: "#6b7280", marginTop: "0.5rem" }}>
-          Role: {currentTenant?.role || "user"}
+          Role: {userRole}
         </p>
         
         <div style={{ marginTop: "2rem" }}>
@@ -60,30 +67,34 @@ export default async function DashboardPage() {
     );
   }
 
-  // Se está no domínio principal, mostra lista de clínicas disponíveis
+  // Se está no domínio principal, mostra lista de organizações disponíveis
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Selecione uma Clínica</h1>
       <div style={{ marginTop: "2rem", display: "grid", gap: "1rem" }}>
-        {tenants.map((tenant) => (
-          <a
-            key={tenant.id}
-            href={`https://${tenant.slug}.${BASE_DOMAIN}/dashboard`}
-            style={{
-              padding: "1.5rem",
-              border: "1px solid #e5e7eb",
-              borderRadius: "0.5rem",
-              display: "block",
-              textDecoration: "none",
-              color: "inherit",
-            }}
-          >
-            <h3>{tenant.name || tenant.slug}</h3>
-            <p style={{ color: "#6b7280", marginTop: "0.5rem" }}>
-              Role: {tenant.role}
-            </p>
-          </a>
-        ))}
+        {orgMemberships.map((membership) => {
+          const slug = membership.slug || membership.organization?.slug;
+          const name = membership.organization?.name || slug;
+          return (
+            <a
+              key={membership.id}
+              href={`https://${slug}.${BASE_DOMAIN}/dashboard`}
+              style={{
+                padding: "1.5rem",
+                border: "1px solid #e5e7eb",
+                borderRadius: "0.5rem",
+                display: "block",
+                textDecoration: "none",
+                color: "inherit",
+              }}
+            >
+              <h3>{name}</h3>
+              <p style={{ color: "#6b7280", marginTop: "0.5rem" }}>
+                Role: {membership.role}
+              </p>
+            </a>
+          );
+        })}
       </div>
     </div>
   );
