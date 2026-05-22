@@ -51,6 +51,7 @@ function LoginForm() {
     if (redirect && isSafeRedirect(redirect)) {
       window.location.href = redirect
     } else {
+      // Redireciona para raiz, middleware fará rewrite para /app/[tenant]/...
       window.location.href = '/dashboard'
     }
   }

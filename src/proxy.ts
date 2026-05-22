@@ -97,11 +97,10 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
   }
 
-  // Reescreve URL
-  const url = req.nextUrl.clone()
-  url.pathname = `/app/${subdomain}${req.nextUrl.pathname === '/' ? '' : req.nextUrl.pathname}`
-
-  return NextResponse.rewrite(url)
+  // Adiciona tenant no header para acesso nas páginas
+  res.headers.set('x-tenant', subdomain)
+  
+  return res
 }
 
 export const config = {

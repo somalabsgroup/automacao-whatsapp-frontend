@@ -1,12 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 
-export default async function TenantDashboard({
-  params,
-}: {
-  params: Promise<{ tenant: string }>
-}) {
-  const { tenant } = await params
+export default async function Dashboard() {
+  const headersList = await headers()
+  const tenant = headersList.get('x-tenant')
   const supabase = await createClient()
 
   const {
@@ -15,6 +13,15 @@ export default async function TenantDashboard({
 
   if (!user) {
     redirect('/login')
+  }
+
+  if (!tenant) {
+    return (
+      <div className="p-8">
+        <h1 className="text-3xl font-bold mb-4">Erro</h1>
+        <p>Acesse através de um subdomínio de clínica válido.</p>
+      </div>
+    )
   }
 
   // Busca dados do tenant
