@@ -1,153 +1,131 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br";
+const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'somaclini.com.br'
 
-// Rotas públicas (não requerem autenticação)
-const isPublicRoute = createRouteMatcher([
-  "/",
-  "/sign-in(.*)",
-  "/unauthorized",
-]);
+function getSubdomain(hostname: string): string | null {
+  const host = hostname.replace(/^www\./, '')
 
-export default clerkMiddleware(async (auth, req: NextRequest) => {
-  const { userId, sessionClaims } = await auth();
-  const url = req.nextUrl.clone();
-  const hostname = req.headers.get("host") || "";
+  // Remove porta (ex: localhost:3000 → localhost)
+  const hostWithoutPort = host.split(':')[0]
 
-  // Extrai o subdomínio
-  const subdomain = getSubdomain(hostname, BASE_DOMAIN);
+  if (hostWithoutPort === BASE_DOMAIN || hostWithoutPort === 'localhost') {
+    return null
+  }
 
-  console.log(`[Middleware] ====================================`);
-  console.log(`[Middleware] Request: ${url.pathname}`);
-  console.log(`[Middleware] Hostname: ${hostname}`);
-  console.log(`[Middleware] Subdomain: ${subdomain}`);
-  console.log(`[Middleware] UserId: ${userId || "não logado"}`);
+  // Extrai subdomain tanto para BASE_DOMAIN quanto para .localhost
+  const subdomain = hostWithoutPort
+    .replace(`.${BASE_DOMAIN}`, '')
+    .replace('.localhost', '')
 
-  // Se está no domínio principal (sem subdomínio)
+  return subdomain && !subdomain.includes('.') ? subdomain : null
+}
+
+export async function middleware(req: NextRequest) {
+  const hostname = req.headers.get('host') || ''
+  const subdomain = getSubdomain(hostname)
+
+  // Cria response
+  let res = NextResponse.next({
+    request: req,
+  })
+
+  // Cria cliente Supabase
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => {
+            req.cookies.set(name, value)
+          })
+          res = NextResponse.next({
+            request: req,
+          })
+          cookiesToSet.forEach(({ name, value, options }) => {
+            res.cookies.set(name, value, options)
+          })
+        },
+      },
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // DOMÍNIO PRINCIPAL
   if (!subdomain) {
-    if (url.pathname === "/" || isPublicRoute(req)) {
-      return NextResponse.next();
+    const publicPaths = ['/', '/login', '/signup', '/unauthorized']
+    if (publicPaths.includes(req.nextUrl.pathname)) {
+      return res
     }
-
-    if (url.pathname.startsWith("/dashboard")) {
-      url.pathname = "/";
-      return NextResponse.redirect(url);
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', req.url))
     }
-
-    return NextResponse.next();
+    return res
   }
 
-  // ============================================
-  // ESTÁ EM UM SUBDOMÍNIO - VALIDA ORGANIZAÇÃO
-  // ============================================
-
-  // Sempre permite /unauthorized
-  if (url.pathname === "/unauthorized") {
-    return NextResponse.next();
+  // SUBDOMÍNIO - ignora assets e rotas públicas (login funciona no próprio subdomínio)
+  const subdomainPublicPaths = ['/login', '/signup', '/unauthorized']
+  if (
+    req.nextUrl.pathname.startsWith('/_next') ||
+    req.nextUrl.pathname.startsWith('/api') ||
+    req.nextUrl.pathname.includes('.') ||
+    subdomainPublicPaths.includes(req.nextUrl.pathname)
+  ) {
+    return res
   }
 
-  // Se NÃO está logado, permite apenas /sign-in
-  if (!userId) {
-    if (url.pathname.startsWith("/sign-in")) {
-      return NextResponse.next();
-    }
-    console.log(`[Middleware] ❌ Não autenticado, redirecionando para /sign-in`);
-    url.pathname = "/sign-in";
-    url.search = "";
-    return NextResponse.redirect(url);
+  // FORÇA LOGIN - redireciona para /login no mesmo subdomínio
+  if (!user) {
+    const loginUrl = new URL('/login', req.url)
+    loginUrl.searchParams.set('redirect', req.url)
+    return NextResponse.redirect(loginUrl)
   }
 
-  // IMPORTANTE: Usuário está logado, mas agora PRECISA validar a organização
-  console.log(`[Middleware] ⚠️ Usuário LOGADO - Iniciando validação de organização`);
+  // BUSCA TENANT
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('id, slug, name')
+    .eq('slug', subdomain)
+    .maybeSingle()
 
-  // ============================================
-  // USUÁRIO LOGADO - VALIDA ACESSO À ORGANIZAÇÃO
-  // ============================================
-
-  const orgMemberships = (sessionClaims?.org_memberships as any[]) || [];
-  
-  console.log(`[Middleware] Total de organizations: ${orgMemberships.length}`);
-  console.log(`[Middleware] Organizations:`, JSON.stringify(orgMemberships, null, 2));
-
-  // Bloqueia se não tem nenhuma organização
-  if (orgMemberships.length === 0) {
-    console.log(`[Middleware] ❌ BLOQUEADO - Sem organizações`);
-    url.pathname = "/unauthorized";
-    url.search = "";
-    return NextResponse.redirect(url);
+  // TENANT NÃO EXISTE
+  if (!tenant) {
+    const mainBase = hostname.includes('localhost')
+      ? 'http://localhost:3000'
+      : `https://${BASE_DOMAIN}`
+    return NextResponse.redirect(`${mainBase}/unauthorized`)
   }
 
-  // Verifica se tem acesso ao subdomain específico
-  const hasAccess = orgMemberships.some((membership) => {
-    const orgSlug = membership.slug || membership.organization?.slug;
-    console.log(`[Middleware] Checando: "${orgSlug}" === "${subdomain}" ?`);
-    
-    if (!orgSlug) {
-      console.log(`[Middleware] ⚠️ Organization sem slug definido!`);
-      return false;
-    }
-    
-    return orgSlug === subdomain;
-  });
+  // VERIFICA ACESSO DO USUÁRIO
+  const { data: access } = await supabase
+    .from('tenant_users')
+    .select('id, role')
+    .eq('user_id', user.id)
+    .eq('tenant_id', tenant.id)
+    .maybeSingle()
 
-  // BLOQUEIA se não tem acesso
-  if (!hasAccess) {
-    console.log(`[Middleware] ❌ BLOQUEADO - Sem acesso a "${subdomain}"`);
-    console.log(`[Middleware] Redirecionando para /unauthorized`);
-    url.pathname = "/unauthorized";
-    url.search = "";
-    return NextResponse.redirect(url);
+  // USUÁRIO SEM ACESSO
+  if (!access) {
+    const mainBase = hostname.includes('localhost')
+      ? 'http://localhost:3000'
+      : `https://${BASE_DOMAIN}`
+    return NextResponse.redirect(`${mainBase}/unauthorized`)
   }
 
-  console.log(`[Middleware] ✅ ACESSO PERMITIDO`);
+  // Reescreve URL
+  const url = req.nextUrl.clone()
+  url.pathname = `/app/${subdomain}${req.nextUrl.pathname === '/' ? '' : req.nextUrl.pathname}`
 
-  // Se está na página de sign-in estando logado e com acesso, redireciona para dashboard
-  if (url.pathname.startsWith("/sign-in")) {
-    console.log(`[Middleware] Já está logado com acesso, redirecionando para /dashboard`);
-    url.pathname = "/dashboard";
-    url.search = "";
-    return NextResponse.redirect(url);
-  }
-
-  // Se acessou a raiz do subdomínio, redireciona para dashboard
-  if (url.pathname === "/") {
-    url.pathname = "/dashboard";
-    url.search = "";
-    return NextResponse.redirect(url);
-  }
-
-  return NextResponse.next();
-});
-
-function getSubdomain(hostname: string, baseDomain: string): string | null {
-  const host = hostname.split(":")[0];
-
-  // Casos de desenvolvimento
-  if (host === "localhost" || host === "127.0.0.1") {
-    return null;
-  }
-
-  // Remove base domain
-  const subdomain = host.replace(`.${baseDomain}`, "");
-
-  // Se for o próprio domain (sem subdomain)
-  if (subdomain === baseDomain || subdomain === host) {
-    return null;
-  }
-
-  return subdomain;
+  return NextResponse.rewrite(url)
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
-};
+}
