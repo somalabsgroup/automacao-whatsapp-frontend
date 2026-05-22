@@ -2,7 +2,23 @@
 
 import { Suspense, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+
+const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'somaclini.com.br'
+
+function isSafeRedirect(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return (
+      parsed.hostname === BASE_DOMAIN ||
+      parsed.hostname.endsWith(`.${BASE_DOMAIN}`) ||
+      parsed.hostname === 'localhost' ||
+      parsed.hostname.endsWith('.localhost')
+    )
+  } catch {
+    return false
+  }
+}
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -10,7 +26,6 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect')
 
@@ -32,12 +47,11 @@ function LoginForm() {
       return
     }
 
-    // Redireciona
-    if (redirect) {
+    // Redireciona — usa window.location para garantir reload completo da sessão
+    if (redirect && isSafeRedirect(redirect)) {
       window.location.href = redirect
     } else {
-      router.push('/')
-      router.refresh()
+      window.location.href = '/'
     }
   }
 
