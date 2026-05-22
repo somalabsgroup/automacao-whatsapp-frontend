@@ -64,18 +64,27 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     const user = await client.users.getUser(userId);
     const tenants = (user.publicMetadata.tenants as TenantInfo[]) || [];
     
+    console.log(`[Middleware] Tenants do usuário:`, JSON.stringify(tenants));
+    console.log(`[Middleware] Subdomain atual: "${subdomain}"`);
+    
     // Verifica se o usuário tem acesso a este tenant
-    const hasAccess = tenants.some((tenant) => tenant.slug === subdomain);
+    const hasAccess = tenants.some((tenant) => {
+      const match = tenant.slug === subdomain;
+      console.log(`[Middleware] Comparando "${tenant.slug}" === "${subdomain}": ${match}`);
+      return match;
+    });
+    
+    console.log(`[Middleware] hasAccess: ${hasAccess}`);
     
     if (!hasAccess) {
-      console.log(`[Middleware] Acesso negado - Usuário ${userId} não tem acesso ao tenant ${subdomain}`);
+      console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não tem acesso ao tenant ${subdomain}`);
       // Redireciona para página de acesso negado
       url.pathname = "/unauthorized";
       url.search = "";
       return NextResponse.redirect(url);
     }
     
-    console.log(`[Middleware] Acesso permitido - Usuário ${userId} tem acesso ao tenant ${subdomain}`);
+    console.log(`[Middleware] ✅ ACESSO PERMITIDO - Usuário ${userId} tem acesso ao tenant ${subdomain}`);
     return NextResponse.next();
   } catch (error) {
     console.error("[Middleware] Erro ao verificar acesso ao tenant:", error);
