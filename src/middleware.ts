@@ -44,20 +44,23 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
 
   // Se está em um subdomínio (tenant-specific)
-  // Permite apenas rotas de autenticação (não a raiz "/")
-  if (url.pathname.startsWith("/sign-in") || url.pathname === "/unauthorized") {
+  // Sempre permite acesso à página de unauthorized
+  if (url.pathname === "/unauthorized") {
     return NextResponse.next();
   }
 
-  // Requer autenticação para todas as outras rotas (incluindo "/")
+  // Se não está logado, permite apenas acesso ao sign-in
   if (!userId) {
-    // Redireciona para login mantendo o mesmo hostname
+    if (url.pathname.startsWith("/sign-in")) {
+      return NextResponse.next();
+    }
+    // Redireciona para login
     url.pathname = "/sign-in";
     url.searchParams.set("redirect_url", req.url);
     return NextResponse.redirect(url);
   }
 
-  // Usuário autenticado: verifica se tem acesso ao tenant específico
+  // USUÁRIO ESTÁ LOGADO - AGORA VALIDA ACESSO AO TENANT
   // Busca tenants do sessionClaims (public metadata)
   const tenants = (sessionClaims?.tenants as TenantInfo[]) || [];
   
@@ -81,9 +84,9 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   
   console.log(`[Middleware] hasAccess: ${hasAccess}`);
   
+  // Se usuário NÃO tem acesso ao tenant, bloqueia TUDO (incluindo /sign-in)
   if (!hasAccess) {
     console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não tem acesso ao tenant ${subdomain}`);
-    // Redireciona para página de acesso negado
     url.pathname = "/unauthorized";
     url.search = "";
     return NextResponse.redirect(url);
