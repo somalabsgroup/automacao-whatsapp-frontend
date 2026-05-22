@@ -89,14 +89,9 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // VERIFICA ACESSO: uma única query via tenant_users → tenants
-  // (evita problemas de RLS na tabela tenants consultada diretamente)
+  // VERIFICA ACESSO via RPC (SECURITY DEFINER, bypassa RLS e restrições de Data API)
   const { data: access } = await supabase
-    .from('tenant_users')
-    .select('id, role, tenants!inner(id, slug, name)')
-    .eq('user_id', user.id)
-    .eq('tenants.slug', subdomain)
-    .maybeSingle()
+    .rpc('check_tenant_access', { tenant_slug: subdomain })
 
   if (!access) {
     return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
