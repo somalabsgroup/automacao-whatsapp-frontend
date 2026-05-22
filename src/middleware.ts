@@ -65,13 +65,12 @@ export default async function middleware(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // DOMÍNIO PRINCIPAL
-  // DOMÍNIO PRINCIPAL - apenas landing page, sem app
   if (!subdomain) {
     return res
   }
 
   // SUBDOMÍNIO - ignora assets e rotas públicas (login funciona no próprio subdomínio)
-  const subdomainPublicPaths = ['/login', '/signup', '/unauthorized']
+  const subdomainPublicPaths = ['/login', '/unauthorized']
   if (
     req.nextUrl.pathname.startsWith('/_next') ||
     req.nextUrl.pathname.startsWith('/api') ||
@@ -96,8 +95,6 @@ export default async function middleware(req: NextRequest) {
   // Se a função RPC não existe ou houve erro, TEMPORARIAMENTE permite acesso para debug
   if (rpcError) {
     console.error('Erro ao verificar acesso ao tenant:', rpcError)
-    // TODO: Descomentar após criar a função RPC no Supabase
-    // return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
   }
 
   if (!access && !rpcError) {
