@@ -12,7 +12,6 @@ export default function SignInPage() {
         }}
         routing="path"
         path="/sign-in"
-        fallbackRedirectUrl="/dashboard"
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br";
 
@@ -22,22 +23,47 @@ function getSubdomain(hostname: string): string | null {
 }
 
 export default async function DashboardPage() {
-  // Middleware já garantiu que o usuário está autenticado e tem acesso
-  const { sessionClaims, orgSlug, orgRole } = await auth();
+  console.log(`[Dashboard] 🏠 Página de dashboard acessada`);
+  
+  const { sessionClaims, userId } = await auth();
+  
+  if (!userId) {
+    console.log(`[Dashboard] ❌ Usuário não autenticado, redirecionando para /sign-in`);
+    redirect("/sign-in");
+  }
+  
   const orgMemberships = (sessionClaims?.org_memberships as OrgMembership[]) || [];
 
   const headersList = await headers();
   const hostname = headersList.get("host") || "";
   const subdomain = getSubdomain(hostname);
+  
+  console.log(`[Dashboard] Hostname: ${hostname}`);
+  console.log(`[Dashboard] Subdomain: ${subdomain}`);
+  console.log(`[Dashboard] Organizations: ${orgMemberships.length}`);
 
-  // Se está em um subdomínio, mostra o dashboard da organização
+  // Se está em um subdomínio, VALIDA SE TEM ACESSO
   if (subdomain) {
-    const currentOrg = orgMemberships.find((m) => 
-      (m.slug || m.organization?.slug) === subdomain
-    );
+    console.log(`[Dashboard] 🔍 Validando acesso ao subdomain "${subdomain}"`);
     
-    const orgName = currentOrg?.organization?.name || subdomain;
-    const userRole = currentOrg?.role || orgRole || "member";
+    const currentOrg = orgMemberships.find((m) => {
+      const orgSlug = m.slug || m.organization?.slug;
+      console.log(`[Dashboard] Comparando: "${orgSlug}" === "${subdomain}"`);
+      return orgSlug === subdomain;
+    });
+    
+    // SE NÃO TEM ACESSO, REDIRECIONA PARA /unauthorized
+    if (!currentOrg) {
+      console.log(`[Dashboard] ❌❌❌ SEM ACESSO - Redirecionando para /unauthorized`);
+      redirect("/unauthorized");
+    }
+    
+    console.log(`[Dashboard] ✅ Acesso confirmado!`);
+    
+    console.log(`[Dashboard] ✅ Acesso confirmado!`);
+    
+    const orgName = currentOrg.organization?.name || subdomain;
+    const userRole = currentOrg.role || "member";
     
     return (
       <div style={{ padding: "2rem" }}>

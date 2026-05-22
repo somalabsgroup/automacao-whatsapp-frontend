@@ -55,8 +55,12 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     }
     console.log(`[Middleware] ❌ Não autenticado, redirecionando para /sign-in`);
     url.pathname = "/sign-in";
+    url.search = "";
     return NextResponse.redirect(url);
   }
+
+  // IMPORTANTE: Usuário está logado, mas agora PRECISA validar a organização
+  console.log(`[Middleware] ⚠️ Usuário LOGADO - Iniciando validação de organização`);
 
   // ============================================
   // USUÁRIO LOGADO - VALIDA ACESSO À ORGANIZAÇÃO
@@ -99,9 +103,18 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
 
   console.log(`[Middleware] ✅ ACESSO PERMITIDO`);
 
+  // Se está na página de sign-in estando logado e com acesso, redireciona para dashboard
+  if (url.pathname.startsWith("/sign-in")) {
+    console.log(`[Middleware] Já está logado com acesso, redirecionando para /dashboard`);
+    url.pathname = "/dashboard";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   // Se acessou a raiz do subdomínio, redireciona para dashboard
   if (url.pathname === "/") {
     url.pathname = "/dashboard";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 
