@@ -57,14 +57,8 @@ export async function proxy(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // DOMÍNIO PRINCIPAL
+  // DOMÍNIO PRINCIPAL - apenas landing page, sem app
   if (!subdomain) {
-    const publicPaths = ['/', '/login', '/signup', '/unauthorized']
-    if (publicPaths.includes(req.nextUrl.pathname)) {
-      return res
-    }
-    if (!user) {
-      return NextResponse.redirect(new URL('/login', req.url))
-    }
     return res
   }
 
@@ -93,12 +87,9 @@ export async function proxy(req: NextRequest) {
     .eq('slug', subdomain)
     .maybeSingle()
 
-  // TENANT NÃO EXISTE
+  // TENANT NÃO EXISTE - redireciona para /unauthorized no mesmo subdomínio
   if (!tenant) {
-    const mainBase = hostname.includes('localhost')
-      ? 'http://localhost:3000'
-      : `https://${BASE_DOMAIN}`
-    return NextResponse.redirect(`${mainBase}/unauthorized`)
+    return NextResponse.redirect(new URL('/unauthorized', req.url))
   }
 
   // VERIFICA ACESSO DO USUÁRIO
@@ -109,12 +100,9 @@ export async function proxy(req: NextRequest) {
     .eq('tenant_id', tenant.id)
     .maybeSingle()
 
-  // USUÁRIO SEM ACESSO
+  // USUÁRIO SEM ACESSO - redireciona para /unauthorized no mesmo subdomínio
   if (!access) {
-    const mainBase = hostname.includes('localhost')
-      ? 'http://localhost:3000'
-      : `https://${BASE_DOMAIN}`
-    return NextResponse.redirect(`${mainBase}/unauthorized`)
+    return NextResponse.redirect(new URL('/unauthorized', req.url))
   }
 
   // Reescreve URL
