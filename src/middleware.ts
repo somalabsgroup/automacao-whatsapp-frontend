@@ -1,7 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { clerkClient } from "@clerk/nextjs/server";
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br";
 
@@ -19,7 +18,7 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   const url = req.nextUrl.clone();
   const hostname = req.headers.get("host") || "";
 
@@ -59,47 +58,46 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
 
   // Usuário autenticado: verifica se tem acesso ao tenant específico
-  try {
-    const client = await clerkClient();
-    const user = await client.users.getUser(userId);
-    const tenants = (user.publicMetadata.tenants as TenantInfo[]) || [];
-    
-    console.log(`[Middleware] Tenants do usuário:`, JSON.stringify(tenants));
-    console.log(`[Middleware] Subdomain atual: "${subdomain}"`);
-    
-    // Verifica se o usuário tem acesso a este tenant
-    const hasAccess = tenants.some((tenant) => {
-      const match = tenant.slug === subdomain;
-      console.log(`[Middleware] Comparando "${tenant.slug}" === "${subdomain}": ${match}`);
-      return match;
-    });
-    
-    console.log(`[Middleware] hasAccess: ${hasAccess}`);
-    
-    if (!hasAccess) {
-      console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não tem acesso ao tenant ${subdomain}`);
-      // Redireciona para página de acesso negado
-      url.pathname = "/unauthorized";
-      url.search = "";
-      return NextResponse.redirect(url);
-    }
-    
-    console.log(`[Middleware] ✅ ACESSO PERMITIDO - Usuário ${userId} tem acesso ao tenant ${subdomain}`);
-    
-    // Se acessou a raiz do subdomínio, redireciona para dashboard
-    if (url.pathname === "/") {
-      url.pathname = "/dashboard";
-      return NextResponse.redirect(url);
-    }
-    
-    return NextResponse.next();
-  } catch (error) {
-    console.error("[Middleware] Erro ao verificar acesso ao tenant:", error);
-    // Em caso de erro, nega acesso por segurança
+  // Busca tenants do sessionClaims (public metadata)
+  const tenants = (sessionClaims?.tenants as TenantInfo[]) || [];
+  
+  console.log(`[Middleware] Tenants do usuário:`, JSON.stringify(tenants));
+  console.log(`[Middleware] Subdomain atual: "${subdomain}"`);
+  
+  // Se usuário não tem tenants configurados, bloqueia acesso
+  if (!tenants || tenants.length === 0) {
+    console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não possui tenants configurados`);
     url.pathname = "/unauthorized";
     url.search = "";
     return NextResponse.redirect(url);
   }
+  
+  // Verifica se o usuário tem acesso a este tenant (slug EXATAMENTE igual)
+  const hasAccess = tenants.some((tenant) => {
+    const match = tenant.slug === subdomain;
+    console.log(`[Middleware] Comparando "${tenant.slug}" === "${subdomain}": ${match}`);
+    return match;
+  });
+  
+  console.log(`[Middleware] hasAccess: ${hasAccess}`);
+  
+  if (!hasAccess) {
+    console.log(`[Middleware] ❌ ACESSO NEGADO - Usuário ${userId} não tem acesso ao tenant ${subdomain}`);
+    // Redireciona para página de acesso negado
+    url.pathname = "/unauthorized";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+  
+  console.log(`[Middleware] ✅ ACESSO PERMITIDO - Usuário ${userId} tem acesso ao tenant ${subdomain}`);
+  
+  // Se acessou a raiz do subdomínio, redireciona para dashboard
+  if (url.pathname === "/") {
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+  
+  return NextResponse.next();
 });
 
 function getSubdomain(hostname: string, baseDomain: string): string | null {
