@@ -3,6 +3,14 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'somaclini.com.br'
 
+/** Reconstrói a URL correta usando x-forwarded-proto (necessário atrás de proxy como Vercel) */
+function getRequestUrl(req: NextRequest): string {
+  const proto = req.headers.get('x-forwarded-proto') ??
+    (req.headers.get('host')?.includes('localhost') ? 'http' : 'https')
+  const host = req.headers.get('host') || ''
+  return `${proto}://${host}${req.nextUrl.pathname}${req.nextUrl.search}`
+}
+
 function getSubdomain(hostname: string): string | null {
   const host = hostname.replace(/^www\./, '')
 
@@ -75,8 +83,9 @@ export async function proxy(req: NextRequest) {
 
   // FORÇA LOGIN - redireciona para /login no mesmo subdomínio
   if (!user) {
-    const loginUrl = new URL('/login', req.url)
-    loginUrl.searchParams.set('redirect', req.url)
+    const requestUrl = getRequestUrl(req)
+    const loginUrl = new URL('/login', requestUrl)
+    loginUrl.searchParams.set('redirect', requestUrl)
     return NextResponse.redirect(loginUrl)
   }
 
@@ -89,7 +98,7 @@ export async function proxy(req: NextRequest) {
 
   // TENANT NÃO EXISTE - redireciona para /unauthorized no mesmo subdomínio
   if (!tenant) {
-    return NextResponse.redirect(new URL('/unauthorized', req.url))
+    return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
   }
 
   // VERIFICA ACESSO DO USUÁRIO
@@ -102,7 +111,7 @@ export async function proxy(req: NextRequest) {
 
   // USUÁRIO SEM ACESSO - redireciona para /unauthorized no mesmo subdomínio
   if (!access) {
-    return NextResponse.redirect(new URL('/unauthorized', req.url))
+    return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
   }
 
   // Reescreve URL
