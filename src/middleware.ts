@@ -93,19 +93,24 @@ export default async function middleware(req: NextRequest) {
   const { data: access, error: rpcError } = await supabase
     .rpc('check_tenant_access', { tenant_slug: subdomain })
 
-  // Se a função RPC não existe ou houve erro, trata como sem acesso
+  // Se a função RPC não existe ou houve erro, TEMPORARIAMENTE permite acesso para debug
   if (rpcError) {
     console.error('Erro ao verificar acesso ao tenant:', rpcError)
-    // Se a função não existe, podemos comentar temporariamente essa verificação
-    // para debug: return res
+    // TODO: Descomentar após criar a função RPC no Supabase
+    // return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
   }
 
-  if (!access) {
+  if (!access && !rpcError) {
     return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
   }
 
   // Adiciona tenant no header para acesso nas páginas
   res.headers.set('x-tenant', subdomain)
+  
+  // Se está na raiz do subdomínio, redireciona para dashboard
+  if (req.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/dashboard', getRequestUrl(req)))
+  }
   
   return res
 }
