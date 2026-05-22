@@ -47,11 +47,11 @@ function LoginForm() {
       return
     }
 
-    // Redireciona — usa window.location para garantir reload completo da sessão
+    // Redireciona — window.location garante reload completo para o middleware ler a sessão
     if (redirect && isSafeRedirect(redirect)) {
       window.location.href = redirect
     } else {
-      window.location.href = '/'
+      window.location.href = '/dashboard'
     }
   }
 
