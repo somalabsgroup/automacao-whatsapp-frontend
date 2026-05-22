@@ -89,27 +89,15 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // BUSCA TENANT
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id, slug, name')
-    .eq('slug', subdomain)
-    .maybeSingle()
-
-  // TENANT NÃO EXISTE - redireciona para /unauthorized no mesmo subdomínio
-  if (!tenant) {
-    return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
-  }
-
-  // VERIFICA ACESSO DO USUÁRIO
+  // VERIFICA ACESSO: uma única query via tenant_users → tenants
+  // (evita problemas de RLS na tabela tenants consultada diretamente)
   const { data: access } = await supabase
     .from('tenant_users')
-    .select('id, role')
+    .select('id, role, tenants!inner(id, slug, name)')
     .eq('user_id', user.id)
-    .eq('tenant_id', tenant.id)
+    .eq('tenants.slug', subdomain)
     .maybeSingle()
 
-  // USUÁRIO SEM ACESSO - redireciona para /unauthorized no mesmo subdomínio
   if (!access) {
     return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
   }
