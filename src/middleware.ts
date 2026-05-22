@@ -1,13 +1,21 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { clerkClient } from "@clerk/nextjs/server";
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br";
+
+interface TenantInfo {
+  id: string;
+  slug: string;
+  role: string;
+}
 
 // Rotas públicas (não requerem autenticação)
 const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
+  "/unauthorized",
 ]);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
@@ -50,9 +58,32 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
     return NextResponse.redirect(url);
   }
 
-  // Usuário autenticado: permite acesso ao dashboard do tenant
-  // A verificação de acesso ao tenant específico será feita no servidor
-  return NextResponse.next();
+  // Usuário autenticado: verifica se tem acesso ao tenant específico
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    const tenants = (user.publicMetadata.tenants as TenantInfo[]) || [];
+    
+    // Verifica se o usuário tem acesso a este tenant
+    const hasAccess = tenants.some((tenant) => tenant.slug === subdomain);
+    
+    if (!hasAccess) {
+      console.log(`[Middleware] Acesso negado - Usuário ${userId} não tem acesso ao tenant ${subdomain}`);
+      // Redireciona para página de acesso negado
+      url.pathname = "/unauthorized";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+    
+    console.log(`[Middleware] Acesso permitido - Usuário ${userId} tem acesso ao tenant ${subdomain}`);
+    return NextResponse.next();
+  } catch (error) {
+    console.error("[Middleware] Erro ao verificar acesso ao tenant:", error);
+    // Em caso de erro, nega acesso por segurança
+    url.pathname = "/unauthorized";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
 });
 
 function getSubdomain(hostname: string, baseDomain: string): string | null {
