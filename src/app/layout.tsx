@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={ptBR}>
+    <ClerkProvider localization={ptBR} signUpUrl="">
       <html lang="pt-BR">
         <body>{children}</body>
       </html>

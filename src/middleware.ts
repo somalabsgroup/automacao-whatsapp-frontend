@@ -8,7 +8,6 @@ const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br";
 const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
-  "/sign-up(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
@@ -38,12 +37,17 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
 
   // Se está em um subdomínio (tenant-specific)
-  // Requer autenticação para todas as rotas
+  // Permite rotas públicas de autenticação (sign-in, sign-up) mesmo em subdomínio
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
+  // Requer autenticação para todas as outras rotas
   if (!userId) {
-    // Redireciona para login na URL principal
-    const signInUrl = new URL("/sign-in", req.url);
-    signInUrl.searchParams.set("redirect_url", req.url);
-    return NextResponse.redirect(signInUrl);
+    // Redireciona para login mantendo o mesmo hostname
+    url.pathname = "/sign-in";
+    url.searchParams.set("redirect_url", req.url);
+    return NextResponse.redirect(url);
   }
 
   // Usuário autenticado: permite acesso ao dashboard do tenant
