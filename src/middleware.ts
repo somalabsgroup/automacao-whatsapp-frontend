@@ -29,7 +29,7 @@ function getSubdomain(hostname: string): string | null {
   return subdomain && !subdomain.includes('.') ? subdomain : null
 }
 
-export async function proxy(req: NextRequest) {
+export default async function middleware(req: NextRequest) {
   const hostname = req.headers.get('host') || ''
   const subdomain = getSubdomain(hostname)
 
@@ -90,8 +90,15 @@ export async function proxy(req: NextRequest) {
   }
 
   // VERIFICA ACESSO via RPC (SECURITY DEFINER, bypassa RLS e restrições de Data API)
-  const { data: access } = await supabase
+  const { data: access, error: rpcError } = await supabase
     .rpc('check_tenant_access', { tenant_slug: subdomain })
+
+  // Se a função RPC não existe ou houve erro, trata como sem acesso
+  if (rpcError) {
+    console.error('Erro ao verificar acesso ao tenant:', rpcError)
+    // Se a função não existe, podemos comentar temporariamente essa verificação
+    // para debug: return res
+  }
 
   if (!access) {
     return NextResponse.redirect(new URL('/unauthorized', getRequestUrl(req)))
