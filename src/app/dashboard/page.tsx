@@ -1,9 +1,14 @@
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { getUserWithTenants } from "@/lib/auth";
 import { headers } from "next/headers";
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || "somaclini.com.br";
+
+interface TenantInfo {
+  id: string;
+  slug: string;
+  role: string;
+  name?: string;
+}
 
 function getSubdomain(hostname: string): string | null {
   const host = hostname.split(":")[0];
@@ -14,42 +19,24 @@ function getSubdomain(hostname: string): string | null {
 }
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
+  // Middleware já garantiu que o usuário está autenticado e tem acesso ao tenant
+  // Apenas pegamos os dados para exibir
+  const { sessionClaims } = await auth();
+  const tenants = (sessionClaims?.tenants as TenantInfo[]) || [];
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  const user = await getUserWithTenants(userId);
-
-  if (!user || user.tenants.length === 0) {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        <h1>Bem-vindo!</h1>
-        <p>Você ainda não tem acesso a nenhuma clínica.</p>
-        <p>Entre em contato com o administrador para obter acesso.</p>
-      </div>
-    );
-  }
-
-  // Verifica se está em um subdomínio
   const headersList = await headers();
   const hostname = headersList.get("host") || "";
   const subdomain = getSubdomain(hostname);
 
   // Se está em um subdomínio, mostra o dashboard do tenant
   if (subdomain) {
-    const currentTenant = user.tenants.find((t) => t.slug === subdomain);
+    const currentTenant = tenants.find((t) => t.slug === subdomain);
     
-    if (!currentTenant) {
-      redirect("/unauthorized");
-    }
-
     return (
       <div style={{ padding: "2rem" }}>
-        <h1>Dashboard - {currentTenant.name || currentTenant.slug}</h1>
+        <h1>Dashboard - {currentTenant?.name || subdomain}</h1>
         <p style={{ color: "#6b7280", marginTop: "0.5rem" }}>
-          Role: {currentTenant.role}
+          Role: {currentTenant?.role || "user"}
         </p>
         
         <div style={{ marginTop: "2rem" }}>
@@ -73,26 +60,22 @@ export default async function DashboardPage() {
     );
   }
 
-  // Se está no domínio principal e tem apenas uma clínica, redireciona direto
-  if (user.tenants.length === 1) {
-    const tenant = user.tenants[0];
-    redirect(`https://${tenant.slug}.${process.env.NEXT_PUBLIC_BASE_DOMAIN}/dashboard`);
-  }
-
-  // Se está no domínio principal e tem múltiplas clínicas, mostra lista
+  // Se está no domínio principal, mostra lista de clínicas disponíveis
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Selecione uma Clínica</h1>
       <div style={{ marginTop: "2rem", display: "grid", gap: "1rem" }}>
-        {user.tenants.map((tenant) => (
+        {tenants.map((tenant) => (
           <a
             key={tenant.id}
-            href={`https://${tenant.slug}.${process.env.NEXT_PUBLIC_BASE_DOMAIN}/dashboard`}
+            href={`https://${tenant.slug}.${BASE_DOMAIN}/dashboard`}
             style={{
               padding: "1.5rem",
               border: "1px solid #e5e7eb",
               borderRadius: "0.5rem",
               display: "block",
+              textDecoration: "none",
+              color: "inherit",
             }}
           >
             <h3>{tenant.name || tenant.slug}</h3>
