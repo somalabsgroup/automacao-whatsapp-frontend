@@ -21,7 +21,7 @@ function getSubdomain(hostname: string): string | null {
   return subdomain && !subdomain.includes('.') ? subdomain : null
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const hostname = req.headers.get('host') || ''
   const subdomain = getSubdomain(hostname)
 
