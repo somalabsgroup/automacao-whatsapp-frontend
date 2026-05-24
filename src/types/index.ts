@@ -36,10 +36,11 @@ export interface Message {
 }
 
 export type ConversationStatus = 
-  | "bot_active" 
-  | "waiting" 
-  | "requires_human" 
-  | "completed";
+  | "ai_handling" 
+  | "human_requested" 
+  | "human_active" 
+  | "awaiting_close" 
+  | "closed";
 
 export type AvatarColor = 
   | "green" 
@@ -52,25 +53,34 @@ export interface Conversation {
   id: string;
   patientId: string;
   patientName: string;
+  patientPhone?: string;
   initials: string;
   avatarColor: AvatarColor;
   lastMessage: string;
   lastMessageTime: string;
   status: ConversationStatus;
+  assignedUserId?: string;
+  handoffReason?: string;
+  lastMessageAt: Date;
+  createdAt: Date;
+  closedAt?: Date;
+  closeReason?: string;
+  context?: Record<string, any>;
   hasNotification: boolean;
   notificationCount?: number;
   tenantId: string;
-  updatedAt: Date;
 }
 
-export type ConversationFilter = "all" | "bot_active" | "waiting" | "requires_human";
+export type ConversationFilter = "all" | "ai_handling" | "human_requested" | "human_active" | "awaiting_close";
 
 // Chat Message Types
-export type MessageSender = "patient" | "bot" | "human";
+export type MessageSender = "patient" | "ai" | "human";
 
-export type MessageType = "text" | "image" | "document" | "audio";
+export type MessageDirection = "inbound" | "outbound";
 
-export type MessageStatus = "sending" | "sent" | "delivered" | "read" | "failed";
+export type MessageType = "text" | "image" | "audio" | "video" | "document" | "sticker" | "location";
+
+export type MessageStatus = "pending" | "sent" | "delivered" | "read" | "failed";
 
 export interface MessageAttachment {
   id: string;
@@ -85,12 +95,18 @@ export interface MessageAttachment {
 export interface ChatMessage {
   id: string;
   conversationId: string;
+  tenantId: string;
+  whatsappMessageId?: string;
+  direction: MessageDirection;
   sender: MessageSender;
+  senderUserId?: string;
   senderName?: string;
   type: MessageType;
-  content: string;
+  content?: string;
+  mediaUrl?: string;
   attachments?: MessageAttachment[];
   status: MessageStatus;
   timestamp: Date;
-  isEdited?: boolean;
+  deletedAt?: Date;
+  rawPayload?: any;
 }

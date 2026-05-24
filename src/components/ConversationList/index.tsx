@@ -23,9 +23,10 @@ interface ConversationListProps {
 
 const filterOptions = {
   all: 'Todas',
-  bot_active: 'Bot Ativo',
-  waiting: 'Aguardando',
-  requires_human: 'Requer Ação Humana',
+  ai_handling: 'IA Ativa',
+  human_requested: 'Ação Humana Solicitada',
+  human_active: 'Atendimento Humano',
+  awaiting_close: 'Aguardando Fechamento',
 };
 
 export default function ConversationList({ conversations }: ConversationListProps) {

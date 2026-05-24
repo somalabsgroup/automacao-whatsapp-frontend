@@ -7,7 +7,8 @@ import ContentLayout from '@/components/ContentLayout'
 import Header from '@/components/Header'
 import ConversationList from '@/components/ConversationList'
 import ChatWrapper from '@/components/ChatWrapper'
-import { mockConversations } from '@/utils/mockData'
+import { getConversations } from '@/lib/services/conversations'
+import { Conversation } from '@/types'
 
 export default async function Dashboard() {
   const headersList = await headers()
@@ -32,11 +33,30 @@ export default async function Dashboard() {
   }
 
   // Busca dados do tenant
-  const { data: tenantData } = await supabase
+  const { data: tenantData, error: tenantError } = await supabase
     .from('tenants')
-    .select('*')
+    .select('id, slug, name')
     .eq('slug', tenant)
-    .single()
+    .maybeSingle()
+  
+  if (tenantError) {
+    return (
+      <div className="p-8">
+        <h1 className="text-3xl font-bold mb-4">Erro ao buscar tenant</h1>
+        <p>Erro: {tenantError.message}</p>
+        <p>Slug: {tenant}</p>
+      </div>
+    );
+  }
+  
+  if (!tenantData) {
+    return (
+      <div className="p-8">
+        <h1 className="text-3xl font-bold mb-4">Tenant não encontrado</h1>
+        <p>Nenhum tenant encontrado com o slug: {tenant}</p>
+      </div>
+    );
+  }
 
   // Busca role do usuário
   await supabase
@@ -60,6 +80,16 @@ export default async function Dashboard() {
     imageUrl: profile?.image_url,
   }
 
+  // Buscar conversas do tenant
+  let conversations: Conversation[] = [];
+  try {
+    if (tenantData?.id) {
+      conversations = await getConversations(supabase, tenantData.id);
+    }
+  } catch (error) {
+    console.error('Error loading conversations:', error);
+  }
+
   return (
     <>
       <Sidebar user={userData} />
@@ -69,8 +99,11 @@ export default async function Dashboard() {
           subtitle="Gerencie as conversas e o atendimento da clínica"
         />
         
-        <ContentLayout conversationList={<ConversationList conversations={mockConversations} />}>
-          <ChatWrapper conversations={mockConversations} />
+        <ContentLayout conversationList={<ConversationList conversations={conversations} />}>
+          <ChatWrapper 
+            conversations={conversations} 
+            tenantId={tenantData?.id || ''} 
+          />
         </ContentLayout>
       </DashboardLayout>
     </>

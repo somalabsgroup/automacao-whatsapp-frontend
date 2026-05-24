@@ -12,14 +12,16 @@ interface ChatHeaderProps {
 
 const getStatusText = (status: Conversation['status']) => {
   switch (status) {
-    case 'bot_active':
-      return 'Bot Ativo';
-    case 'waiting':
-      return 'Aguardando';
-    case 'requires_human':
-      return 'Requer Atenção';
-    case 'completed':
-      return 'Concluído';
+    case 'ai_handling':
+      return 'IA Ativa';
+    case 'human_requested':
+      return 'Ação Humana Solicitada';
+    case 'human_active':
+      return 'Atendimento Humano';
+    case 'awaiting_close':
+      return 'Aguardando Fechamento';
+    case 'closed':
+      return 'Encerrado';
     default:
       return '';
   }
@@ -27,13 +29,15 @@ const getStatusText = (status: Conversation['status']) => {
 
 const getStatusColor = (status: Conversation['status']) => {
   switch (status) {
-    case 'bot_active':
+    case 'ai_handling':
       return '#10b981';
-    case 'waiting':
-      return '#f59e0b';
-    case 'requires_human':
+    case 'human_requested':
       return '#ef4444';
-    case 'completed':
+    case 'human_active':
+      return '#f59e0b';
+    case 'awaiting_close':
+      return '#f59e0b';
+    case 'closed':
       return '#6b7280';
     default:
       return '#6b7280';

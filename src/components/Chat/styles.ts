@@ -206,11 +206,11 @@ export const MessageBubble = styled.div<{ $sender: MessageSender }>`
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   background-color: ${({ $sender }) => {
-    if ($sender === 'human' || $sender === 'bot') return '#14b8a6';
+    if ($sender === 'human' || $sender === 'ai') return '#14b8a6';
     return '#ffffff';
   }};
   color: ${({ $sender }) => {
-    if ($sender === 'human' || $sender === 'bot') return '#ffffff';
+    if ($sender === 'human' || $sender === 'ai') return '#ffffff';
     return '#111827';
   }};
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);

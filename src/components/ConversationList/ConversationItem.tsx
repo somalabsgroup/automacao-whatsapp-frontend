@@ -11,14 +11,16 @@ interface ConversationItemProps {
 
 const getStatusLabel = (status: Conversation['status']) => {
   switch (status) {
-    case 'bot_active':
-      return 'Bot Ativo';
-    case 'waiting':
-      return 'Aguardando';
-    case 'requires_human':
-      return 'REQUER AÇÃO HUMANA';
-    case 'completed':
-      return 'Concluído';
+    case 'ai_handling':
+      return 'IA Ativa';
+    case 'human_requested':
+      return 'AÇÃO HUMANA SOLICITADA';
+    case 'human_active':
+      return 'Atendimento Humano';
+    case 'awaiting_close':
+      return 'Aguardando Fechamento';
+    case 'closed':
+      return 'Encerrado';
     default:
       return status;
   }
@@ -26,13 +28,15 @@ const getStatusLabel = (status: Conversation['status']) => {
 
 const getStatusVariant = (status: Conversation['status']) => {
   switch (status) {
-    case 'bot_active':
+    case 'ai_handling':
       return 'success';
-    case 'waiting':
-      return 'warning';
-    case 'requires_human':
+    case 'human_requested':
       return 'danger';
-    case 'completed':
+    case 'human_active':
+      return 'warning';
+    case 'awaiting_close':
+      return 'warning';
+    case 'closed':
       return 'default';
     default:
       return 'default';

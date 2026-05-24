@@ -9,10 +9,11 @@ export const mockConversations: Conversation[] = [
     avatarColor: 'green',
     lastMessage: 'Oi, Gostaria de saber os horários...',
     lastMessageTime: '10:30',
-    status: 'bot_active',
+    status: 'ai_handling',
     hasNotification: false,
     tenantId: 'tenant1',
-    updatedAt: new Date('2026-05-22T10:30:00'),
+    lastMessageAt: new Date('2026-05-22T10:30:00'),
+    createdAt: new Date('2026-05-22T10:00:00'),
   },
   {
     id: '2',
@@ -22,10 +23,11 @@ export const mockConversations: Conversation[] = [
     avatarColor: 'orange',
     lastMessage: 'Oi, obrigado! Qual o valor da...',
     lastMessageTime: '10:25',
-    status: 'waiting',
+    status: 'awaiting_close',
     hasNotification: false,
     tenantId: 'tenant1',
-    updatedAt: new Date('2026-05-22T10:25:00'),
+    lastMessageAt: new Date('2026-05-22T10:25:00'),
+    createdAt: new Date('2026-05-22T09:00:00'),
   },
   {
     id: '3',
@@ -35,11 +37,12 @@ export const mockConversations: Conversation[] = [
     avatarColor: 'red',
     lastMessage: 'Estou com muita dor e preciso...',
     lastMessageTime: '10:20',
-    status: 'requires_human',
+    status: 'human_requested',
     hasNotification: true,
     notificationCount: 1,
     tenantId: 'tenant1',
-    updatedAt: new Date('2026-05-22T10:20:00'),
+    lastMessageAt: new Date('2026-05-22T10:20:00'),
+    createdAt: new Date('2026-05-22T10:15:00'),
   },
   {
     id: '4',
@@ -49,10 +52,11 @@ export const mockConversations: Conversation[] = [
     avatarColor: 'purple',
     lastMessage: 'Gostaria de reagendar minha consulta',
     lastMessageTime: '09:15',
-    status: 'bot_active',
+    status: 'ai_handling',
     hasNotification: false,
     tenantId: 'tenant1',
-    updatedAt: new Date('2026-05-22T09:15:00'),
+    lastMessageAt: new Date('2026-05-22T09:15:00'),
+    createdAt: new Date('2026-05-22T09:00:00'),
   },
   {
     id: '5',
@@ -62,10 +66,11 @@ export const mockConversations: Conversation[] = [
     avatarColor: 'blue',
     lastMessage: 'Onde fica a clínica?',
     lastMessageTime: 'Ontem',
-    status: 'bot_active',
+    status: 'ai_handling',
     hasNotification: false,
     tenantId: 'tenant1',
-    updatedAt: new Date('2026-05-21T18:00:00'),
+    lastMessageAt: new Date('2026-05-21T18:00:00'),
+    createdAt: new Date('2026-05-21T17:00:00'),
   },
   {
     id: '6',
@@ -75,19 +80,24 @@ export const mockConversations: Conversation[] = [
     avatarColor: 'green',
     lastMessage: 'Preciso cancelar meu agendamento',
     lastMessageTime: 'Ontem',
-    status: 'completed',
+    status: 'closed',
     hasNotification: false,
     tenantId: 'tenant1',
-    updatedAt: new Date('2026-05-21T16:30:00'),
+    lastMessageAt: new Date('2026-05-21T16:30:00'),
+    createdAt: new Date('2026-05-21T16:00:00'),
+    closedAt: new Date('2026-05-21T16:35:00'),
+    closeReason: 'Resolvido',
   },
 ];
 
-// Mock messages for conversation with Ana Costa (requires_human)
+// Mock messages for conversation with Ana Costa (human_requested)
 export const mockMessages: Record<string, ChatMessage[]> = {
   '3': [
     {
       id: 'm1',
       conversationId: '3',
+      tenantId: 'tenant1',
+      direction: 'inbound',
       sender: 'patient',
       senderName: 'Ana Costa',
       type: 'text',
@@ -98,7 +108,9 @@ export const mockMessages: Record<string, ChatMessage[]> = {
     {
       id: 'm2',
       conversationId: '3',
-      sender: 'bot',
+      tenantId: 'tenant1',
+      direction: 'outbound',
+      sender: 'ai',
       type: 'text',
       content: 'Olá, Ana! Sinto muito que não esteja se sentindo bem. Para casos de emergência, recomendamos que procure o pronto atendimento mais próximo ou ligue para o 192.\n\nPosso ajudar com agendamento de consultas ou outras informações?',
       status: 'read',
@@ -107,6 +119,8 @@ export const mockMessages: Record<string, ChatMessage[]> = {
     {
       id: 'm3',
       conversationId: '3',
+      tenantId: 'tenant1',
+      direction: 'inbound',
       sender: 'patient',
       type: 'text',
       content: 'Não, preciso ser atendida hoje! A dor está muito forte!',
@@ -115,4 +129,3 @@ export const mockMessages: Record<string, ChatMessage[]> = {
     },
   ],
 };
-

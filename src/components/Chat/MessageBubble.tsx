@@ -38,7 +38,7 @@ const formatFileSize = (bytes: number) => {
 
 const getStatusIcon = (status: ChatMessage['status']) => {
   switch (status) {
-    case 'sending':
+    case 'pending':
       return <Clock size={14} />;
     case 'sent':
       return <Check size={14} />;
@@ -54,20 +54,42 @@ const getStatusIcon = (status: ChatMessage['status']) => {
 
 export default function MessageBubble({ message }: MessageBubbleProps) {
   const isOwn = message.sender === 'human';
-  const isBot = message.sender === 'bot';
+  const isAi = message.sender === 'ai';
 
   return (
-    <MessageContainer $isOwn={isOwn || isBot}>
+    <MessageContainer $isOwn={isOwn || isAi}>
       <Bubble $sender={message.sender}>
         <MessageContent>
-          {/* Renderizar anexos de imagem */}
+          {/* Renderizar media_url se for imagem */}
+          {message.mediaUrl && (message.type === 'image' || message.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
+            <MessageAttachmentContainer>
+              <MessageImage src={message.mediaUrl} alt="Image" />
+            </MessageAttachmentContainer>
+          )}
+
+          {/* Renderizar media_url se for documento */}
+          {message.mediaUrl && message.type !== 'image' && !message.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) && (
+            <MessageAttachmentContainer>
+              <MessageDocument href={message.mediaUrl} download>
+                <DocumentIcon>
+                  <FileText size={24} />
+                </DocumentIcon>
+                <DocumentInfo>
+                  <DocumentName>Documento</DocumentName>
+                </DocumentInfo>
+                <Download size={20} />
+              </MessageDocument>
+            </MessageAttachmentContainer>
+          )}
+
+          {/* Renderizar anexos de imagem (fallback para compatibilidade) */}
           {message.attachments?.filter(att => att.type === 'image').map((attachment) => (
             <MessageAttachmentContainer key={attachment.id}>
               <MessageImage src={attachment.url} alt={attachment.fileName || 'Image'} />
             </MessageAttachmentContainer>
           ))}
 
-          {/* Renderizar anexos de documento */}
+          {/* Renderizar anexos de documento (fallback para compatibilidade) */}
           {message.attachments?.filter(att => att.type === 'document').map((attachment) => (
             <MessageAttachmentContainer key={attachment.id}>
               <MessageDocument href={attachment.url} download={attachment.fileName}>
