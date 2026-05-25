@@ -34,34 +34,6 @@ export const FormHeader = styled.div`
   }
 `;
 
-export const BackButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem 0.625rem;
-  margin-bottom: 0.75rem;
-  background-color: transparent;
-  border: none;
-  color: #9ca3af;
-  font-size: 0.8125rem;
-  font-weight: 400;
-  cursor: pointer;
-  border-radius: 0.25rem;
-  transition: all 0.2s;
-
-  &:hover {
-    color: #6b7280;
-  }
-
-  svg {
-    transition: transform 0.2s;
-  }
-
-  &:hover svg {
-    transform: translateX(-1px);
-  }
-`;
-
 export const FormTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: 600;

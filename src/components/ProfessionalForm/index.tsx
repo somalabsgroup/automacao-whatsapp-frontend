@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import { z } from 'zod';
-import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { Professional, CreateProfessionalInput, WorkingHours } from '@/types';
 import {
   FormContainer,
   FormHeader,
-  BackButton,
   FormTitle,
   FormSubtitle,
   FormContent,
@@ -183,10 +182,6 @@ export default function ProfessionalForm({
   return (
     <FormContainer>
       <FormHeader>
-        <BackButton onClick={onCancel} type="button">
-          <ArrowLeft size={18} />
-          Voltar
-        </BackButton>
         <FormTitle>{professional ? 'Editar Profissional' : 'Novo Profissional'}</FormTitle>
         <FormSubtitle>
           Campos com <span>*</span> são obrigatórios
