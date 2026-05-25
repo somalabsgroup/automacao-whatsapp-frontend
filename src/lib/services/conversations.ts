@@ -193,14 +193,36 @@ interface ConversationListUpdateCallback {
  * Subscribe to real-time updates for conversations
  * Listens to both conversation table changes and message table changes
  */
+/**
+ * Delete a conversation and all its messages
+ * Note: Messages will be automatically deleted via CASCADE DELETE if foreign key is configured
+ */
+export async function deleteConversation(
+  supabase: SupabaseClient,
+  conversationId: string,
+  tenantId: string
+): Promise<void> {
+  // Deleta apenas a conversa - as mensagens serão deletadas automaticamente via CASCADE
+  const { error } = await supabase
+    .from('conversations')
+    .delete()
+    .eq('id', conversationId)
+    .eq('tenant_id', tenantId);
+
+  if (error) throw error;
+}
+
 export function subscribeToConversations(
   supabase: SupabaseClient,
   tenantId: string,
   onUpdate: ConversationListUpdateCallback
 ) {
+  // Criar nomes únicos para os canais para evitar conflitos
+  const timestamp = Date.now();
+  
   // Subscribe to conversation table changes
   const conversationChannel = supabase
-    .channel(`conversations:${tenantId}`)
+    .channel(`conversations:${tenantId}:${timestamp}`)
     .on(
       'postgres_changes',
       {
@@ -226,7 +248,7 @@ export function subscribeToConversations(
 
   // Subscribe to message changes to update last message in conversations
   const messageChannel = supabase
-    .channel(`messages:tenant:${tenantId}`)
+    .channel(`messages:tenant:${tenantId}:${timestamp}`)
     .on(
       'postgres_changes',
       {

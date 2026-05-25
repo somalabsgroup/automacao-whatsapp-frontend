@@ -5,16 +5,17 @@ import { useConversationStore } from '@/stores/useConversationStore';
 import { Conversation, ChatMessage } from '@/types';
 import Chat from '@/components/Chat';
 import { createClient } from '@/lib/supabase/client';
-import { sendTextMessage } from '@/lib/services/conversations';
+import { sendTextMessage, deleteConversation } from '@/lib/services/conversations';
 import { getMessagesByConversation, subscribeToMessages } from '@/lib/services/messages';
 
 interface ChatWrapperProps {
   conversations: Conversation[];
   tenantId: string;
   onConversationStatusChange?: (conversationId: string, status: Conversation['status']) => void;
+  onConversationDeleted?: (conversationId: string) => void;
 }
 
-export default function ChatWrapper({ conversations, tenantId, onConversationStatusChange }: ChatWrapperProps) {
+export default function ChatWrapper({ conversations, tenantId, onConversationStatusChange, onConversationDeleted }: ChatWrapperProps) {
   const { selectedConversationId } = useConversationStore();
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({});
   const [loading, setLoading] = useState(false);
@@ -245,6 +246,33 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     }
   };
 
+  const handleDeleteConversation = async () => {
+    if (!selectedConversationId) return;
+
+    try {
+      await deleteConversation(supabase, selectedConversationId, tenantId);
+      
+      // Remover da lista imediatamente (não espera realtime)
+      if (onConversationDeleted) {
+        onConversationDeleted(selectedConversationId);
+      }
+      
+      // Limpar mensagens locais
+      setMessages((prev) => {
+        const newMessages = { ...prev };
+        delete newMessages[selectedConversationId];
+        return newMessages;
+      });
+
+      // Desselecionar conversa
+      useConversationStore.getState().setSelectedConversation(null);
+      
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      alert('Erro ao excluir conversa. Tente novamente.');
+    }
+  };
+
   if (loading) {
     return <div>Carregando mensagens...</div>;
   }
@@ -255,7 +283,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       messages={conversationMessages}
       onSendMessage={handleSendMessage}
       onRetryMessage={handleRetryMessage}
-      onMenuClick={() => {}}
+      onDeleteConversation={handleDeleteConversation}
     />
   );
 }

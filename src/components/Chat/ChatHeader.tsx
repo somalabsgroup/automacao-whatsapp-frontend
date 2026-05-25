@@ -1,13 +1,14 @@
 'use client';
 
-import { MoreVertical, User } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { MoreVertical, User, Trash2 } from 'lucide-react';
 import { Conversation } from '@/types';
-import { ActionButton, HeaderContainer, HeaderLeft, HeaderRight, PatientAvatar, PatientInfo, PatientName, PatientPhone, StatusIndicator } from './styles';
+import { ActionButton, HeaderContainer, HeaderLeft, HeaderRight, PatientAvatar, PatientInfo, PatientName, PatientPhone, StatusIndicator, DropdownMenu, DropdownItem } from './styles';
 
 
 interface ChatHeaderProps {
   conversation: Conversation;
-  onMenuClick?: () => void;
+  onDeleteConversation?: () => void;
 }
 
 const getStatusText = (status: Conversation['status']) => {
@@ -44,7 +45,39 @@ const getStatusColor = (status: Conversation['status']) => {
   }
 };
 
-export default function ChatHeader({ conversation, onMenuClick }: ChatHeaderProps) {
+export default function ChatHeader({ conversation, onDeleteConversation }: ChatHeaderProps) {
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showMenu &&
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu]);
+
+  const handleDeleteClick = () => {
+    setShowMenu(false);
+    if (onDeleteConversation) {
+      if (confirm('Tem certeza que deseja excluir esta conversa e todas as mensagens? Esta ação não pode ser desfeita.')) {
+        onDeleteConversation();
+      }
+    }
+  };
+
   return (
     <HeaderContainer>
       <HeaderLeft>
@@ -62,9 +95,22 @@ export default function ChatHeader({ conversation, onMenuClick }: ChatHeaderProp
       </HeaderLeft>
 
       <HeaderRight>
-        <ActionButton onClick={onMenuClick} title="Mais opções">
+        <ActionButton 
+          ref={buttonRef}
+          onClick={() => setShowMenu(!showMenu)} 
+          title="Mais opções"
+        >
           <MoreVertical size={20} />
         </ActionButton>
+        
+        {showMenu && (
+          <DropdownMenu ref={menuRef}>
+            <DropdownItem onClick={handleDeleteClick} $danger>
+              <Trash2 size={16} />
+              Excluir Conversa
+            </DropdownItem>
+          </DropdownMenu>
+        )}
       </HeaderRight>
     </HeaderContainer>
   );

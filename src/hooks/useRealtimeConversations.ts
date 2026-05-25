@@ -81,5 +81,5 @@ export function useRealtimeConversations(
     };
   }, [supabase, tenantId, updateConversation, removeConversation]);
 
-  return { conversations, updateConversationStatusLocal };
+  return { conversations, updateConversationStatusLocal, removeConversation };
 }

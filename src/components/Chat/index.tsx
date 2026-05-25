@@ -22,7 +22,7 @@ interface ChatContainerProps {
   messages: ChatMessage[];
   onSendMessage: (content: string, attachments?: File[]) => void;
   onRetryMessage?: (messageId: string) => void;
-  onMenuClick?: () => void;
+  onDeleteConversation?: () => void;
 }
 
 const formatDate = (date: Date) => {
@@ -68,7 +68,7 @@ export default function ChatContainer({
   messages,
   onSendMessage,
   onRetryMessage,
-  onMenuClick,
+  onDeleteConversation,
 }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -98,7 +98,7 @@ export default function ChatContainer({
     <Container>
       <ChatHeader
         conversation={conversation}
-        onMenuClick={onMenuClick}
+        onDeleteConversation={onDeleteConversation}
       />
 
       <MessagesArea>

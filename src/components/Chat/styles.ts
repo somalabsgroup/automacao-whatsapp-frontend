@@ -137,6 +137,45 @@ export const ActionButton = styled.button`
   }
 `;
 
+export const DropdownMenu = styled.div`
+  position: absolute;
+  top: 48px;
+  right: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  z-index: 1000;
+  overflow: hidden;
+`;
+
+export const DropdownItem = styled.button<{ $danger?: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: none;
+  background: white;
+  color: ${({ $danger }) => ($danger ? '#ef4444' : '#374151')};
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: ${({ $danger }) => ($danger ? '#fef2f2' : '#f9fafb')};
+  }
+
+  &:active {
+    background-color: ${({ $danger }) => ($danger ? '#fee2e2' : '#f3f4f6')};
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+`;
+
 // ============= MessagesArea =============
 export const MessagesArea = styled.div`
   flex: 1;

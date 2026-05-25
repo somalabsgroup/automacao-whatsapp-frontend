@@ -55,8 +55,11 @@ export async function subscribeToMessages(
   conversationId: string,
   onNewMessage: (message: ChatMessage) => void
 ) {
+  // Criar canal com nome único para evitar conflitos
+  const channelName = `messages:${conversationId}:${Date.now()}`;
+  
   const channel = supabase
-    .channel(`messages:${conversationId}`)
+    .channel(channelName)
     .on(
       'postgres_changes',
       {

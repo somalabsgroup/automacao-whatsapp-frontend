@@ -4,11 +4,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
   ChevronLeft,
   ChevronRight,
-  LayoutDashboard,
   MessageSquare,
   Calendar,
   Users,
-  BarChart3,
+  UserCog,
   Settings,
   LogOut
 } from 'lucide-react';
@@ -48,7 +47,7 @@ export default function Sidebar({ user }: SidebarProps) {
     {
       name: 'Mensagens',
       href: '/dashboard',
-      icon: <LayoutDashboard size={24} />,
+      icon: <MessageSquare size={24} />,
     },
     {
       name: 'Follow-ups',
@@ -63,7 +62,7 @@ export default function Sidebar({ user }: SidebarProps) {
     {
       name: 'Profissionais',
       href: '/profissionais',
-      icon: <BarChart3 size={24} />,
+      icon: <UserCog size={24} />,
     },
     {
       name: 'Configurações',

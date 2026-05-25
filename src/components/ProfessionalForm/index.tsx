@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import { z } from 'zod';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { Professional, CreateProfessionalInput, WorkingHours } from '@/types';
 import {
   FormContainer,
   FormHeader,
+  BackButton,
   FormTitle,
-  FormDescription,
+  FormSubtitle,
+  FormContent,
   Form,
   FormRow,
   FormGroup,
@@ -16,15 +18,23 @@ import {
   Required,
   Input,
   Select,
+  SelectWithPreview,
+  ColorPreview,
   TextArea,
   ErrorMessage,
   HelpText,
+  CharCounter,
+  StickyFooter,
   ButtonGroup,
   Button,
   WorkingHoursSection,
+  WorkingHoursHeader,
   WorkingHoursTitle,
+  QuickActionButton,
+  WorkingHoursHelp,
   DayRow,
   DayCheckbox,
+  DayLabelGroup,
   DayLabel,
   TimeInputGroup,
   TimeInput,
@@ -58,17 +68,17 @@ interface ProfessionalFormProps {
 }
 
 const CALENDAR_COLORS = [
-  { id: '1', name: 'Lavanda', color: '#7986CB' },
-  { id: '2', name: 'Sálvia', color: '#33B679' },
-  { id: '3', name: 'Uva', color: '#8E24AA' },
-  { id: '4', name: 'Flamingo', color: '#E67C73' },
-  { id: '5', name: 'Banana', color: '#F6BF26' },
-  { id: '6', name: 'Tangerina', color: '#F4511E' },
-  { id: '7', name: 'Pavão', color: '#039BE5' },
-  { id: '8', name: 'Grafite', color: '#616161' },
-  { id: '9', name: 'Mirtilo', color: '#3F51B5' },
-  { id: '10', name: 'Manjericão', color: '#0B8043' },
-  { id: '11', name: 'Tomate', color: '#D50000' },
+  { id: '1', name: 'Azul Claro', color: '#7986CB' },
+  { id: '2', name: 'Verde', color: '#33B679' },
+  { id: '3', name: 'Roxo', color: '#8E24AA' },
+  { id: '4', name: 'Rosa', color: '#EC4899' },
+  { id: '5', name: 'Amarelo', color: '#F6BF26' },
+  { id: '6', name: 'Laranja', color: '#F4511E' },
+  { id: '7', name: 'Azul', color: '#039BE5' },
+  { id: '8', name: 'Cinza', color: '#616161' },
+  { id: '9', name: 'Azul Escuro', color: '#3F51B5' },
+  { id: '10', name: 'Verde Escuro', color: '#0B8043' },
+  { id: '11', name: 'Vermelho', color: '#D50000' },
 ];
 
 const DAYS = [
@@ -130,6 +140,25 @@ export default function ProfessionalForm({
     }));
   };
 
+  const applyWeekdayHours = () => {
+    const weekdays: Array<keyof WorkingHours> = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    const updatedHours: Partial<WorkingHours> = {};
+    
+    weekdays.forEach(day => {
+      updatedHours[day] = { start: '08:00', end: '18:00', enabled: true };
+    });
+
+    setFormData((prev) => ({
+      ...prev,
+      workingHours: {
+        ...prev.workingHours,
+        ...updatedHours,
+        saturday: { start: '08:00', end: '12:00', enabled: false },
+        sunday: { start: '08:00', end: '12:00', enabled: false },
+      },
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -154,16 +183,19 @@ export default function ProfessionalForm({
   return (
     <FormContainer>
       <FormHeader>
+        <BackButton onClick={onCancel} type="button">
+          <ArrowLeft size={18} />
+          Voltar
+        </BackButton>
         <FormTitle>{professional ? 'Editar Profissional' : 'Novo Profissional'}</FormTitle>
-        <FormDescription>
-          {professional
-            ? 'Atualize as informações do profissional'
-            : 'Preencha os dados para cadastrar um novo profissional'}
-        </FormDescription>
+        <FormSubtitle>
+          Campos com <span>*</span> são obrigatórios
+        </FormSubtitle>
       </FormHeader>
 
-      <Form onSubmit={handleSubmit}>
-        <FormRow>
+      <FormContent>
+        <Form onSubmit={handleSubmit}>
+          <FormRow>
           <FormGroup>
             <Label>
               Nome Completo <Required>*</Required>
@@ -234,23 +266,36 @@ export default function ProfessionalForm({
 
           <FormGroup>
             <Label>Cor do Calendário</Label>
-            <Select
-              value={formData.calendarColorId}
-              onChange={(e) => handleChange('calendarColorId', e.target.value)}
-              disabled={isSubmitting}
-            >
-              {CALENDAR_COLORS.map((color) => (
-                <option key={color.id} value={color.id}>
-                  {color.name}
-                </option>
-              ))}
-            </Select>
+            <SelectWithPreview>
+              <ColorPreview 
+                $color={CALENDAR_COLORS.find(c => c.id === formData.calendarColorId)?.color || '#039BE5'} 
+              />
+              <Select
+                value={formData.calendarColorId}
+                onChange={(e) => handleChange('calendarColorId', e.target.value)}
+                disabled={isSubmitting}
+              >
+                {CALENDAR_COLORS.map((color) => (
+                  <option key={color.id} value={color.id}>
+                    {color.name}
+                  </option>
+                ))}
+              </Select>
+            </SelectWithPreview>
             <HelpText>Cor para identificar no calendário de agendamentos</HelpText>
           </FormGroup>
         </FormRow>
 
         <FormGroup>
-          <WorkingHoursTitle>Horários de Trabalho</WorkingHoursTitle>
+          <WorkingHoursHeader>
+            <div>
+              <WorkingHoursTitle>Horários de Trabalho</WorkingHoursTitle>
+              <WorkingHoursHelp>Defina os dias e horários de atendimento</WorkingHoursHelp>
+            </div>
+            <QuickActionButton type="button" onClick={applyWeekdayHours} disabled={isSubmitting}>
+              Aplicar Seg-Sex 8h-18h
+            </QuickActionButton>
+          </WorkingHoursHeader>
           <WorkingHoursSection>
             {DAYS.map((day) => {
               const dayData = formData.workingHours?.[day.key] || {
@@ -260,15 +305,17 @@ export default function ProfessionalForm({
               };
 
               return (
-                <DayRow key={day.key}>
-                  <DayCheckbox
-                    type="checkbox"
-                    id={`day-${day.key}`}
-                    checked={dayData.enabled}
-                    onChange={(e) => handleWorkingHoursChange(day.key, 'enabled', e.target.checked)}
-                    disabled={isSubmitting}
-                  />
-                  <DayLabel htmlFor={`day-${day.key}`}>{day.label}</DayLabel>
+                <DayRow key={day.key} $enabled={dayData.enabled}>
+                  <DayLabelGroup>
+                    <DayCheckbox
+                      type="checkbox"
+                      id={`day-${day.key}`}
+                      checked={dayData.enabled}
+                      onChange={(e) => handleWorkingHoursChange(day.key, 'enabled', e.target.checked)}
+                      disabled={isSubmitting}
+                    />
+                    <DayLabel htmlFor={`day-${day.key}`}>{day.label}</DayLabel>
+                  </DayLabelGroup>
                   <TimeInputGroup>
                     <TimeInput
                       type="time"
@@ -305,18 +352,27 @@ export default function ProfessionalForm({
               {errors.notes}
             </ErrorMessage>
           )}
-          <HelpText>Máximo 500 caracteres</HelpText>
+          <HelpText style={{ display: 'flex', alignItems: 'center' }}>
+            Informações adicionais (opcional)
+            <CharCounter $isNearLimit={(formData.notes?.length || 0) > 400}>
+              {formData.notes?.length || 0}/500
+            </CharCounter>
+          </HelpText>
         </FormGroup>
+        </Form>
+      </FormContent>
 
+      <StickyFooter>
         <ButtonGroup>
           <Button type="button" $variant="secondary" onClick={onCancel} disabled={isSubmitting}>
             Cancelar
           </Button>
-          <Button type="submit" $variant="primary" disabled={isSubmitting}>
-            {isSubmitting ? 'Salvando...' : professional ? 'Atualizar' : 'Cadastrar'}
+          <Button type="submit" $variant="primary" disabled={isSubmitting} onClick={handleSubmit}>
+            {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+            {isSubmitting ? 'Salvando...' : professional ? 'Atualizar Profissional' : 'Cadastrar Profissional'}
           </Button>
         </ButtonGroup>
-      </Form>
+      </StickyFooter>
     </FormContainer>
   );
 }

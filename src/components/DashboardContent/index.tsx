@@ -17,7 +17,7 @@ export default function DashboardContent({
   initialConversations,
   tenantId,
 }: DashboardContentProps) {
-  const { conversations, updateConversationStatusLocal } = useRealtimeConversations(initialConversations, tenantId);
+  const { conversations, updateConversationStatusLocal, removeConversation } = useRealtimeConversations(initialConversations, tenantId);
 
   const metrics: HeaderMetric[] = useMemo(() => {
     const totalConversations = conversations.length;
@@ -55,6 +55,7 @@ export default function DashboardContent({
           conversations={conversations} 
           tenantId={tenantId}
           onConversationStatusChange={updateConversationStatusLocal}
+          onConversationDeleted={removeConversation}
         />
       </ContentLayout>
     </>
