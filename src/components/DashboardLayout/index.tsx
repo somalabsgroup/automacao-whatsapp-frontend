@@ -7,7 +7,8 @@ const MainWrapper = styled.div<{ $sidebarOpen: boolean }>`
   margin-left: ${({ $sidebarOpen }) => ($sidebarOpen ? '256px' : '80px')};
   transition: margin-left 0.3s ease;
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background-color: #f9fafb;
 `;
 

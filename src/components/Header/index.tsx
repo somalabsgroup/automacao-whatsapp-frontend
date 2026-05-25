@@ -25,13 +25,6 @@ interface HeaderProps {
   metrics?: HeaderMetric[];
 }
 
-const defaultMetrics: HeaderMetric[] = [
-  { label: 'Total Conversas', value: 24, variant: 'info' },
-  { label: 'Aguardando Ação', value: 3, variant: 'warning' },
-  { label: 'Follow-ups Hoje', value: 8, variant: 'default' },
-  { label: 'Bot Ativo', value: 'Online', variant: 'success' },
-];
-
 const metricIcons = {
   'Total Conversas': MessageSquare,
   'Aguardando Ação': AlertTriangle,
@@ -43,7 +36,7 @@ export default function Header({
   title,
   subtitle,
   logoText = 'CV+',
-  metrics = defaultMetrics,
+  metrics = [],
 }: HeaderProps) {
   return (
     <HeaderContainer>

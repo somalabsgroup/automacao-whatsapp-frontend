@@ -65,7 +65,7 @@ export interface Conversation {
   createdAt: Date;
   closedAt?: Date;
   closeReason?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   hasNotification: boolean;
   notificationCount?: number;
   tenantId: string;
@@ -108,5 +108,45 @@ export interface ChatMessage {
   status: MessageStatus;
   timestamp: Date;
   deletedAt?: Date;
-  rawPayload?: any;
+  rawPayload?: Record<string, unknown>;
+  isOptimistic?: boolean;
+  error?: string;
+}
+
+// Professional Types
+export interface WorkingHours {
+  monday?: { start: string; end: string; enabled: boolean };
+  tuesday?: { start: string; end: string; enabled: boolean };
+  wednesday?: { start: string; end: string; enabled: boolean };
+  thursday?: { start: string; end: string; enabled: boolean };
+  friday?: { start: string; end: string; enabled: boolean };
+  saturday?: { start: string; end: string; enabled: boolean };
+  sunday?: { start: string; end: string; enabled: boolean };
+}
+
+export interface Professional {
+  id: string;
+  tenantId: string;
+  name: string;
+  specialty: string;
+  defaultDuration: number;
+  calendarColorId: string;
+  workingHours: WorkingHours;
+  isActive: boolean;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateProfessionalInput {
+  name: string;
+  specialty: string;
+  defaultDuration: number;
+  calendarColorId?: string;
+  workingHours?: WorkingHours;
+  notes?: string;
+}
+
+export interface UpdateProfessionalInput extends Partial<CreateProfessionalInput> {
+  isActive?: boolean;
 }

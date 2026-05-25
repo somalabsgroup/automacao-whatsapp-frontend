@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, CheckCheck, Clock, AlertCircle, Download, FileText } from 'lucide-react';
+import { Check, CheckCheck, Clock, AlertCircle, Download, FileText, RefreshCw } from 'lucide-react';
 import { ChatMessage } from '@/types';
 import { 
   MessageContainer,
@@ -16,11 +16,13 @@ import {
   MessageText, 
   MessageFooter, 
   MessageTime, 
-  MessageStatusIcon 
+  MessageStatusIcon,
+  RetryButton
 } from './styles';
 
 interface MessageBubbleProps {
   message: ChatMessage;
+  onRetry?: (messageId: string) => void;
 }
 
 const formatTime = (date: Date) => {
@@ -52,15 +54,25 @@ const getStatusIcon = (status: ChatMessage['status']) => {
   }
 };
 
-export default function MessageBubble({ message }: MessageBubbleProps) {
+export default function MessageBubble({ message, onRetry }: MessageBubbleProps) {
   const isOwn = message.sender === 'human';
   const isAi = message.sender === 'ai';
+  const hasError = message.status === 'failed' && message.error;
 
   return (
     <MessageContainer $isOwn={isOwn || isAi}>
-      <Bubble $sender={message.sender}>
+      {/* Botão de retry minimalista do lado esquerdo */}
+      {hasError && onRetry && (
+        <RetryButton 
+          onClick={() => onRetry(message.id)}
+          title={message.error || 'Tentar novamente'}
+        >
+          <RefreshCw size={14} />
+        </RetryButton>
+      )}
+      
+      <Bubble $sender={message.sender} $hasError={!!hasError}>
         <MessageContent>
-          {/* Renderizar media_url se for imagem */}
           {message.mediaUrl && (message.type === 'image' || message.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
             <MessageAttachmentContainer>
               <MessageImage src={message.mediaUrl} alt="Image" />
@@ -107,7 +119,6 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
             </MessageAttachmentContainer>
           ))}
 
-          {/* Texto da mensagem */}
           {message.content && <MessageText>{message.content}</MessageText>}
         </MessageContent>
 

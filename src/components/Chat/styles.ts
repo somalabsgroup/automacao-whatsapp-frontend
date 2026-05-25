@@ -193,6 +193,8 @@ export const DateLabel = styled.span`
 export const MessageContainer = styled.div<{ $isOwn: boolean }>`
   display: flex;
   justify-content: ${({ $isOwn }) => ($isOwn ? 'flex-end' : 'flex-start')};
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.375rem;
   padding: 0 0.5rem;
 
@@ -201,7 +203,33 @@ export const MessageContainer = styled.div<{ $isOwn: boolean }>`
   }
 `;
 
-export const MessageBubble = styled.div<{ $sender: MessageSender }>`
+export const RetryButton = styled.button`
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  border: none;
+  background-color: #ef4444;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.9;
+
+  &:hover {
+    opacity: 1;
+    background-color: #dc2626;
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+export const MessageBubble = styled.div<{ $sender: MessageSender; $hasError?: boolean }>`
   max-width: 70%;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
@@ -214,32 +242,11 @@ export const MessageBubble = styled.div<{ $sender: MessageSender }>`
     return '#111827';
   }};
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: ${({ $hasError }) => $hasError ? '1px solid #ef4444' : 'none'};
   word-wrap: break-word;
 
   @media (max-width: 768px) {
     max-width: 85%;
-  }
-`;
-
-export const SenderLabel = styled.div`
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  opacity: 0.9;
-`;
-
-export const BotLabel = styled.div`
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  opacity: 0.95;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-
-  &::before {
-    content: '🤖';
-    font-size: 0.875rem;
   }
 `;
 
@@ -505,44 +512,4 @@ export const RemoveAttachmentButton = styled.button`
 
 export const HiddenFileInput = styled.input`
   display: none;
-`;
-
-// ============= Alerts & Notices =============
-export const KeywordAlert = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  margin: 1rem 0;
-  background-color: #fef3c7;
-  border: 1px solid #fbbf24;
-  border-radius: 0.5rem;
-  color: #92400e;
-`;
-
-export const KeywordAlertIcon = styled.div`
-  flex-shrink: 0;
-  color: #f59e0b;
-`;
-
-export const KeywordAlertText = styled.p`
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin: 0 0 0.25rem 0;
-`;
-
-export const KeywordList = styled.p`
-  font-size: 0.8125rem;
-  margin: 0;
-  opacity: 0.8;
-`;
-
-export const TransferredNotice = styled.div`
-  padding: 0.75rem 1rem;
-  margin: 1rem 0;
-  background-color: #ccfbf1;
-  border: 1px solid #14b8a6;
-  border-radius: 0.5rem;
-  color: #0f766e;
-  font-size: 0.875rem;
-  text-align: center;
 `;

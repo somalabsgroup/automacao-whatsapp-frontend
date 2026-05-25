@@ -46,7 +46,7 @@ export default function Sidebar({ user }: SidebarProps) {
 
   const menuItems = [
     {
-      name: 'Dashboard',
+      name: 'Mensagens',
       href: '/dashboard',
       icon: <LayoutDashboard size={24} />,
     },
@@ -61,8 +61,8 @@ export default function Sidebar({ user }: SidebarProps) {
       icon: <Users size={24} />,
     },
     {
-      name: 'Relatórios',
-      href: '/relatorios',
+      name: 'Profissionais',
+      href: '/profissionais',
       icon: <BarChart3 size={24} />,
     },
     {

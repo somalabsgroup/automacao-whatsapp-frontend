@@ -1,7 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Conversation, ConversationStatus, AvatarColor } from '@/types';
+import axios, { AxiosError } from 'axios';
 
 const avatarColors: AvatarColor[] = ['green', 'orange', 'red', 'purple', 'blue'];
+const N8N_WEBHOOK_URL = 'https://n8n.somaclini.com.br/webhook-test/send-message';
 
 function getInitials(name: string): string {
   return name
@@ -180,15 +182,156 @@ export async function getConversationById(
   };
 }
 
-export async function updateConversationStatus(
-  supabase: SupabaseClient,
-  conversationId: string,
-  status: ConversationStatus
-): Promise<void> {
-  const { error } = await supabase
-    .from('conversations')
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq('id', conversationId);
 
+
+// Callback para notificar mudanças na lista de conversas
+interface ConversationListUpdateCallback {
+  (event: 'insert' | 'update' | 'delete', conversationId: string): void;
+}
+
+/**
+ * Subscribe to real-time updates for conversations
+ * Listens to both conversation table changes and message table changes
+ */
+export function subscribeToConversations(
+  supabase: SupabaseClient,
+  tenantId: string,
+  onUpdate: ConversationListUpdateCallback
+) {
+  // Subscribe to conversation table changes
+  const conversationChannel = supabase
+    .channel(`conversations:${tenantId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'conversations',
+        filter: `tenant_id=eq.${tenantId}`,
+      },
+      (payload) => {
+        const convId = (payload.new as { id?: string })?.id || (payload.old as { id?: string })?.id;
+        if (convId) {
+          if (payload.eventType === 'INSERT') {
+            onUpdate('insert', convId);
+          } else if (payload.eventType === 'UPDATE') {
+            onUpdate('update', convId);
+          } else if (payload.eventType === 'DELETE') {
+            onUpdate('delete', convId);
+          }
+        }
+      }
+    )
+    .subscribe();
+
+  // Subscribe to message changes to update last message in conversations
+  const messageChannel = supabase
+    .channel(`messages:tenant:${tenantId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `tenant_id=eq.${tenantId}`,
+      },
+      (payload) => {
+        const conversationId = (payload.new as { conversation_id?: string })?.conversation_id;
+        if (conversationId) {
+          onUpdate('update', conversationId);
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(conversationChannel);
+    supabase.removeChannel(messageChannel);
+  };
+}
+
+
+interface N8NWebhookPayload {
+  tenant_id: string;
+  conversation_id: string;
+  phone_number: string;
+  content?: string;
+  media_url?: string;
+  caption?: string;
+  media_type?: 'image' | 'video' | 'audio' | 'document';
+  sender_user_id?: string;
+}
+
+interface N8NWebhookResponse {
+  success: boolean;
+  message?: string;
+  data?: Record<string, unknown>;
+}
+
+/**
+ * Função auxiliar para fazer POST no webhook do n8n
+ */
+async function postToN8NWebhook(
+  payload: N8NWebhookPayload
+): Promise<{ data?: N8NWebhookResponse; error?: Error }> {
+  try {
+    const response = await axios.post<N8NWebhookResponse>(
+      N8N_WEBHOOK_URL,
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: payload.media_url ? 15000 : 10000, // 15s para mídia, 10s para texto
+      }
+    );
+
+    if (!response.data.success) {
+      return {
+        error: new Error(response.data.message || 'Falha ao processar mensagem'),
+      };
+    }
+
+    return { data: response.data };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      return {
+        error: new Error(
+          error.response?.data?.message || 
+          error.message || 
+          'Erro ao comunicar com o servidor'
+        ),
+      };
+    }
+    
+    return {
+      error: error instanceof Error ? error : new Error('Erro desconhecido'),
+    };
+  }
+}
+
+/**
+ * Envia mensagem de texto via n8n webhook
+ * O n8n irá processar, enviar via Evolution API e gravar no Supabase
+ */
+export async function sendTextMessage(
+  tenantId: string,
+  conversationId: string,
+  phoneNumber: string,
+  text: string,
+  senderUserId?: string
+): Promise<void> {
+  const payload: N8NWebhookPayload = {
+    tenant_id: tenantId,
+    conversation_id: conversationId,
+    phone_number: phoneNumber,
+    content: text,
+    sender_user_id: senderUserId,
+  };
+
+  const { error } = await postToN8NWebhook(payload);
+  
   if (error) throw error;
 }
+
+

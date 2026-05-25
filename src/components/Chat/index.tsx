@@ -21,6 +21,7 @@ interface ChatContainerProps {
   conversation: Conversation | null;
   messages: ChatMessage[];
   onSendMessage: (content: string, attachments?: File[]) => void;
+  onRetryMessage?: (messageId: string) => void;
   onMenuClick?: () => void;
 }
 
@@ -66,6 +67,7 @@ export default function ChatContainer({
   conversation,
   messages,
   onSendMessage,
+  onRetryMessage,
   onMenuClick,
 }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -108,7 +110,11 @@ export default function ChatContainer({
               </DateDivider>
               
               {group.messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
+                <MessageBubble 
+                  key={message.id} 
+                  message={message} 
+                  onRetry={onRetryMessage}
+                />
               ))}
             </div>
           ))}
