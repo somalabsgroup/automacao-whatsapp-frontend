@@ -79,6 +79,31 @@ export const FormRow = styled.div`
   }
 `;
 
+export const FormRowWide = styled.div`
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 1.5rem;
+  row-gap: 0.625rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: unset;
+    row-gap: 1.5rem;
+  }
+`;
+
+export const NotesHeader = styled.div`
+  display: flex;
+  align-items: flex-end;
+`;
+
+export const NotesTextareaWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
 export const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
@@ -172,7 +197,7 @@ export const ColorPreview = styled.div<{ $color: string }>`
   }
 `;
 
-export const TextArea = styled.textarea<{ $hasError?: boolean }>`
+export const TextArea = styled.textarea<{ $hasError?: boolean; $stretch?: boolean }>`
   padding: 0.625rem 0.75rem;
   border: 1px solid
     ${({ $hasError, theme }) => ($hasError ? '#ef4444' : theme.border.default)};
@@ -181,8 +206,9 @@ export const TextArea = styled.textarea<{ $hasError?: boolean }>`
   color: ${({ theme }) => theme.text.primary};
   background-color: ${({ theme }) => theme.card.bg};
   transition: all 0.2s;
-  resize: vertical;
+  resize: ${({ $stretch }) => ($stretch ? 'none' : 'vertical')};
   min-height: 100px;
+  flex: ${({ $stretch }) => ($stretch ? '1' : 'none')};
   font-family: inherit;
   line-height: 1.5;
 
@@ -202,6 +228,13 @@ export const TextArea = styled.textarea<{ $hasError?: boolean }>`
   &::placeholder {
     color: ${({ theme }) => theme.text.placeholder};
   }
+`;
+
+export const NotesGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
 `;
 
 export const ErrorMessage = styled.span`
@@ -309,18 +342,17 @@ export const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
 export const WorkingHoursSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background-color: ${({ theme }) => theme.bg.secondary};
-  border-radius: 0.375rem;
+  border-radius: 0.625rem;
   border: 1px solid ${({ theme }) => theme.border.default};
+  overflow: hidden;
+  background-color: ${({ theme }) => theme.bg.secondary};
 `;
 
 export const WorkingHoursHeader = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
   flex-wrap: wrap;
   gap: 0.5rem;
 `;
@@ -329,24 +361,30 @@ export const WorkingHoursTitle = styled.h3`
   font-size: 0.9375rem;
   font-weight: 600;
   color: ${({ theme }) => theme.text.primary};
-  margin: 0;
+  margin: 0 0 0.125rem 0;
 `;
 
 export const QuickActionButton = styled.button`
-  padding: 0.375rem 0.75rem;
-  background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.border.default};
+  padding: 0.4375rem 0.875rem;
+  background-color: ${({ theme }) => theme.brand.tint};
+  border: 1px solid ${({ theme }) => theme.brand.primary};
   border-radius: 0.375rem;
   font-size: 0.75rem;
-  font-weight: 500;
-  color: ${({ theme }) => theme.text.muted};
+  font-weight: 600;
+  color: ${({ theme }) => theme.brand.primary};
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 
-  &:hover {
-    background-color: ${({ theme }) => theme.bg.secondary};
-    color: ${({ theme }) => theme.text.secondary};
-    border-color: ${({ theme }) => theme.border.strong};
+  &:hover:not(:disabled) {
+    background-color: ${({ theme }) => theme.brand.primary};
+    color: #ffffff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
@@ -360,17 +398,22 @@ export const DayRow = styled.div<{ $enabled?: boolean }>`
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem;
+  padding: 0.875rem 1rem;
   background-color: ${({ $enabled, theme }) =>
-    $enabled ? theme.card.bg : theme.bg.secondary};
-  border-radius: 0.375rem;
-  transition: all 0.2s;
-  border: 1px solid
-    ${({ $enabled, theme }) => ($enabled ? theme.border.default : 'transparent')};
+    $enabled ? theme.card.bg : 'transparent'};
+  border-left: 3px solid
+    ${({ $enabled, theme }) => ($enabled ? theme.brand.primary : 'transparent')};
+  transition: background-color 0.2s, border-color 0.2s;
+  opacity: ${({ $enabled }) => ($enabled ? 1 : 0.55)};
+
+  &:not(:last-child) {
+    border-bottom: 1px solid ${({ theme }) => theme.border.default};
+  }
 
   &:hover {
     background-color: ${({ $enabled, theme }) =>
       $enabled ? theme.bg.secondary : theme.bg.tertiary};
+    opacity: ${({ $enabled }) => ($enabled ? 1 : 0.7)};
   }
 
   @media (max-width: 640px) {
@@ -381,8 +424,8 @@ export const DayRow = styled.div<{ $enabled?: boolean }>`
 `;
 
 export const DayCheckbox = styled.input`
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 1rem;
+  height: 1rem;
   cursor: pointer;
   accent-color: #14b8a6;
   flex-shrink: 0;
@@ -391,8 +434,8 @@ export const DayCheckbox = styled.input`
 export const DayLabelGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  min-width: 140px;
+  gap: 0.625rem;
+  min-width: 148px;
 
   @media (max-width: 640px) {
     width: 100%;
@@ -402,7 +445,7 @@ export const DayLabelGroup = styled.div`
 
 export const DayLabel = styled.label`
   font-size: 0.875rem;
-  color: ${({ theme }) => theme.text.secondary};
+  color: ${({ theme }) => theme.text.primary};
   font-weight: 500;
   cursor: pointer;
   user-select: none;
@@ -411,11 +454,8 @@ export const DayLabel = styled.label`
 export const TimeInputGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.625rem;
   flex: 1;
-  padding: 0.5rem;
-  background-color: ${({ theme }) => theme.bg.secondary};
-  border-radius: 0.375rem;
 
   @media (max-width: 640px) {
     width: 100%;
@@ -423,31 +463,36 @@ export const TimeInputGroup = styled.div`
 `;
 
 export const TimeInput = styled(Input)`
-  min-width: 120px;
-  max-width: 140px;
-  font-size: 0.9375rem;
+  min-width: 112px;
+  max-width: 128px;
+  font-size: 0.875rem;
   font-weight: 500;
   text-align: center;
-  padding: 0.75rem 0.875rem;
+  padding: 0.5rem 0.625rem;
   font-family: 'Segoe UI', system-ui, sans-serif;
-  letter-spacing: 0.025rem;
+  letter-spacing: 0.02rem;
+  border-radius: 0.375rem;
 
   &::-webkit-calendar-picker-indicator {
     cursor: pointer;
-    opacity: 0.6;
+    opacity: 0.5;
     transition: opacity 0.2s;
+    filter: ${({ theme }) =>
+      theme.bg.primary === '#ffffff' ? 'none' : 'invert(1) opacity(0.5)'};
 
     &:hover {
-      opacity: 1;
+      opacity: 0.9;
     }
   }
 
   &:disabled {
-    opacity: 0.4;
-    background-color: ${({ theme }) => theme.bg.tertiary};
+    opacity: 0.35;
+    background-color: transparent;
+    border-color: ${({ theme }) => theme.border.default};
+    cursor: not-allowed;
 
     &::-webkit-calendar-picker-indicator {
-      opacity: 0.3;
+      opacity: 0.2;
       cursor: not-allowed;
     }
   }
@@ -460,9 +505,9 @@ export const TimeInput = styled(Input)`
 `;
 
 export const TimeLabel = styled.span`
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: ${({ theme }) => theme.text.muted};
-  font-weight: 600;
-  text-transform: lowercase;
+  font-weight: 500;
   flex-shrink: 0;
+  padding: 0 0.125rem;
 `;

@@ -12,7 +12,10 @@ import {
   FormContent,
   Form,
   FormRow,
+  FormRowWide,
   FormGroup,
+  NotesHeader,
+  NotesTextareaWrapper,
   Label,
   Required,
   Input,
@@ -281,7 +284,8 @@ export default function ProfessionalForm({
           </FormGroup>
         </FormRow>
 
-        <FormGroup>
+        <FormRowWide>
+          {/* linha 1, col 1 — cabeçalho dos horários */}
           <WorkingHoursHeader>
             <div>
               <WorkingHoursTitle>Horários de Trabalho</WorkingHoursTitle>
@@ -291,6 +295,13 @@ export default function ProfessionalForm({
               Aplicar Seg-Sex 8h-18h
             </QuickActionButton>
           </WorkingHoursHeader>
+
+          {/* linha 1, col 2 — label alinhada ao fundo da linha do cabeçalho */}
+          <NotesHeader>
+            <Label>Observações</Label>
+          </NotesHeader>
+
+          {/* linha 2, col 1 — container dos dias */}
           <WorkingHoursSection>
             {DAYS.map((day) => {
               const dayData = formData.workingHours?.[day.key] || {
@@ -330,30 +341,31 @@ export default function ProfessionalForm({
               );
             })}
           </WorkingHoursSection>
-        </FormGroup>
 
-        <FormGroup>
-          <Label>Observações</Label>
-          <TextArea
-            value={formData.notes}
-            onChange={(e) => handleChange('notes', e.target.value)}
-            placeholder="Informações adicionais sobre o profissional..."
-            $hasError={!!errors.notes}
-            disabled={isSubmitting}
-          />
-          {errors.notes && (
-            <ErrorMessage>
-              <AlertCircle size={14} />
-              {errors.notes}
-            </ErrorMessage>
-          )}
-          <HelpText style={{ display: 'flex', alignItems: 'center' }}>
-            Informações adicionais (opcional)
-            <CharCounter $isNearLimit={(formData.notes?.length || 0) > 400}>
-              {formData.notes?.length || 0}/500
-            </CharCounter>
-          </HelpText>
-        </FormGroup>
+          {/* linha 2, col 2 — textarea estica para igualar a altura dos horários */}
+          <NotesTextareaWrapper>
+            <TextArea
+              $stretch
+              value={formData.notes}
+              onChange={(e) => handleChange('notes', e.target.value)}
+              placeholder="Informações adicionais sobre o profissional..."
+              $hasError={!!errors.notes}
+              disabled={isSubmitting}
+            />
+            {errors.notes && (
+              <ErrorMessage>
+                <AlertCircle size={14} />
+                {errors.notes}
+              </ErrorMessage>
+            )}
+            <HelpText style={{ display: 'flex', alignItems: 'center' }}>
+              Informações adicionais (opcional)
+              <CharCounter $isNearLimit={(formData.notes?.length || 0) > 400}>
+                {formData.notes?.length || 0}/500
+              </CharCounter>
+            </HelpText>
+          </NotesTextareaWrapper>
+        </FormRowWide>
         </Form>
       </FormContent>
 
