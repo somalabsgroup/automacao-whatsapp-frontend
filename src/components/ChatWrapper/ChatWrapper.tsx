@@ -16,6 +16,12 @@ const logError = (label: string, error: unknown) => {
 };
 import { getMessagesByConversation, subscribeToMessages } from '@/lib/services/messages';
 
+interface PaginationState {
+  hasMore: boolean;
+  oldestTimestamp: string | null;
+  isLoadingMore: boolean;
+}
+
 interface ChatWrapperProps {
   conversations: Conversation[];
   tenantId: string;
@@ -26,6 +32,7 @@ interface ChatWrapperProps {
 export default function ChatWrapper({ conversations, tenantId, onConversationStatusChange, onConversationDeleted }: ChatWrapperProps) {
   const { selectedConversationId } = useConversationStore();
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({});
+  const [pagination, setPagination] = useState<Record<string, PaginationState>>({});
   const [loading, setLoading] = useState(false);
   const supabaseRef = useRef(createClient());
   const supabase = supabaseRef.current;
@@ -34,6 +41,8 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
   const conversationMessages = selectedConversationId
     ? messages[selectedConversationId] || []
     : [];
+
+  const currentPagination = selectedConversationId ? pagination[selectedConversationId] : undefined;
 
   // Buscar mensagens quando uma conversa é selecionada
   useEffect(() => {
@@ -45,10 +54,18 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     const loadMessages = async () => {
       setLoading(true);
       try {
-        const fetchedMessages = await getMessagesByConversation(supabase, selectedConversationId);
+        const { messages: fetched, hasMore } = await getMessagesByConversation(supabase, selectedConversationId);
         setMessages((prev) => ({
           ...prev,
-          [selectedConversationId]: fetchedMessages,
+          [selectedConversationId]: fetched,
+        }));
+        setPagination((prev) => ({
+          ...prev,
+          [selectedConversationId]: {
+            hasMore,
+            oldestTimestamp: fetched[0]?.timestamp.toISOString() ?? null,
+            isLoadingMore: false,
+          },
         }));
       } finally {
         setLoading(false);
@@ -57,6 +74,44 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
     loadMessages();
   }, [selectedConversationId, supabase, messages]);
+
+  const handleLoadMore = async () => {
+    if (!selectedConversationId) return;
+    const pag = pagination[selectedConversationId];
+    if (!pag?.hasMore || pag.isLoadingMore || !pag.oldestTimestamp) return;
+
+    setPagination((prev) => ({
+      ...prev,
+      [selectedConversationId]: { ...prev[selectedConversationId], isLoadingMore: true },
+    }));
+
+    try {
+      const { messages: older, hasMore } = await getMessagesByConversation(
+        supabase,
+        selectedConversationId,
+        pag.oldestTimestamp
+      );
+
+      setMessages((prev) => ({
+        ...prev,
+        [selectedConversationId]: [...older, ...(prev[selectedConversationId] || [])],
+      }));
+
+      setPagination((prev) => ({
+        ...prev,
+        [selectedConversationId]: {
+          hasMore,
+          oldestTimestamp: older[0]?.timestamp.toISOString() ?? pag.oldestTimestamp,
+          isLoadingMore: false,
+        },
+      }));
+    } catch {
+      setPagination((prev) => ({
+        ...prev,
+        [selectedConversationId]: { ...prev[selectedConversationId], isLoadingMore: false },
+      }));
+    }
+  };
 
   // Inscrever-se para novas mensagens em tempo real
   useEffect(() => {
@@ -355,6 +410,9 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       onDeleteMessage={handleDeleteMessage}
       onDeleteConversation={handleDeleteConversation}
       onCloseConversation={handleCloseConversation}
+      hasMore={currentPagination?.hasMore ?? false}
+      isLoadingMore={currentPagination?.isLoadingMore ?? false}
+      onLoadMore={handleLoadMore}
     />
   );
 }

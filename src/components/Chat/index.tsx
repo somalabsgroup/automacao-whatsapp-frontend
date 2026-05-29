@@ -1,19 +1,20 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Conversation, ChatMessage } from '@/types';
 import ChatHeader from './ChatHeader';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 import { MessageCircle } from 'lucide-react';
-import { 
+import {
   ChatContainer as Container,
-  EmptyState, 
-  EmptyStateIcon, 
-  EmptyStateText, 
-  MessagesArea, 
-  MessagesScroll, 
-  DateDivider, 
+  EmptyState,
+  EmptyStateIcon,
+  EmptyStateText,
+  MessagesArea,
+  MessagesScroll,
+  LoadMoreIndicator,
+  DateDivider,
   DateLabel
 } from './styles';
 
@@ -26,6 +27,9 @@ interface ChatContainerProps {
   onDeleteMessage?: (messageId: string) => void;
   onDeleteConversation?: () => void;
   onCloseConversation?: () => void;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 const formatDate = (date: Date) => {
@@ -75,10 +79,17 @@ export default function ChatContainer({
   onDeleteMessage,
   onDeleteConversation,
   onCloseConversation,
+  hasMore = false,
+  isLoadingMore = false,
+  onLoadMore,
 }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const prevConversationIdRef = useRef<string | null>(null);
+  const prevScrollHeightRef = useRef(0);
+  const prevIsLoadingMoreRef = useRef(false);
 
+  // Scroll to bottom on new conversation (instant) or new message (smooth)
   useEffect(() => {
     const isNewConversation = conversation?.id !== prevConversationIdRef.current;
     prevConversationIdRef.current = conversation?.id ?? null;
@@ -87,6 +98,29 @@ export default function ChatContainer({
       behavior: isNewConversation ? 'instant' : 'smooth',
     });
   }, [messages, conversation?.id]);
+
+  // Restore scroll position after older messages are prepended
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    if (prevIsLoadingMoreRef.current && !isLoadingMore && prevScrollHeightRef.current > 0) {
+      container.scrollTop = container.scrollHeight - prevScrollHeightRef.current;
+      prevScrollHeightRef.current = 0;
+    }
+
+    prevIsLoadingMoreRef.current = isLoadingMore;
+  }, [isLoadingMore]);
+
+  const handleScroll = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container || !hasMore || isLoadingMore) return;
+
+    if (container.scrollTop < 80) {
+      prevScrollHeightRef.current = container.scrollHeight;
+      onLoadMore?.();
+    }
+  }, [hasMore, isLoadingMore, onLoadMore]);
 
   if (!conversation) {
     return (
@@ -114,13 +148,17 @@ export default function ChatContainer({
       />
 
       <MessagesArea>
-        <MessagesScroll>
+        <MessagesScroll ref={scrollRef} onScroll={handleScroll}>
+          {isLoadingMore && (
+            <LoadMoreIndicator>Carregando mensagens anteriores...</LoadMoreIndicator>
+          )}
+
           {messageGroups.map((group) => (
             <div key={group.date}>
               <DateDivider>
                 <DateLabel>{group.date}</DateLabel>
               </DateDivider>
-              
+
               {group.messages.map((message) => (
                 <MessageBubble
                   key={message.id}
@@ -132,7 +170,7 @@ export default function ChatContainer({
               ))}
             </div>
           ))}
-          
+
           <div ref={messagesEndRef} />
         </MessagesScroll>
       </MessagesArea>

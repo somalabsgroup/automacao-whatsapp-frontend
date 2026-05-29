@@ -205,6 +205,14 @@ export const MessagesScroll = styled.div`
   gap: 0.5rem;
 `;
 
+export const LoadMoreIndicator = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+  color: ${({ theme }) => theme.text.muted};
+  font-size: 0.75rem;
+`;
+
 export const DateDivider = styled.div`
   display: flex;
   justify-content: center;
