@@ -1,0 +1,24 @@
+# SomaClini - robots.txt
+# https://somaclini.com.br/robots.txt
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin/auth pages
+Disallow: /dashboard
+Disallow: /login
+Disallow: /profissionais
+Disallow: /pacientes
+Disallow: /configuracoes
+Disallow: /unauthorized
+
+# Allow search engines to crawl images
+User-agent: Googlebot-Image
+Allow: /
+
+# Sitemap location
+Sitemap: https://somaclini.com.br/sitemap.xml
+
+# Crawl delay (optional, for slower bots)
+Crawl-delay: 0
