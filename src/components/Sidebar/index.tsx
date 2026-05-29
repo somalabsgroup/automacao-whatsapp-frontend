@@ -1,17 +1,17 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { 
+import {
   ChevronLeft,
   ChevronRight,
   MessageSquare,
-  Calendar,
-  Users,
   UserCog,
-  Settings,
-  LogOut
+  LogOut,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useSidebarStore } from '@/stores/useSidebarStore';
+import { useThemeStore } from '@/stores/useThemeStore';
 import {
   SidebarContainer,
   SidebarHeader,
@@ -27,6 +27,7 @@ import {
   UserName,
   UserEmail,
   LogoutButton,
+  ThemeToggleButton,
 } from './styles';
 
 interface SidebarProps {
@@ -42,6 +43,7 @@ export default function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { isOpen, toggleSidebar } = useSidebarStore();
+  const { mode, toggleTheme } = useThemeStore();
 
   const menuItems = [
     {
@@ -49,26 +51,11 @@ export default function Sidebar({ user }: SidebarProps) {
       href: '/dashboard',
       icon: <MessageSquare size={24} />,
     },
-    // {
-    //   name: 'Follow-ups',
-    //   href: '/follow-ups',
-    //   icon: <Calendar size={24} />,
-    // },
-    // {
-    //   name: 'Pacientes',
-    //   href: '/pacientes',
-    //   icon: <Users size={24} />,
-    // },
     {
       name: 'Profissionais',
       href: '/profissionais',
       icon: <UserCog size={24} />,
     },
-    // {
-    //   name: 'Configurações',
-    //   href: '/configuracoes',
-    //   icon: <Settings size={24} />,
-    // },
   ];
 
   const handleLogout = async () => {
@@ -127,6 +114,12 @@ export default function Sidebar({ user }: SidebarProps) {
             <UserEmail>{user?.email || 'roberto@clinica.com'}</UserEmail>
           </UserDetails>
         </UserInfo>
+        <ThemeToggleButton
+          onClick={toggleTheme}
+          title={mode === 'dark' ? 'Modo claro' : 'Modo escuro'}
+        >
+          {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        </ThemeToggleButton>
         <LogoutButton onClick={handleLogout} title="Sair">
           <LogOut size={20} />
         </LogoutButton>

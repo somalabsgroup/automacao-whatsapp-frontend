@@ -6,11 +6,11 @@ export const SidebarContainer = styled.aside<{ $isOpen: boolean }>`
   top: 0;
   height: 100vh;
   width: ${({ $isOpen }) => ($isOpen ? '256px' : '80px')};
-  background-color: #ffffff;
-  border-right: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.sidebar.bg};
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, background-color 0.2s ease;
   z-index: 1000;
 `;
 
@@ -30,13 +30,13 @@ export const HamburgerButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
-  transition: color 0.2s;
+  color: ${({ theme }) => theme.sidebar.iconColor};
+  transition: color 0.2s, background-color 0.2s;
   border-radius: 0.375rem;
 
   &:hover {
-    color: #111827;
-    background-color: #f3f4f6;
+    color: ${({ theme }) => theme.sidebar.iconHoverColor};
+    background-color: ${({ theme }) => theme.sidebar.buttonHoverBg};
   }
 
   svg {
@@ -45,25 +45,10 @@ export const HamburgerButton = styled.button`
   }
 `;
 
-
-
 export const MenuList = styled.nav`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 4px;
-  }
 `;
 
 export const MenuItem = styled.a<{ $active?: boolean; $isOpen: boolean }>`
@@ -71,18 +56,24 @@ export const MenuItem = styled.a<{ $active?: boolean; $isOpen: boolean }>`
   align-items: center;
   padding: 0.75rem 1rem;
   margin: 0.25rem 0.75rem;
-  color: ${({ $active }) => ($active ? '#0f766e' : '#374151')};
-  background-color: ${({ $active }) => ($active ? '#f0fdfa' : 'transparent')};
+  color: ${({ $active, theme }) => ($active ? theme.sidebar.activeText : theme.sidebar.itemText)};
+  background-color: ${({ $active, theme }) =>
+    $active ? theme.sidebar.activeBg : 'transparent'};
   border-radius: 0.5rem;
+  border-left: 3px solid
+    ${({ $active, theme }) => ($active ? theme.sidebar.activeText : 'transparent')};
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s;
   white-space: nowrap;
   position: relative;
-  font-weight: ${({ $active }) => ($active ? '500' : '400')};
+  font-weight: ${({ $active }) => ($active ? '600' : '400')};
 
   &:hover {
-    background-color: ${({ $active }) => ($active ? '#f0fdfa' : '#f9fafb')};
+    background-color: ${({ $active, theme }) =>
+      $active ? theme.sidebar.activeHoverBg : theme.sidebar.hoverBg};
+    color: ${({ $active, theme }) =>
+      $active ? theme.sidebar.activeText : theme.sidebar.hoverText};
   }
 
   svg {
@@ -101,7 +92,7 @@ export const MenuItemText = styled.span<{ $isOpen: boolean }>`
 `;
 
 export const UserSection = styled.div<{ $isOpen: boolean }>`
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid ${({ theme }) => theme.sidebar.border};
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -123,7 +114,8 @@ export const UserAvatar = styled.img`
   min-width: 40px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #10b981;
+  background-color: ${({ theme }) => theme.brand.primary};
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.3);
 `;
 
 export const UserAvatarPlaceholder = styled.div`
@@ -131,13 +123,14 @@ export const UserAvatarPlaceholder = styled.div`
   height: 40px;
   min-width: 40px;
   border-radius: 50%;
-  background-color: #10b981;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: 600;
   font-size: 0.875rem;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.25);
 `;
 
 export const UserDetails = styled.div<{ $isOpen: boolean }>`
@@ -150,7 +143,7 @@ export const UserDetails = styled.div<{ $isOpen: boolean }>`
 export const UserName = styled.div`
   font-weight: 500;
   font-size: 0.875rem;
-  color: #111827;
+  color: ${({ theme }) => theme.sidebar.userName};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -158,13 +151,13 @@ export const UserName = styled.div`
 
 export const UserEmail = styled.div`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.sidebar.userEmail};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-export const LogoutButton = styled.button`
+export const SidebarIconButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -172,16 +165,11 @@ export const LogoutButton = styled.button`
   background-color: transparent;
   border: none;
   border-radius: 0.375rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.sidebar.iconColor};
   cursor: pointer;
   transition: all 0.2s;
   min-width: 32px;
   height: 32px;
-
-  &:hover {
-    background-color: #f3f4f6;
-    color: #111827;
-  }
 
   svg {
     width: 20px;
@@ -189,4 +177,16 @@ export const LogoutButton = styled.button`
   }
 `;
 
+export const LogoutButton = styled(SidebarIconButton)`
+  &:hover {
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+  }
+`;
 
+export const ThemeToggleButton = styled(SidebarIconButton)`
+  &:hover {
+    background-color: ${({ theme }) => theme.sidebar.buttonHoverBg};
+    color: ${({ theme }) => theme.sidebar.iconHoverColor};
+  }
+`;

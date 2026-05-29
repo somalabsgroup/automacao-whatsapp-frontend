@@ -15,9 +15,10 @@ export const ConversationPanel = styled.div.attrs<{ $width: number }>(props => (
   },
 }))<{ $width: number }>`
   height: 100%;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.conversation.containerBg};
   overflow: hidden;
   flex-shrink: 0;
+  transition: background-color 0.2s ease;
 
   @media (max-width: 1024px) {
     width: 300px !important;
@@ -33,14 +34,15 @@ export const ConversationPanel = styled.div.attrs<{ $width: number }>(props => (
 export const Resizer = styled.div<{ $isResizing: boolean }>`
   width: 4px;
   height: 100%;
-  background-color: ${({ $isResizing }) => ($isResizing ? '#14b8a6' : 'transparent')};
+  background-color: ${({ $isResizing, theme }) =>
+    $isResizing ? theme.brand.primary : 'transparent'};
   cursor: col-resize;
   flex-shrink: 0;
   transition: background-color 0.2s;
   position: relative;
 
   &:hover {
-    background-color: #14b8a6;
+    background-color: ${({ theme }) => theme.brand.primary};
   }
 
   &::after {
@@ -61,5 +63,6 @@ export const MainContent = styled.div`
   flex: 1;
   height: 100%;
   overflow: hidden;
-  background-color: #f9fafb;
+  background-color: ${({ theme }) => theme.bg.secondary};
+  transition: background-color 0.2s ease;
 `;

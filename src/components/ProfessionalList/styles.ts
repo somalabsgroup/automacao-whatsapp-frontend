@@ -1,15 +1,16 @@
 import styled from 'styled-components';
 
 export const ListContainer = styled.div`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.card.bg};
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.card.shadow};
   overflow: hidden;
+  transition: background-color 0.2s ease;
 `;
 
 export const ListHeader = styled.div`
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -24,7 +25,7 @@ export const ListHeader = styled.div`
 export const ListTitle = styled.h2`
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -33,7 +34,7 @@ export const HeaderActions = styled.div`
   gap: 0.75rem;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
   justify-content: space-between;
 
   @media (max-width: 768px) {
@@ -47,7 +48,7 @@ export const AddButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1rem;
-  background-color: #14b8a6;
+  background-color: ${({ theme }) => theme.brand.primary};
   color: #ffffff;
   border: none;
   border-radius: 0.375rem;
@@ -57,19 +58,21 @@ export const AddButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background-color: #0f9688;
+    background-color: ${({ theme }) => theme.brand.hover};
   }
 
   &:active {
-    background-color: #0d7a6f;
+    background-color: ${({ theme }) => theme.brand.active};
   }
 `;
 
 export const FilterButton = styled.button<{ $active?: boolean }>`
   padding: 0.625rem 1rem;
-  background-color: ${({ $active }) => ($active ? '#14b8a6' : '#ffffff')};
-  color: ${({ $active }) => ($active ? '#ffffff' : '#374151')};
-  border: 1px solid ${({ $active }) => ($active ? '#14b8a6' : '#e5e7eb')};
+  background-color: ${({ $active, theme }) =>
+    $active ? theme.brand.primary : theme.bg.primary};
+  color: ${({ $active, theme }) => ($active ? '#ffffff' : theme.text.secondary)};
+  border: 1px solid
+    ${({ $active, theme }) => ($active ? theme.brand.primary : theme.border.default)};
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 500;
@@ -77,8 +80,10 @@ export const FilterButton = styled.button<{ $active?: boolean }>`
   transition: all 0.2s;
 
   &:hover {
-    background-color: ${({ $active }) => ($active ? '#0f9688' : '#f9fafb')};
-    border-color: ${({ $active }) => ($active ? '#0f9688' : '#d1d5db')};
+    background-color: ${({ $active, theme }) =>
+      $active ? theme.brand.hover : theme.bg.secondary};
+    border-color: ${({ $active, theme }) =>
+      $active ? theme.brand.hover : theme.border.strong};
   }
 `;
 
@@ -97,7 +102,7 @@ export const SearchIcon = styled.div`
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.placeholder};
   display: flex;
   align-items: center;
   pointer-events: none;
@@ -106,21 +111,21 @@ export const SearchIcon = styled.div`
 export const SearchInput = styled.input`
   width: 100%;
   padding: 0.625rem 0.75rem 0.625rem 2.25rem;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.bg.secondary};
+  border: 1px solid ${({ theme }) => theme.border.default};
   border-radius: 0.375rem;
   font-size: 0.875rem;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   transition: all 0.2s;
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.placeholder};
   }
 
   &:focus {
     outline: none;
-    background-color: #ffffff;
-    border-color: #14b8a6;
+    background-color: ${({ theme }) => theme.bg.primary};
+    border-color: ${({ theme }) => theme.brand.primary};
   }
 `;
 
@@ -134,17 +139,17 @@ export const Table = styled.table`
 `;
 
 export const TableHead = styled.thead`
-  background-color: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.table.headBg};
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
 `;
 
 export const TableRow = styled.tr<{ $inactive?: boolean }>`
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
   opacity: ${({ $inactive }) => ($inactive ? 0.6 : 1)};
   transition: background-color 0.15s;
 
   &:hover {
-    background-color: #f9fafb;
+    background-color: ${({ theme }) => theme.table.rowHoverBg};
   }
 
   &:last-child {
@@ -157,7 +162,7 @@ export const TableHeader = styled.th`
   text-align: left;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   text-transform: uppercase;
   letter-spacing: 0.05em;
 `;
@@ -165,17 +170,17 @@ export const TableHeader = styled.th`
 export const TableCell = styled.td`
   padding: 1rem 1.5rem;
   font-size: 0.875rem;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ProfessionalName = styled.div`
   font-weight: 500;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ProfessionalSpecialty = styled.div`
   font-size: 0.8125rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   margin-top: 0.125rem;
 `;
 
@@ -185,8 +190,8 @@ export const ColorBadge = styled.div<{ $color: string }>`
   height: 24px;
   border-radius: 0.25rem;
   background-color: ${({ $color }) => $color};
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 0 1px #e5e7eb;
+  border: 2px solid ${({ theme }) => theme.bg.primary};
+  box-shadow: 0 0 0 1px ${({ theme }) => theme.border.default};
 `;
 
 export const StatusBadge = styled.span<{ $active: boolean }>`
@@ -197,8 +202,10 @@ export const StatusBadge = styled.span<{ $active: boolean }>`
   border-radius: 0.375rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  background-color: ${({ $active }) => ($active ? '#d1fae5' : '#fee2e2')};
-  color: ${({ $active }) => ($active ? '#065f46' : '#991b1b')};
+  background-color: ${({ $active, theme }) =>
+    $active ? theme.status.success.bg : theme.status.danger.bg};
+  color: ${({ $active, theme }) =>
+    $active ? theme.status.success.text : theme.status.danger.text};
 `;
 
 export const StatusDot = styled.span<{ $active: boolean }>`
@@ -218,7 +225,7 @@ export const IconButton = styled.button`
   padding: 0.375rem;
   border: none;
   background-color: transparent;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   cursor: pointer;
   border-radius: 0.25rem;
   transition: all 0.2s;
@@ -227,35 +234,35 @@ export const IconButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background-color: #f3f4f6;
-    color: #111827;
+    background-color: ${({ theme }) => theme.bg.tertiary};
+    color: ${({ theme }) => theme.text.primary};
   }
 
   &:active {
-    background-color: #e5e7eb;
+    background-color: ${({ theme }) => theme.border.default};
   }
 `;
 
 export const EmptyState = styled.div`
   padding: 3rem 1.5rem;
   text-align: center;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
 `;
 
 export const EmptyIcon = styled.div`
   margin: 0 auto 1rem;
-  color: #d1d5db;
+  color: ${({ theme }) => theme.border.strong};
 `;
 
 export const EmptyTitle = styled.h3`
   font-size: 1rem;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0 0 0.5rem 0;
 `;
 
 export const EmptyDescription = styled.p`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   margin: 0 0 1.5rem 0;
 `;

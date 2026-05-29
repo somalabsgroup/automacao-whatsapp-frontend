@@ -109,6 +109,7 @@ export interface ChatMessage {
   attachments?: MessageAttachment[];
   status: MessageStatus;
   timestamp: Date;
+  editedAt?: Date;
   deletedAt?: Date;
   rawPayload?: Record<string, unknown>;
   isOptimistic?: boolean;

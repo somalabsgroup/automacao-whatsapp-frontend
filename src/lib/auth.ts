@@ -61,30 +61,3 @@ export async function fetchTenantData(
     return null;
   }
 }
-
-/**
- * Valida se o usuário tem acesso ao tenant
- */
-export async function validateTenantAccess(
-  supabase: SupabaseClient,
-  userId: string,
-  tenantId: string
-): Promise<{ hasAccess: boolean; role?: string }> {
-  try {
-    const { data, error } = await supabase
-      .from('tenant_users')
-      .select('role')
-      .eq('user_id', userId)
-      .eq('tenant_id', tenantId)
-      .single();
-
-    if (error || !data) {
-      return { hasAccess: false };
-    }
-
-    return { hasAccess: true, role: data.role };
-  } catch (error) {
-    console.error('Error validating tenant access:', error);
-    return { hasAccess: false };
-  }
-}

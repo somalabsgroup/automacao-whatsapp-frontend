@@ -1,12 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useConversationStore } from '@/stores/useConversationStore';
 import { Conversation, ChatMessage } from '@/types';
 import Chat from '@/components/Chat';
 import { createClient } from '@/lib/supabase/client';
-import { sendTextMessage, deleteConversation, closeConversation } from '@/lib/services/conversations';
+import { sendTextMessage, editMessage, deleteMessage, deleteConversation, closeConversation } from '@/lib/services/conversations';
+
+const logError = (label: string, error: unknown) => {
+  if (error && typeof error === 'object' && 'message' in error) {
+    console.error(label, (error as { message: string; code?: string; details?: string }).message, error);
+  } else {
+    console.error(label, error);
+  }
+};
 import { getMessagesByConversation, subscribeToMessages } from '@/lib/services/messages';
+
+interface PaginationState {
+  hasMore: boolean;
+  oldestTimestamp: string | null;
+  isLoadingMore: boolean;
+}
 
 interface ChatWrapperProps {
   conversations: Conversation[];
@@ -18,13 +32,17 @@ interface ChatWrapperProps {
 export default function ChatWrapper({ conversations, tenantId, onConversationStatusChange, onConversationDeleted }: ChatWrapperProps) {
   const { selectedConversationId } = useConversationStore();
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({});
+  const [pagination, setPagination] = useState<Record<string, PaginationState>>({});
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
+  const supabaseRef = useRef(createClient());
+  const supabase = supabaseRef.current;
 
   const selectedConversation = conversations.find((c) => c.id === selectedConversationId);
   const conversationMessages = selectedConversationId
     ? messages[selectedConversationId] || []
     : [];
+
+  const currentPagination = selectedConversationId ? pagination[selectedConversationId] : undefined;
 
   // Buscar mensagens quando uma conversa é selecionada
   useEffect(() => {
@@ -36,10 +54,18 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     const loadMessages = async () => {
       setLoading(true);
       try {
-        const fetchedMessages = await getMessagesByConversation(supabase, selectedConversationId);
+        const { messages: fetched, hasMore } = await getMessagesByConversation(supabase, selectedConversationId);
         setMessages((prev) => ({
           ...prev,
-          [selectedConversationId]: fetchedMessages,
+          [selectedConversationId]: fetched,
+        }));
+        setPagination((prev) => ({
+          ...prev,
+          [selectedConversationId]: {
+            hasMore,
+            oldestTimestamp: fetched[0]?.timestamp.toISOString() ?? null,
+            isLoadingMore: false,
+          },
         }));
       } finally {
         setLoading(false);
@@ -48,6 +74,44 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
     loadMessages();
   }, [selectedConversationId, supabase, messages]);
+
+  const handleLoadMore = async () => {
+    if (!selectedConversationId) return;
+    const pag = pagination[selectedConversationId];
+    if (!pag?.hasMore || pag.isLoadingMore || !pag.oldestTimestamp) return;
+
+    setPagination((prev) => ({
+      ...prev,
+      [selectedConversationId]: { ...prev[selectedConversationId], isLoadingMore: true },
+    }));
+
+    try {
+      const { messages: older, hasMore } = await getMessagesByConversation(
+        supabase,
+        selectedConversationId,
+        pag.oldestTimestamp
+      );
+
+      setMessages((prev) => ({
+        ...prev,
+        [selectedConversationId]: [...older, ...(prev[selectedConversationId] || [])],
+      }));
+
+      setPagination((prev) => ({
+        ...prev,
+        [selectedConversationId]: {
+          hasMore,
+          oldestTimestamp: older[0]?.timestamp.toISOString() ?? pag.oldestTimestamp,
+          isLoadingMore: false,
+        },
+      }));
+    } catch {
+      setPagination((prev) => ({
+        ...prev,
+        [selectedConversationId]: { ...prev[selectedConversationId], isLoadingMore: false },
+      }));
+    }
+  };
 
   // Inscrever-se para novas mensagens em tempo real
   useEffect(() => {
@@ -246,6 +310,48 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     }
   };
 
+  const handleEditMessage = async (messageId: string, newContent: string) => {
+    if (!selectedConversationId) return;
+
+    const previous = messages[selectedConversationId] || [];
+
+    setMessages(prev => ({
+      ...prev,
+      [selectedConversationId]: (prev[selectedConversationId] || []).map(msg =>
+        msg.id === messageId ? { ...msg, content: newContent, editedAt: new Date() } : msg
+      ),
+    }));
+
+    try {
+      await editMessage(messageId, newContent);
+    } catch (error) {
+      logError('Error updating message:', error);
+      setMessages(prev => ({ ...prev, [selectedConversationId]: previous }));
+      alert('Erro ao editar mensagem. Tente novamente.');
+    }
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!selectedConversationId) return;
+
+    const previous = messages[selectedConversationId] || [];
+
+    setMessages(prev => ({
+      ...prev,
+      [selectedConversationId]: (prev[selectedConversationId] || []).map(msg =>
+        msg.id === messageId ? { ...msg, deletedAt: new Date() } : msg
+      ),
+    }));
+
+    try {
+      await deleteMessage(messageId);
+    } catch (error) {
+      logError('Error deleting message:', error);
+      setMessages(prev => ({ ...prev, [selectedConversationId]: previous }));
+      alert('Erro ao excluir mensagem. Tente novamente.');
+    }
+  };
+
   const handleCloseConversation = async () => {
     if (!selectedConversationId) return;
 
@@ -258,7 +364,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       }
       
     } catch (error) {
-      console.error('Error closing conversation:', error);
+      logError('Error closing conversation:', error);
       alert('Erro ao encerrar atendimento. Tente novamente.');
     }
   };
@@ -285,7 +391,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       useConversationStore.getState().setSelectedConversation(null);
       
     } catch (error) {
-      console.error('Error deleting conversation:', error);
+      logError('Error deleting conversation:', error);
       alert('Erro ao excluir conversa. Tente novamente.');
     }
   };
@@ -300,8 +406,13 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       messages={conversationMessages}
       onSendMessage={handleSendMessage}
       onRetryMessage={handleRetryMessage}
+      onEditMessage={handleEditMessage}
+      onDeleteMessage={handleDeleteMessage}
       onDeleteConversation={handleDeleteConversation}
       onCloseConversation={handleCloseConversation}
+      hasMore={currentPagination?.hasMore ?? false}
+      isLoadingMore={currentPagination?.isLoadingMore ?? false}
+      onLoadMore={handleLoadMore}
     />
   );
 }

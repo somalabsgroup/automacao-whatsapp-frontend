@@ -1,6 +1,8 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ChatMessage, MessageSender, MessageStatus, MessageDirection, MessageType } from '@/types';
 
+const PAGE_SIZE = 30;
+
 interface MessageRow {
   id: string;
   tenant_id: string;
@@ -15,24 +17,17 @@ interface MessageRow {
   status: string;
   raw_payload?: Record<string, unknown>;
   created_at: string;
+  edited_at?: string;
   deleted_at?: string;
 }
 
-export async function getMessagesByConversation(
-  supabase: SupabaseClient,
-  conversationId: string
-): Promise<ChatMessage[]> {
-  const { data, error } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: true });
+export interface MessagesPage {
+  messages: ChatMessage[];
+  hasMore: boolean;
+}
 
-  if (error) throw error;
-
-  if (!data) return [];
-
-  return data.map((msg: MessageRow) => ({
+function convertMessage(msg: MessageRow): ChatMessage {
+  return {
     id: msg.id,
     tenantId: msg.tenant_id,
     conversationId: msg.conversation_id,
@@ -45,9 +40,35 @@ export async function getMessagesByConversation(
     mediaUrl: msg.media_url,
     status: msg.status as MessageStatus,
     timestamp: new Date(msg.created_at),
+    editedAt: msg.edited_at ? new Date(msg.edited_at) : undefined,
     deletedAt: msg.deleted_at ? new Date(msg.deleted_at) : undefined,
     rawPayload: msg.raw_payload,
-  }));
+  };
+}
+
+export async function getMessagesByConversation(
+  supabase: SupabaseClient,
+  conversationId: string,
+  beforeTimestamp?: string
+): Promise<MessagesPage> {
+  let query = supabase
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: false })
+    .limit(PAGE_SIZE);
+
+  if (beforeTimestamp) {
+    query = query.lt('created_at', beforeTimestamp);
+  }
+
+  const { data, error } = await query;
+
+  if (error) throw error;
+  if (!data) return { messages: [], hasMore: false };
+
+  const messages = [...data].reverse().map(convertMessage);
+  return { messages, hasMore: data.length === PAGE_SIZE };
 }
 
 export async function subscribeToMessages(
@@ -69,24 +90,7 @@ export async function subscribeToMessages(
         filter: `conversation_id=eq.${conversationId}`,
       },
       (payload) => {
-        const msg = payload.new as MessageRow;
-        const newMessage: ChatMessage = {
-          id: msg.id,
-          tenantId: msg.tenant_id,
-          conversationId: msg.conversation_id,
-          whatsappMessageId: msg.whatsapp_message_id,
-          direction: msg.direction as MessageDirection,
-          sender: msg.sender as MessageSender,
-          senderUserId: msg.sender_user_id,
-          type: msg.message_type as MessageType,
-          content: msg.content,
-          mediaUrl: msg.media_url,
-          status: msg.status as MessageStatus,
-          timestamp: new Date(msg.created_at),
-          deletedAt: msg.deleted_at ? new Date(msg.deleted_at) : undefined,
-          rawPayload: msg.raw_payload,
-        };
-        onNewMessage(newMessage);
+        onNewMessage(convertMessage(payload.new as MessageRow));
       }
     )
     .on(
@@ -98,24 +102,7 @@ export async function subscribeToMessages(
         filter: `conversation_id=eq.${conversationId}`,
       },
       (payload) => {
-        const msg = payload.new as MessageRow;
-        const updatedMessage: ChatMessage = {
-          id: msg.id,
-          tenantId: msg.tenant_id,
-          conversationId: msg.conversation_id,
-          whatsappMessageId: msg.whatsapp_message_id,
-          direction: msg.direction as MessageDirection,
-          sender: msg.sender as MessageSender,
-          senderUserId: msg.sender_user_id,
-          type: msg.message_type as MessageType,
-          content: msg.content,
-          mediaUrl: msg.media_url,
-          status: msg.status as MessageStatus,
-          timestamp: new Date(msg.created_at),
-          deletedAt: msg.deleted_at ? new Date(msg.deleted_at) : undefined,
-          rawPayload: msg.raw_payload,
-        };
-        onNewMessage(updatedMessage);
+        onNewMessage(convertMessage(payload.new as MessageRow));
       }
     )
     .subscribe();
