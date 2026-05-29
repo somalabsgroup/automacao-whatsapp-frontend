@@ -12,9 +12,10 @@ export const Container = styled.div`
 
 export const Card = styled.div`
   padding: 4rem;
-  background: white;
+  background: ${({ theme }) => theme.card.bg};
   border-radius: 1.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: ${({ theme }) => theme.card.loginShadow};
+  transition: background-color 0.2s ease;
 
   @media (max-width: 640px) {
     padding: 2.5rem;
@@ -31,7 +32,7 @@ export const Header = styled.div`
 export const LogoContainer = styled.div`
   width: 4rem;
   height: 4rem;
-  background: #14b8a6;
+  background: ${({ theme }) => theme.brand.primary};
   border-radius: 1rem;
   display: flex;
   align-items: center;
@@ -43,13 +44,13 @@ export const LogoContainer = styled.div`
 export const Title = styled.h1`
   font-size: 1.875rem;
   font-weight: 700;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 0.5rem 0;
 `;
 
 export const Subtitle = styled.p`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   text-align: center;
   margin: 0;
 `;
@@ -69,7 +70,7 @@ export const FormGroup = styled.div`
 export const Label = styled.label`
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const InputWrapper = styled.div`
@@ -80,26 +81,26 @@ export const InputWrapper = styled.div`
 export const Input = styled.input<{ $hasIcon?: boolean }>`
   height: 2.75rem;
   width: 100%;
-  padding: 0 ${({ $hasIcon }) => $hasIcon ? '2.75rem' : '0.75rem'} 0 0.75rem;
-  border: 1px solid #e5e7eb;
+  padding: 0 ${({ $hasIcon }) => ($hasIcon ? '2.75rem' : '0.75rem')} 0 0.75rem;
+  border: 1px solid ${({ theme }) => theme.border.default};
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  color: #111827;
-  background: white;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.card.bg};
   transition: all 0.2s ease;
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.placeholder};
   }
 
   &:focus {
     outline: none;
-    border-color: #14b8a6;
+    border-color: ${({ theme }) => theme.brand.primary};
     box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
   }
 
   &:disabled {
-    background: #f3f4f6;
+    background: ${({ theme }) => theme.bg.tertiary};
     cursor: not-allowed;
   }
 `;
@@ -112,7 +113,7 @@ export const TogglePasswordButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   padding: 0;
   display: flex;
   align-items: center;
@@ -120,7 +121,7 @@ export const TogglePasswordButton = styled.button`
   transition: color 0.2s ease;
 
   &:hover {
-    color: #14b8a6;
+    color: ${({ theme }) => theme.brand.primary};
   }
 
   &:focus {
@@ -132,7 +133,7 @@ export const Button = styled.button`
   height: 2.75rem;
   width: 100%;
   padding: 0 1rem;
-  background: #14b8a6;
+  background: ${({ theme }) => theme.brand.primary};
   color: white;
   font-size: 0.875rem;
   font-weight: 600;
@@ -142,7 +143,7 @@ export const Button = styled.button`
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    background: #0d9488;
+    background: ${({ theme }) => theme.brand.hover};
   }
 
   &:disabled {
@@ -153,11 +154,11 @@ export const Button = styled.button`
 
 export const ErrorMessage = styled.div`
   padding: 0.75rem;
-  background: #fef2f2;
-  color: #dc2626;
+  background: ${({ theme }) => theme.status.danger.bg};
+  color: ${({ theme }) => theme.status.danger.text};
   font-size: 0.875rem;
   border-radius: 0.5rem;
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid ${({ theme }) => theme.status.danger.border};
 `;
 
 export const ForgotPasswordLink = styled.a`
@@ -165,12 +166,12 @@ export const ForgotPasswordLink = styled.a`
   margin-top: 1.5rem;
   text-align: center;
   font-size: 0.875rem;
-  color: #14b8a6;
+  color: ${({ theme }) => theme.brand.primary};
   text-decoration: none;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #0d9488;
+    color: ${({ theme }) => theme.brand.hover};
   }
 `;
 
@@ -181,6 +182,6 @@ export const Footer = styled.div`
 
 export const FooterText = styled.p`
   font-size: 0.875rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   margin: 0;
 `;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import styled from 'styled-components';
 import { Professional, CreateProfessionalInput } from '@/types';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -12,6 +13,16 @@ import {
 import ProfessionalForm from '../ProfessionalForm';
 import ProfessionalList from '../ProfessionalList';
 import Header, { HeaderMetric } from '../Header';
+
+const ContentArea = styled.div`
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+  background-color: ${({ theme }) => theme.bg.secondary};
+  transition: background-color 0.2s ease;
+`;
 
 interface ProfessionalsContentProps {
   initialProfessionals: Professional[];
@@ -119,25 +130,25 @@ export default function ProfessionalsContent({
         subtitle="Gerencie os profissionais da clínica"
         metrics={metrics}
       />
-      <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {showForm ? (
-        <ProfessionalForm
-          professional={editingProfessional || undefined}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-          isSubmitting={isSubmitting}
-        />
-      ) : (
-        <ProfessionalList
-          professionals={professionals}
-          onAdd={handleAdd}
-          onEdit={handleEdit}
-          onToggleActive={handleToggleActive}
-          showInactive={showInactive}
-          onToggleShowInactive={() => setShowInactive(!showInactive)}
-        />
-      )}
-    </div>
+      <ContentArea>
+        {showForm ? (
+          <ProfessionalForm
+            professional={editingProfessional || undefined}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            isSubmitting={isSubmitting}
+          />
+        ) : (
+          <ProfessionalList
+            professionals={professionals}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onToggleActive={handleToggleActive}
+            showInactive={showInactive}
+            onToggleShowInactive={() => setShowInactive(!showInactive)}
+          />
+        )}
+      </ContentArea>
     </>
   );
 }

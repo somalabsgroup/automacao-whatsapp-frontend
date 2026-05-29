@@ -1,23 +1,22 @@
 import styled from 'styled-components';
 
-// Container Principal
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.conversation.containerBg};
+  transition: background-color 0.2s ease;
 `;
 
-// Header
 export const Header = styled.div`
   padding: 0.875rem 1rem 0.75rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
 `;
 
 export const Title = styled.h2`
   font-size: 1rem;
   font-weight: 600;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 0.625rem;
 `;
 
@@ -27,29 +26,28 @@ export const FilterButton = styled.button`
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 0.75rem;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.bg.secondary};
+  border: 1px solid ${({ theme }) => theme.border.default};
   border-radius: 0.375rem;
   font-size: 0.875rem;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
+    background-color: ${({ theme }) => theme.bg.tertiary};
+    border-color: ${({ theme }) => theme.border.strong};
   }
 
   svg {
-    color: #6b7280;
+    color: ${({ theme }) => theme.text.muted};
   }
 `;
 
-// Search
 export const SearchContainer = styled.div`
   position: relative;
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
 `;
 
 export const SearchIcon = styled.div`
@@ -57,7 +55,7 @@ export const SearchIcon = styled.div`
   left: 1.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.placeholder};
   display: flex;
   align-items: center;
   pointer-events: none;
@@ -66,25 +64,24 @@ export const SearchIcon = styled.div`
 export const SearchInput = styled.input`
   width: 100%;
   padding: 0.625rem 0.75rem 0.625rem 2.25rem;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.bg.secondary};
+  border: 1px solid ${({ theme }) => theme.border.default};
   border-radius: 0.375rem;
   font-size: 0.875rem;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   transition: all 0.2s;
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.placeholder};
   }
 
   &:focus {
     outline: none;
-    background-color: #ffffff;
-    border-color: #14b8a6;
+    background-color: ${({ theme }) => theme.bg.primary};
+    border-color: ${({ theme }) => theme.brand.primary};
   }
 `;
 
-// Lista de Conversas
 export const ConversationsList = styled.div`
   flex: 1;
   overflow-y: auto;
@@ -99,35 +96,39 @@ export const ConversationsList = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #e5e7eb;
+    background: ${({ theme }) => theme.conversation.scrollThumb};
     border-radius: 3px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #14b8a6;
+    background: ${({ theme }) => theme.brand.primary};
   }
 `;
 
 export const EmptyState = styled.div`
   padding: 3rem 1rem;
   text-align: center;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   font-size: 0.875rem;
 `;
 
-// Item de Conversa
-export const ItemContainer = styled.button<{ $isSelected: boolean; $hasUnread?: boolean }>`
+export const ItemContainer = styled.button<{
+  $isSelected: boolean;
+  $hasUnread?: boolean;
+}>`
   width: 100%;
   display: flex;
   align-items: flex-start;
   gap: 0.625rem;
   padding: 0.75rem;
   border: none;
-  border-left: 3px solid ${({ $hasUnread }) => ($hasUnread ? '#14b8a6' : 'transparent')};
-  border-bottom: 1px solid #f3f4f6;
-  background-color: ${({ $isSelected, $hasUnread }) => {
-    if ($hasUnread) return '#ccfbf1'; // Teal mais forte para mensagem não lida
-    if ($isSelected) return '#f0fdfa';
+  border-left: 3px solid
+    ${({ $hasUnread, theme }) =>
+      $hasUnread ? theme.brand.primary : 'transparent'};
+  border-bottom: 1px solid ${({ theme }) => theme.conversation.itemBorder};
+  background-color: ${({ $isSelected, $hasUnread, theme }) => {
+    if ($hasUnread) return theme.conversation.unreadBg;
+    if ($isSelected) return theme.conversation.selectedBg;
     return 'transparent';
   }};
   cursor: pointer;
@@ -135,15 +136,15 @@ export const ItemContainer = styled.button<{ $isSelected: boolean; $hasUnread?: 
   text-align: left;
 
   &:hover {
-    background-color: ${({ $isSelected, $hasUnread }) => {
-      if ($hasUnread) return '#99f6e4'; // Hover mais forte quando não lida
-      if ($isSelected) return '#f0fdfa';
-      return '#f9fafb';
+    background-color: ${({ $isSelected, $hasUnread, theme }) => {
+      if ($hasUnread) return theme.conversation.unreadHover;
+      if ($isSelected) return theme.conversation.selectedBg;
+      return theme.conversation.hoverBg;
     }};
   }
 
   &:active {
-    background-color: #f0fdfa;
+    background-color: ${({ theme }) => theme.conversation.selectedBg};
   }
 `;
 
@@ -165,7 +166,8 @@ export const ItemHeader = styled.div`
 export const ItemName = styled.h3<{ $hasUnread?: boolean }>`
   font-size: 0.875rem;
   font-weight: ${({ $hasUnread }) => ($hasUnread ? 700 : 500)};
-  color: ${({ $hasUnread }) => ($hasUnread ? '#0f766e' : '#111827')};
+  color: ${({ $hasUnread, theme }) =>
+    $hasUnread ? theme.conversation.unreadText : theme.text.primary};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -175,7 +177,8 @@ export const ItemName = styled.h3<{ $hasUnread?: boolean }>`
 export const ItemTime = styled.span<{ $hasUnread?: boolean }>`
   font-size: 0.75rem;
   font-weight: ${({ $hasUnread }) => ($hasUnread ? 600 : 400)};
-  color: ${({ $hasUnread }) => ($hasUnread ? '#0f766e' : '#6b7280')};
+  color: ${({ $hasUnread, theme }) =>
+    $hasUnread ? theme.conversation.unreadText : theme.text.muted};
   margin-left: 0.5rem;
   flex-shrink: 0;
 `;
@@ -183,7 +186,8 @@ export const ItemTime = styled.span<{ $hasUnread?: boolean }>`
 export const ItemMessage = styled.p<{ $hasUnread?: boolean }>`
   font-size: 0.875rem;
   font-weight: ${({ $hasUnread }) => ($hasUnread ? 600 : 400)};
-  color: ${({ $hasUnread }) => ($hasUnread ? '#374151' : '#6b7280')};
+  color: ${({ $hasUnread, theme }) =>
+    $hasUnread ? theme.text.secondary : theme.text.muted};
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -199,7 +203,6 @@ export const ItemFooter = styled.div`
   gap: 0.5rem;
 `;
 
-// Status Badge
 export const StatusBadge = styled.span<{ $variant?: string }>`
   font-size: 0.75rem;
   font-weight: 500;
@@ -208,38 +211,37 @@ export const StatusBadge = styled.span<{ $variant?: string }>`
   border: 1px solid;
   line-height: 1;
   display: inline-block;
-  
-  ${({ $variant }) => {
+
+  ${({ $variant, theme }) => {
     switch ($variant) {
       case 'success':
         return `
-          background-color: #d1fae5;
-          color: #059669;
-          border-color: #10b981;
+          background-color: ${theme.status.success.bg};
+          color: ${theme.status.success.text};
+          border-color: ${theme.status.success.border};
         `;
       case 'warning':
         return `
-          background-color: #fed7aa;
-          color: #ea580c;
-          border-color: #f97316;
+          background-color: ${theme.status.warning.bg};
+          color: ${theme.status.warning.text};
+          border-color: ${theme.status.warning.border};
         `;
       case 'danger':
         return `
-          background-color: #fee2e2;
-          color: #dc2626;
-          border-color: #ef4444;
+          background-color: ${theme.status.danger.bg};
+          color: ${theme.status.danger.text};
+          border-color: ${theme.status.danger.border};
         `;
       default:
         return `
-          background-color: #f3f4f6;
-          color: #6b7280;
-          border-color: #d1d5db;
+          background-color: ${theme.status.default.bg};
+          color: ${theme.status.default.text};
+          border-color: ${theme.status.default.border};
         `;
     }
   }}
 `;
 
-// Notification Badge
 export const NotificationBadge = styled.div`
   width: 20px;
   height: 20px;

@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 export const HeaderContainer = styled.header`
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.bg.primary};
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   padding: 0.75rem 1.5rem;
   display: flex;
@@ -10,6 +10,7 @@ export const HeaderContainer = styled.header`
   justify-content: space-between;
   gap: 1.5rem;
   flex-shrink: 0;
+  transition: background-color 0.2s ease;
 
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -48,14 +49,14 @@ export const HeaderInfo = styled.div`
 export const HeaderTitle = styled.h1`
   font-size: 1rem;
   font-weight: 600;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
   line-height: 1.4;
 `;
 
 export const HeaderSubtitle = styled.p`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   margin: 0;
   line-height: 1.4;
 `;
@@ -71,10 +72,9 @@ export const MetricsContainer = styled.div`
   }
 `;
 
-// MetricCard Styles
 export const CardContainer = styled.div`
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.bg.primary};
+  border: 1px solid ${({ theme }) => theme.border.default};
   border-radius: 0.5rem;
   padding: 0.625rem 0.875rem;
   display: flex;
@@ -82,11 +82,11 @@ export const CardContainer = styled.div`
   gap: 0.625rem;
   min-width: 120px;
   transition: all 0.2s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.card.shadow};
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border-color: #d1d5db;
+    box-shadow: ${({ theme }) => theme.card.shadowHover};
+    border-color: ${({ theme }) => theme.border.strong};
     transform: translateY(-1px);
   }
 
@@ -105,7 +105,7 @@ export const MetricContent = styled.div`
 
 export const MetricLabel = styled.span`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   font-weight: 400;
   line-height: 1.3;
 `;
@@ -113,7 +113,7 @@ export const MetricLabel = styled.span`
 export const MetricValue = styled.span`
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1;
 `;
 
@@ -124,17 +124,17 @@ export const StatusBadge = styled.span<{ $variant?: string }>`
   border-radius: 0.25rem;
   line-height: 1;
   display: inline-block;
-  background-color: ${({ $variant }) => {
-    if ($variant === 'success') return '#d1fae5';
-    if ($variant === 'warning') return '#fed7aa';
-    if ($variant === 'danger') return '#fee2e2';
-    return '#e5e7eb';
+  background-color: ${({ $variant, theme }) => {
+    if ($variant === 'success') return theme.status.success.bg;
+    if ($variant === 'warning') return theme.status.warning.bg;
+    if ($variant === 'danger') return theme.status.danger.bg;
+    return theme.status.default.bg;
   }};
-  color: ${({ $variant }) => {
-    if ($variant === 'success') return '#059669';
-    if ($variant === 'warning') return '#ea580c';
-    if ($variant === 'danger') return '#dc2626';
-    return '#6b7280';
+  color: ${({ $variant, theme }) => {
+    if ($variant === 'success') return theme.status.success.text;
+    if ($variant === 'warning') return theme.status.warning.text;
+    if ($variant === 'danger') return theme.status.danger.text;
+    return theme.status.default.text;
   }};
 `;
 

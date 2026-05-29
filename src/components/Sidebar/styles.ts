@@ -6,11 +6,11 @@ export const SidebarContainer = styled.aside<{ $isOpen: boolean }>`
   top: 0;
   height: 100vh;
   width: ${({ $isOpen }) => ($isOpen ? '256px' : '80px')};
-  background-color: #111827;
+  background-color: ${({ theme }) => theme.sidebar.bg};
   box-shadow: 2px 0 16px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, background-color 0.2s ease;
   z-index: 1000;
 `;
 
@@ -30,13 +30,13 @@ export const HamburgerButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: ${({ theme }) => theme.sidebar.iconColor};
   transition: color 0.2s, background-color 0.2s;
   border-radius: 0.375rem;
 
   &:hover {
-    color: #f9fafb;
-    background-color: rgba(255, 255, 255, 0.08);
+    color: ${({ theme }) => theme.sidebar.iconHoverColor};
+    background-color: ${({ theme }) => theme.sidebar.buttonHoverBg};
   }
 
   svg {
@@ -59,12 +59,12 @@ export const MenuList = styled.nav`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: ${({ theme }) => theme.sidebar.scrollThumb};
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: ${({ theme }) => theme.sidebar.scrollThumbHover};
   }
 `;
 
@@ -73,10 +73,12 @@ export const MenuItem = styled.a<{ $active?: boolean; $isOpen: boolean }>`
   align-items: center;
   padding: 0.75rem 1rem;
   margin: 0.25rem 0.75rem;
-  color: ${({ $active }) => ($active ? '#14b8a6' : '#9ca3af')};
-  background-color: ${({ $active }) => ($active ? 'rgba(20, 184, 166, 0.12)' : 'transparent')};
+  color: ${({ $active, theme }) => ($active ? theme.sidebar.activeText : theme.sidebar.itemText)};
+  background-color: ${({ $active, theme }) =>
+    $active ? theme.sidebar.activeBg : 'transparent'};
   border-radius: 0.5rem;
-  border-left: 3px solid ${({ $active }) => ($active ? '#14b8a6' : 'transparent')};
+  border-left: 3px solid
+    ${({ $active, theme }) => ($active ? theme.sidebar.activeText : 'transparent')};
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s;
@@ -85,9 +87,10 @@ export const MenuItem = styled.a<{ $active?: boolean; $isOpen: boolean }>`
   font-weight: ${({ $active }) => ($active ? '600' : '400')};
 
   &:hover {
-    background-color: ${({ $active }) =>
-      $active ? 'rgba(20, 184, 166, 0.18)' : 'rgba(255, 255, 255, 0.06)'};
-    color: ${({ $active }) => ($active ? '#14b8a6' : '#e5e7eb')};
+    background-color: ${({ $active, theme }) =>
+      $active ? theme.sidebar.activeHoverBg : theme.sidebar.hoverBg};
+    color: ${({ $active, theme }) =>
+      $active ? theme.sidebar.activeText : theme.sidebar.hoverText};
   }
 
   svg {
@@ -106,7 +109,7 @@ export const MenuItemText = styled.span<{ $isOpen: boolean }>`
 `;
 
 export const UserSection = styled.div<{ $isOpen: boolean }>`
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid ${({ theme }) => theme.sidebar.border};
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -128,7 +131,7 @@ export const UserAvatar = styled.img`
   min-width: 40px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #14b8a6;
+  background-color: ${({ theme }) => theme.brand.primary};
   box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.3);
 `;
 
@@ -157,7 +160,7 @@ export const UserDetails = styled.div<{ $isOpen: boolean }>`
 export const UserName = styled.div`
   font-weight: 500;
   font-size: 0.875rem;
-  color: #f9fafb;
+  color: ${({ theme }) => theme.sidebar.userName};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -165,13 +168,13 @@ export const UserName = styled.div`
 
 export const UserEmail = styled.div`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.sidebar.userEmail};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-export const LogoutButton = styled.button`
+export const SidebarIconButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,19 +182,28 @@ export const LogoutButton = styled.button`
   background-color: transparent;
   border: none;
   border-radius: 0.375rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.sidebar.iconColor};
   cursor: pointer;
   transition: all 0.2s;
   min-width: 32px;
   height: 32px;
 
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const LogoutButton = styled(SidebarIconButton)`
   &:hover {
     background-color: rgba(239, 68, 68, 0.12);
     color: #ef4444;
   }
+`;
 
-  svg {
-    width: 20px;
-    height: 20px;
+export const ThemeToggleButton = styled(SidebarIconButton)`
+  &:hover {
+    background-color: ${({ theme }) => theme.sidebar.buttonHoverBg};
+    color: ${({ theme }) => theme.sidebar.iconHoverColor};
   }
 `;

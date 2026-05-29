@@ -6,7 +6,7 @@ export const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #f9fafb;
+  background-color: ${({ theme }) => theme.chat.areaBg};
 `;
 
 export const EmptyState = styled.div`
@@ -15,17 +15,17 @@ export const EmptyState = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.placeholder};
   gap: 1rem;
 `;
 
 export const EmptyStateIcon = styled.div`
-  color: #d1d5db;
+  color: ${({ theme }) => theme.border.strong};
 `;
 
 export const EmptyStateText = styled.p`
   font-size: 1rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
 `;
 
 // ============= ChatHeader =============
@@ -34,8 +34,9 @@ export const HeaderContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1.25rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.chat.headerBg};
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
+  transition: background-color 0.2s ease;
 
   @media (max-width: 768px) {
     padding: 0.625rem 1rem;
@@ -85,12 +86,12 @@ export const PatientInfo = styled.div`
 export const PatientName = styled.h2`
   font-size: 0.875rem;
   font-weight: 600;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const PatientPhone = styled.span`
   font-size: 0.8125rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -115,7 +116,7 @@ export const ActionButton = styled.button`
   border-radius: 50%;
   border: none;
   background-color: transparent;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,12 +124,12 @@ export const ActionButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f3f4f6;
-    color: #111827;
+    background-color: ${({ theme }) => theme.bg.tertiary};
+    color: ${({ theme }) => theme.text.primary};
   }
 
   &:active {
-    background-color: #e5e7eb;
+    background-color: ${({ theme }) => theme.border.default};
   }
 
   &:disabled {
@@ -141,9 +142,9 @@ export const DropdownMenu = styled.div`
   position: absolute;
   top: 48px;
   right: 8px;
-  background: white;
+  background: ${({ theme }) => theme.dropdown.bg};
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: ${({ theme }) => theme.dropdown.shadow};
   min-width: 200px;
   z-index: 1000;
   overflow: hidden;
@@ -156,19 +157,21 @@ export const DropdownItem = styled.button<{ $danger?: boolean }>`
   gap: 12px;
   padding: 12px 16px;
   border: none;
-  background: white;
-  color: ${({ $danger }) => ($danger ? '#ef4444' : '#374151')};
+  background: ${({ theme }) => theme.dropdown.bg};
+  color: ${({ $danger, theme }) => ($danger ? '#ef4444' : theme.dropdown.text)};
   font-size: 14px;
   text-align: left;
   cursor: pointer;
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: ${({ $danger }) => ($danger ? '#fef2f2' : '#f9fafb')};
+    background-color: ${({ $danger, theme }) =>
+      $danger ? theme.dropdown.dangerHoverBg : theme.dropdown.hoverBg};
   }
 
   &:active {
-    background-color: ${({ $danger }) => ($danger ? '#fee2e2' : '#f3f4f6')};
+    background-color: ${({ $danger, theme }) =>
+      $danger ? theme.dropdown.dangerActiveBg : theme.dropdown.activeBg};
   }
 
   svg {
@@ -180,8 +183,12 @@ export const DropdownItem = styled.button<{ $danger?: boolean }>`
 export const MessagesArea = styled.div`
   flex: 1;
   overflow: hidden;
-  background-color: #f3f4f6;
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+  background-color: ${({ theme }) => theme.chat.areaBg};
+  background-image: radial-gradient(
+    circle,
+    ${({ theme }) => theme.chat.dotColor} 1px,
+    transparent 1px
+  );
   background-size: 20px 20px;
 `;
 
@@ -206,12 +213,12 @@ export const MessagesScroll = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: ${({ theme }) => theme.chat.scrollThumb};
     border-radius: 3px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: ${({ theme }) => theme.chat.scrollThumbHover};
   }
 `;
 
@@ -222,8 +229,8 @@ export const DateDivider = styled.div`
 `;
 
 export const DateLabel = styled.span`
-  background-color: #e5e7eb;
-  color: #6b7280;
+  background-color: ${({ theme }) => theme.chat.dateLabelBg};
+  color: ${({ theme }) => theme.chat.dateLabelText};
   padding: 0.25rem 0.625rem;
   border-radius: 0.375rem;
   font-size: 0.6875rem;
@@ -263,10 +270,10 @@ export const MessageMenuDropdown = styled.div`
   bottom: 28px;
   top: auto;
   right: 6px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.dropdown.bg};
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
-  border: 1px solid #f3f4f6;
+  box-shadow: ${({ theme }) => theme.dropdown.shadow};
+  border: 1px solid ${({ theme }) => theme.dropdown.border};
   z-index: 100;
   overflow: hidden;
   min-width: 136px;
@@ -279,15 +286,16 @@ export const MessageMenuItem = styled.button<{ $danger?: boolean }>`
   gap: 8px;
   padding: 10px 14px;
   border: none;
-  background: #ffffff;
-  color: ${({ $danger }) => ($danger ? '#ef4444' : '#374151')};
+  background: ${({ theme }) => theme.dropdown.bg};
+  color: ${({ $danger, theme }) => ($danger ? '#ef4444' : theme.dropdown.text)};
   font-size: 0.8125rem;
   text-align: left;
   cursor: pointer;
   transition: background-color 0.15s;
 
   &:hover {
-    background-color: ${({ $danger }) => ($danger ? '#fef2f2' : '#f9fafb')};
+    background-color: ${({ $danger, theme }) =>
+      $danger ? theme.dropdown.dangerHoverBg : theme.dropdown.hoverBg};
   }
 
   svg {
@@ -334,27 +342,37 @@ export const RetryButton = styled.button`
   }
 `;
 
-export const MessageBubble = styled.div<{ $sender: MessageSender; $hasError?: boolean; $isDeleted?: boolean }>`
+export const MessageBubble = styled.div<{
+  $sender: MessageSender;
+  $hasError?: boolean;
+  $isDeleted?: boolean;
+}>`
   max-width: 70%;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   position: relative;
-  background-color: ${({ $sender, $isDeleted }) => {
-    if ($isDeleted) return $sender === 'human' || $sender === 'ai' ? '#0d9488' : '#f3f4f6';
-    if ($sender === 'human' || $sender === 'ai') return '#14b8a6';
-    return '#ffffff';
+  background-color: ${({ $sender, $isDeleted, theme }) => {
+    if ($isDeleted)
+      return $sender === 'human' || $sender === 'ai' ? '#0d9488' : theme.chat.inboundBg;
+    if ($sender === 'human' || $sender === 'ai') return theme.brand.primary;
+    return theme.chat.inboundBg;
   }};
-  color: ${({ $sender, $isDeleted }) => {
-    if ($isDeleted) return $sender === 'human' || $sender === 'ai' ? 'rgba(255,255,255,0.55)' : '#9ca3af';
+  color: ${({ $sender, $isDeleted, theme }) => {
+    if ($isDeleted)
+      return $sender === 'human' || $sender === 'ai'
+        ? 'rgba(255,255,255,0.55)'
+        : theme.text.muted;
     if ($sender === 'human' || $sender === 'ai') return '#ffffff';
-    return '#111827';
+    return theme.chat.inboundText;
   }};
-  opacity: ${({ $isDeleted }) => $isDeleted ? 0.7 : 1};
+  opacity: ${({ $isDeleted }) => ($isDeleted ? 0.7 : 1)};
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   border: ${({ $hasError, $isDeleted }) =>
-    $isDeleted ? '1px dashed rgba(0,0,0,0.15)' :
-    $hasError   ? '1px solid #ef4444' :
-    'none'};
+    $isDeleted
+      ? '1px dashed rgba(0,0,0,0.15)'
+      : $hasError
+      ? '1px solid #ef4444'
+      : 'none'};
   word-wrap: break-word;
   transition: opacity 0.2s;
 
@@ -468,7 +486,7 @@ export const MessageStatusIcon = styled.span<{ $status: MessageStatus }>`
   display: flex;
   align-items: center;
   opacity: 0.7;
-  
+
   color: ${({ $status }) => {
     if ($status === 'read') return '#10b981';
     if ($status === 'failed') return '#ef4444';
@@ -478,9 +496,10 @@ export const MessageStatusIcon = styled.span<{ $status: MessageStatus }>`
 
 // ============= MessageInput =============
 export const InputContainer = styled.div`
-  background-color: #ffffff;
-  border-top: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.chat.headerBg};
+  border-top: 1px solid ${({ theme }) => theme.border.default};
   position: relative;
+  transition: background-color 0.2s ease;
 `;
 
 export const InputWrapper = styled.div`
@@ -499,23 +518,23 @@ export const InputField = styled.textarea`
   min-height: 40px;
   max-height: 120px;
   padding: 0.625rem 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid ${({ theme }) => theme.border.default};
   border-radius: 1.25rem;
   font-size: 0.9375rem;
   font-family: inherit;
-  color: #111827;
-  background-color: #f9fafb;
+  color: ${({ theme }) => theme.text.primary};
+  background-color: ${({ theme }) => theme.chat.inputBg};
   resize: none;
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #14b8a6;
-    background-color: #ffffff;
+    border-color: ${({ theme }) => theme.brand.primary};
+    background-color: ${({ theme }) => theme.chat.inputFocusBg};
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.placeholder};
   }
 
   &:disabled {
@@ -529,7 +548,7 @@ export const SendButton = styled.button`
   height: 36px;
   border-radius: 50%;
   border: none;
-  background-color: #14b8a6;
+  background-color: ${({ theme }) => theme.brand.primary};
   color: white;
   display: flex;
   align-items: center;
@@ -539,15 +558,15 @@ export const SendButton = styled.button`
   flex-shrink: 0;
 
   &:hover:not(:disabled) {
-    background-color: #0f9688;
+    background-color: ${({ theme }) => theme.brand.hover};
   }
 
   &:active:not(:disabled) {
-    background-color: #0d7a6f;
+    background-color: ${({ theme }) => theme.brand.active};
   }
 
   &:disabled {
-    background-color: #d1d5db;
+    background-color: ${({ theme }) => theme.border.strong};
     cursor: not-allowed;
   }
 `;
@@ -567,8 +586,8 @@ export const AttachmentPreview = styled.div`
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background-color: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.chat.inputBg};
+  border-top: 1px solid ${({ theme }) => theme.border.default};
   overflow-x: auto;
 
   &::-webkit-scrollbar {
@@ -580,7 +599,7 @@ export const AttachmentPreview = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: ${({ theme }) => theme.border.strong};
     border-radius: 2px;
   }
 `;
@@ -595,7 +614,7 @@ export const AttachmentImage = styled.img`
   height: 80px;
   object-fit: cover;
   border-radius: 0.375rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid ${({ theme }) => theme.chat.attachmentBorder};
 `;
 
 export const AttachmentDocument = styled.div`
@@ -606,15 +625,15 @@ export const AttachmentDocument = styled.div`
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
-  background-color: #ffffff;
-  border: 2px solid #e5e7eb;
+  background-color: ${({ theme }) => theme.chat.attachmentDocBg};
+  border: 2px solid ${({ theme }) => theme.chat.attachmentBorder};
   border-radius: 0.375rem;
   padding: 0.5rem;
 `;
 
 export const AttachmentName = styled.span`
   font-size: 0.75rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.muted};
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -690,11 +709,14 @@ export const EditButton = styled.button<{ $primary?: boolean }>`
   font-family: inherit;
   border: 1px solid rgba(255, 255, 255, 0.3);
 
-  ${({ $primary }) => $primary ? `
+  ${({ $primary }) =>
+    $primary
+      ? `
     background: rgba(255, 255, 255, 0.25);
     color: #ffffff;
     &:hover { background: rgba(255, 255, 255, 0.35); }
-  ` : `
+  `
+      : `
     background: transparent;
     color: rgba(255, 255, 255, 0.7);
     &:hover { background: rgba(255, 255, 255, 0.1); }
