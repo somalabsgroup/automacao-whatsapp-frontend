@@ -77,11 +77,16 @@ export default function ChatContainer({
   onCloseConversation,
 }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevConversationIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Scroll to bottom when new messages arrive
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const isNewConversation = conversation?.id !== prevConversationIdRef.current;
+    prevConversationIdRef.current = conversation?.id ?? null;
+
+    messagesEndRef.current?.scrollIntoView({
+      behavior: isNewConversation ? 'instant' : 'smooth',
+    });
+  }, [messages, conversation?.id]);
 
   if (!conversation) {
     return (
