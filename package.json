@@ -14,6 +14,7 @@
     "@types/styled-components": "^5.1.36",
     "axios": "^1.16.1",
     "emoji-picker-react": "^4.19.1",
+    "framer-motion": "^12.40.0",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
     "react": "19.2.4",
