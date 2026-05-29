@@ -203,23 +203,6 @@ export const MessagesScroll = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.chat.scrollThumb};
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: ${({ theme }) => theme.chat.scrollThumbHover};
-  }
 `;
 
 export const DateDivider = styled.div`
@@ -589,19 +572,6 @@ export const AttachmentPreview = styled.div`
   background-color: ${({ theme }) => theme.chat.inputBg};
   border-top: 1px solid ${({ theme }) => theme.border.default};
   overflow-x: auto;
-
-  &::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.border.strong};
-    border-radius: 2px;
-  }
 `;
 
 export const AttachmentItem = styled.div`

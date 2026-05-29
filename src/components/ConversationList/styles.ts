@@ -86,23 +86,6 @@ export const ConversationsList = styled.div`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.conversation.scrollThumb};
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: ${({ theme }) => theme.brand.primary};
-  }
 `;
 
 export const EmptyState = styled.div`

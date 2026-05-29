@@ -30,8 +30,6 @@ export const lightTheme = {
     hoverBg: 'rgba(255, 255, 255, 0.06)',
     hoverText: '#e5e7eb',
     border: 'rgba(255, 255, 255, 0.08)',
-    scrollThumb: 'rgba(255, 255, 255, 0.1)',
-    scrollThumbHover: 'rgba(255, 255, 255, 0.2)',
     userName: '#f9fafb',
     userEmail: '#6b7280',
     iconColor: '#6b7280',
@@ -48,8 +46,6 @@ export const lightTheme = {
     inputFocusBg: '#ffffff',
     dateLabelBg: '#e5e7eb',
     dateLabelText: '#6b7280',
-    scrollThumb: '#d1d5db',
-    scrollThumbHover: '#9ca3af',
     attachmentDocBg: '#ffffff',
     attachmentBorder: '#e5e7eb',
   },
@@ -71,7 +67,6 @@ export const lightTheme = {
     selectedBg: '#f0fdfa',
     hoverBg: '#f9fafb',
     itemBorder: '#f3f4f6',
-    scrollThumb: '#e5e7eb',
   },
   table: {
     headBg: '#f9fafb',
@@ -88,6 +83,10 @@ export const lightTheme = {
     warning: { bg: '#fed7aa', text: '#ea580c', border: '#f97316' },
     danger: { bg: '#fee2e2', text: '#dc2626', border: '#ef4444' },
     default: { bg: '#f3f4f6', text: '#6b7280', border: '#d1d5db' },
+  },
+  scrollbar: {
+    thumb: 'rgba(15, 118, 110, 0.5)',
+    thumbHover: 'rgba(15, 118, 110, 0.8)',
   },
 };
 
@@ -123,8 +122,6 @@ export const darkTheme: typeof lightTheme = {
     hoverBg: 'rgba(255, 255, 255, 0.06)',
     hoverText: '#e5e7eb',
     border: 'rgba(255, 255, 255, 0.08)',
-    scrollThumb: 'rgba(255, 255, 255, 0.1)',
-    scrollThumbHover: 'rgba(255, 255, 255, 0.2)',
     userName: '#f9fafb',
     userEmail: '#6b7280',
     iconColor: '#6b7280',
@@ -141,8 +138,6 @@ export const darkTheme: typeof lightTheme = {
     inputFocusBg: '#1f2937',
     dateLabelBg: '#374151',
     dateLabelText: '#9ca3af',
-    scrollThumb: '#4b5563',
-    scrollThumbHover: '#6b7280',
     attachmentDocBg: '#374151',
     attachmentBorder: '#4b5563',
   },
@@ -164,7 +159,6 @@ export const darkTheme: typeof lightTheme = {
     selectedBg: 'rgba(20, 184, 166, 0.08)',
     hoverBg: '#374151',
     itemBorder: '#374151',
-    scrollThumb: '#4b5563',
   },
   table: {
     headBg: '#111827',
@@ -181,6 +175,10 @@ export const darkTheme: typeof lightTheme = {
     warning: { bg: '#431407', text: '#fb923c', border: '#ea580c' },
     danger: { bg: '#450a0a', text: '#f87171', border: '#dc2626' },
     default: { bg: '#1f2937', text: '#9ca3af', border: '#374151' },
+  },
+  scrollbar: {
+    thumb: 'rgba(20, 184, 166, 0.35)',
+    thumbHover: 'rgba(20, 184, 166, 0.65)',
   },
 };
 

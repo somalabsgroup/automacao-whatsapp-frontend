@@ -17,6 +17,36 @@ const GlobalStyle = createGlobalStyle`
     background: ${({ theme }) => theme.bg.secondary};
     transition: background-color 0.2s ease, color 0.2s ease;
   }
+
+  /* Scrollbar global — Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: ${({ theme }) => theme.scrollbar.thumb} transparent;
+  }
+
+  /* Scrollbar global — WebKit/Blink */
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.scrollbar.thumb};
+    border-radius: 9999px;
+    transition: background 0.2s;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: ${({ theme }) => theme.scrollbar.thumbHover};
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 `;
 
 export default function StyledComponentsRegistry({

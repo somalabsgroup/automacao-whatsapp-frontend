@@ -49,23 +49,6 @@ export const MenuList = styled.nav`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.sidebar.scrollThumb};
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: ${({ theme }) => theme.sidebar.scrollThumbHover};
-  }
 `;
 
 export const MenuItem = styled.a<{ $active?: boolean; $isOpen: boolean }>`
