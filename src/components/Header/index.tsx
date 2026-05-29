@@ -5,7 +5,9 @@ import MetricCard from './MetricCard';
 import {
   HeaderContainer,
   HeaderLeft,
-  LogoContainer,
+  Logo,
+  LogoIcon,
+  LogoText,
   HeaderInfo,
   HeaderTitle,
   HeaderSubtitle,
@@ -35,13 +37,18 @@ const metricIcons = {
 export default function Header({
   title,
   subtitle,
-  logoText = 'CV+',
+  logoText = 'SomaClini',
   metrics = [],
 }: HeaderProps) {
   return (
     <HeaderContainer>
       <HeaderLeft>
-        {/* <LogoContainer>{logoText}</LogoContainer> */}
+        <Logo>
+          <LogoIcon>
+            <MessageSquare />
+          </LogoIcon>
+          <LogoText>{logoText}</LogoText>
+        </Logo>
         <HeaderInfo>
           <HeaderTitle>{title}</HeaderTitle>
           {subtitle && <HeaderSubtitle>{subtitle}</HeaderSubtitle>}

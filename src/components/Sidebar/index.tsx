@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import { useState, useRef, useEffect } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,6 +10,8 @@ import {
   LogOut,
   Sun,
   Moon,
+  Settings,
+  ChevronDown,
 } from 'lucide-react';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useThemeStore } from '@/stores/useThemeStore';
@@ -26,8 +29,11 @@ import {
   UserDetails,
   UserName,
   UserEmail,
-  LogoutButton,
-  ThemeToggleButton,
+  UserMenuButton,
+  UserDropdown,
+  DropdownItem,
+  DropdownDivider,
+  DropdownIconBox,
 } from './styles';
 
 interface SidebarProps {
@@ -44,6 +50,22 @@ export default function Sidebar({ user }: SidebarProps) {
   const router = useRouter();
   const { isOpen, toggleSidebar } = useSidebarStore();
   const { mode, toggleTheme } = useThemeStore();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    }
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showUserMenu]);
 
   const menuItems = [
     {
@@ -102,8 +124,13 @@ export default function Sidebar({ user }: SidebarProps) {
         ))}
       </MenuList>
 
-      <UserSection $isOpen={isOpen}>
-        <UserInfo $isOpen={isOpen}>
+      <UserSection $isOpen={isOpen} ref={dropdownRef}>
+        <UserMenuButton
+          $isOpen={isOpen}
+          onClick={() => setShowUserMenu(!showUserMenu)}
+          aria-label="Menu do usuário"
+          aria-expanded={showUserMenu}
+        >
           {user?.imageUrl ? (
             <UserAvatar src={user.imageUrl} alt={getUserFullName()} />
           ) : (
@@ -113,16 +140,38 @@ export default function Sidebar({ user }: SidebarProps) {
             <UserName>{getUserFullName()}</UserName>
             <UserEmail>{user?.email || 'roberto@clinica.com'}</UserEmail>
           </UserDetails>
-        </UserInfo>
-        <ThemeToggleButton
-          onClick={toggleTheme}
-          title={mode === 'dark' ? 'Modo claro' : 'Modo escuro'}
-        >
-          {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        </ThemeToggleButton>
-        <LogoutButton onClick={handleLogout} title="Sair">
-          <LogOut size={20} />
-        </LogoutButton>
+          {isOpen && (
+            <ChevronDown
+              size={16}
+              style={{
+                transition: 'transform 0.2s',
+                transform: showUserMenu ? 'rotate(180deg)' : 'rotate(0deg)',
+                marginLeft: 'auto',
+                minWidth: '16px',
+              }}
+            />
+          )}
+        </UserMenuButton>
+
+        {showUserMenu && (
+          <UserDropdown $isOpen={isOpen}>
+            <DropdownItem onClick={toggleTheme}>
+              <DropdownIconBox>
+                {mode === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              </DropdownIconBox>
+              <span>{mode === 'dark' ? 'Modo Claro' : 'Modo Escuro'}</span>
+            </DropdownItem>
+            
+            <DropdownDivider />
+            
+            <DropdownItem $danger onClick={handleLogout}>
+              <DropdownIconBox>
+                <LogOut size={18} />
+              </DropdownIconBox>
+              <span>Sair</span>
+            </DropdownItem>
+          </UserDropdown>
+        )}
       </UserSection>
     </SidebarContainer>
   );

@@ -94,18 +94,7 @@ export const MenuItemText = styled.span<{ $isOpen: boolean }>`
 export const UserSection = styled.div<{ $isOpen: boolean }>`
   border-top: 1px solid ${({ theme }) => theme.sidebar.border};
   padding: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: ${({ $isOpen }) => ($isOpen ? 'space-between' : 'center')};
-  gap: 0.5rem;
-`;
-
-export const UserInfo = styled.div<{ $isOpen: boolean }>`
-  display: ${({ $isOpen }) => ($isOpen ? 'flex' : 'none')};
-  align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 0;
+  position: relative;
 `;
 
 export const UserAvatar = styled.img`
@@ -138,6 +127,10 @@ export const UserDetails = styled.div<{ $isOpen: boolean }>`
   min-width: 0;
   opacity: ${({ $isOpen }) => ($isOpen ? '1' : '0')};
   transition: opacity 0.2s;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
 `;
 
 export const UserName = styled.div`
@@ -157,36 +150,103 @@ export const UserEmail = styled.div`
   white-space: nowrap;
 `;
 
-export const SidebarIconButton = styled.button`
+export const UserMenuButton = styled.button<{ $isOpen: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: ${({ $isOpen }) => ($isOpen ? '0.5rem' : '0')};
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: ${({ theme }) => theme.sidebar.userName};
+
+  &:hover {
+    background: ${({ theme, $isOpen }) => ($isOpen ? theme.sidebar.buttonHoverBg : 'transparent')};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+export const UserDropdown = styled.div<{ $isOpen: boolean }>`
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: ${({ $isOpen }) => ($isOpen ? '1rem' : '0.5rem')};
+  right: ${({ $isOpen }) => ($isOpen ? 'auto' : '0.5rem')};
+  width: ${({ $isOpen }) => ($isOpen ? 'calc(100% - 2rem)' : 'auto')};
+  min-width: ${({ $isOpen }) => ($isOpen ? 'auto' : '220px')};
+  background: ${({ theme }) => theme.dropdown.bg};
+  border: 1px solid ${({ theme }) => theme.dropdown.border};
+  border-radius: 0.75rem;
+  box-shadow: ${({ theme }) => theme.dropdown.shadow};
+  overflow: hidden;
+  z-index: 1000;
+  animation: slideUp 0.2s ease;
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+export const DropdownItem = styled.button<{ $danger?: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: ${({ theme, $danger }) => ($danger ? '#ef4444' : theme.dropdown.text)};
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  &:hover {
+    background: ${({ theme, $danger }) =>
+      $danger ? theme.dropdown.dangerHoverBg : theme.dropdown.hoverBg};
+  }
+
+  &:active {
+    background: ${({ theme, $danger }) =>
+      $danger ? theme.dropdown.dangerActiveBg : theme.dropdown.activeBg};
+  }
+
+  span {
+    flex: 1;
+  }
+`;
+
+export const DropdownDivider = styled.div`
+  height: 1px;
+  background: ${({ theme }) => theme.dropdown.border};
+  margin: 0.25rem 0;
+`;
+
+export const DropdownIconBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
-  background-color: transparent;
-  border: none;
-  border-radius: 0.375rem;
-  color: ${({ theme }) => theme.sidebar.iconColor};
-  cursor: pointer;
-  transition: all 0.2s;
-  min-width: 32px;
+  width: 32px;
   height: 32px;
+  border-radius: 0.375rem;
+  background: ${({ theme }) => theme.dropdown.activeBg};
+  flex-shrink: 0;
 
   svg {
-    width: 20px;
-    height: 20px;
-  }
-`;
-
-export const LogoutButton = styled(SidebarIconButton)`
-  &:hover {
-    background-color: rgba(239, 68, 68, 0.12);
-    color: #ef4444;
-  }
-`;
-
-export const ThemeToggleButton = styled(SidebarIconButton)`
-  &:hover {
-    background-color: ${({ theme }) => theme.sidebar.buttonHoverBg};
-    color: ${({ theme }) => theme.sidebar.iconHoverColor};
+    width: 18px;
+    height: 18px;
   }
 `;

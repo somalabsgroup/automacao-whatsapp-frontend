@@ -13,13 +13,13 @@ interface ConversationItemProps {
 const getStatusLabel = (status: Conversation['status']) => {
   switch (status) {
     case 'ai_handling':
-      return 'IA Ativa';
+      return 'IA';
     case 'human_requested':
-      return 'AÇÃO HUMANA SOLICITADA';
+      return 'Urgente';
     case 'human_active':
-      return 'Atendimento Humano';
+      return 'Em Atendimento';
     case 'awaiting_close':
-      return 'Aguardando Fechamento';
+      return 'Aguardando';
     case 'closed':
       return 'Encerrado';
     default:
