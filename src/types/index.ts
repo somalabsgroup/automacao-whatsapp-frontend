@@ -73,7 +73,7 @@ export interface Conversation {
   tenantId: string;
 }
 
-export type ConversationFilter = "all" | "ai_handling" | "human_requested" | "human_active" | "awaiting_close";
+export type ConversationFilter = "all" | "ai_handling" | "human_requested" | "human_active" | "awaiting_close" | "closed";
 
 // Chat Message Types
 export type MessageSender = "patient" | "ai" | "human";

@@ -1,20 +1,10 @@
-'use client';
+"use client";
 
-import { usePathname, useRouter } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  MessageSquare,
-  UserCog,
-  LogOut,
-  Sun,
-  Moon,
-  Settings,
-  ChevronDown,
-} from 'lucide-react';
-import { useSidebarStore } from '@/stores/useSidebarStore';
-import { useThemeStore } from '@/stores/useThemeStore';
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight, MessageSquare, UserCog, LogOut, Sun, Moon, ChevronDown } from "lucide-react";
+import { useSidebarStore } from "@/stores/useSidebarStore";
+import { useThemeStore } from "@/stores/useThemeStore";
 import {
   SidebarContainer,
   SidebarHeader,
@@ -23,7 +13,6 @@ import {
   MenuItem,
   MenuItemText,
   UserSection,
-  UserInfo,
   UserAvatar,
   UserAvatarPlaceholder,
   UserDetails,
@@ -34,7 +23,7 @@ import {
   DropdownItem,
   DropdownDivider,
   DropdownIconBox,
-} from './styles';
+} from "./styles";
 
 interface SidebarProps {
   user?: {
@@ -62,40 +51,40 @@ export default function Sidebar({ user }: SidebarProps) {
     }
 
     if (showUserMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [showUserMenu]);
 
   const menuItems = [
     {
-      name: 'Mensagens',
-      href: '/dashboard',
+      name: "Mensagens",
+      href: "/dashboard",
       icon: <MessageSquare size={24} />,
     },
     {
-      name: 'Profissionais',
-      href: '/profissionais',
+      name: "Profissionais",
+      href: "/profissionais",
       icon: <UserCog size={24} />,
     },
   ];
 
   const handleLogout = async () => {
-    router.push('/login');
+    router.push("/login");
   };
 
   const getUserInitials = () => {
-    if (!user) return 'DR';
-    const firstName = user.firstName || '';
-    const lastName = user.lastName || '';
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'DR';
+    if (!user) return "DR";
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || "DR";
   };
 
   const getUserFullName = () => {
-    if (!user) return 'Dr. Roberto';
-    const firstName = user.firstName || '';
-    const lastName = user.lastName || '';
-    return `${firstName} ${lastName}`.trim() || 'Usuário';
+    if (!user) return "Dr. Roberto";
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    return `${firstName} ${lastName}`.trim() || "Usuário";
   };
 
   return (
@@ -138,16 +127,16 @@ export default function Sidebar({ user }: SidebarProps) {
           )}
           <UserDetails $isOpen={isOpen}>
             <UserName>{getUserFullName()}</UserName>
-            <UserEmail>{user?.email || 'roberto@clinica.com'}</UserEmail>
+            <UserEmail>{user?.email || "roberto@clinica.com"}</UserEmail>
           </UserDetails>
           {isOpen && (
             <ChevronDown
               size={16}
               style={{
-                transition: 'transform 0.2s',
-                transform: showUserMenu ? 'rotate(180deg)' : 'rotate(0deg)',
-                marginLeft: 'auto',
-                minWidth: '16px',
+                transition: "transform 0.2s",
+                transform: showUserMenu ? "rotate(180deg)" : "rotate(0deg)",
+                marginLeft: "auto",
+                minWidth: "16px",
               }}
             />
           )}
@@ -156,14 +145,12 @@ export default function Sidebar({ user }: SidebarProps) {
         {showUserMenu && (
           <UserDropdown $isOpen={isOpen}>
             <DropdownItem onClick={toggleTheme}>
-              <DropdownIconBox>
-                {mode === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-              </DropdownIconBox>
-              <span>{mode === 'dark' ? 'Modo Claro' : 'Modo Escuro'}</span>
+              <DropdownIconBox>{mode === "dark" ? <Sun size={18} /> : <Moon size={18} />}</DropdownIconBox>
+              <span>{mode === "dark" ? "Modo Claro" : "Modo Escuro"}</span>
             </DropdownItem>
-            
+
             <DropdownDivider />
-            
+
             <DropdownItem $danger onClick={handleLogout}>
               <DropdownIconBox>
                 <LogOut size={18} />
