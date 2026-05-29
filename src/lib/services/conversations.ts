@@ -55,7 +55,7 @@ export async function getConversations(
     conversationsData.map(async (conv: Record<string, unknown>) => {
       const { data: lastMessage } = await supabase
         .from('messages')
-        .select('content, created_at, sender')
+        .select('content, created_at, sender, direction')
         .eq('conversation_id', (conv as { id: string }).id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -94,6 +94,8 @@ export async function getConversations(
               minute: '2-digit',
             })
           : '',
+        lastMessageDirection: lastMessage?.direction as 'inbound' | 'outbound' | undefined,
+        lastMessageSender: lastMessage?.sender as 'patient' | 'ai' | 'human' | undefined,
         status: convData.status as ConversationStatus,
         assignedUserId: convData.assigned_user_id,
         handoffReason: convData.handoff_reason,
@@ -144,7 +146,7 @@ export async function getConversationById(
 
   const { data: lastMessage } = await supabase
     .from('messages')
-    .select('content, created_at')
+    .select('content, created_at, sender, direction')
     .eq('conversation_id', data.id)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -168,6 +170,8 @@ export async function getConversationById(
           minute: '2-digit',
         })
       : '',
+    lastMessageDirection: lastMessage?.direction as 'inbound' | 'outbound' | undefined,
+    lastMessageSender: lastMessage?.sender as 'patient' | 'ai' | 'human' | undefined,
     status: data.status as ConversationStatus,
     assignedUserId: data.assigned_user_id,
     handoffReason: data.handoff_reason,
@@ -197,6 +201,25 @@ interface ConversationListUpdateCallback {
  * Delete a conversation and all its messages
  * Note: Messages will be automatically deleted via CASCADE DELETE if foreign key is configured
  */
+export async function closeConversation(
+  supabase: SupabaseClient,
+  conversationId: string,
+  tenantId: string,
+  reason?: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('conversations')
+    .update({
+      status: 'closed',
+      closed_at: new Date().toISOString(),
+      close_reason: reason || 'Atendimento encerrado pelo atendente',
+    })
+    .eq('id', conversationId)
+    .eq('tenant_id', tenantId);
+
+  if (error) throw error;
+}
+
 export async function deleteConversation(
   supabase: SupabaseClient,
   conversationId: string,

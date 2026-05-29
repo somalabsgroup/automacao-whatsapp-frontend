@@ -41,7 +41,7 @@ export default function Header({
   return (
     <HeaderContainer>
       <HeaderLeft>
-        <LogoContainer>{logoText}</LogoContainer>
+        {/* <LogoContainer>{logoText}</LogoContainer> */}
         <HeaderInfo>
           <HeaderTitle>{title}</HeaderTitle>
           {subtitle && <HeaderSubtitle>{subtitle}</HeaderSubtitle>}

@@ -32,6 +32,14 @@ export const HeaderActions = styled.div`
   display: flex;
   gap: 0.75rem;
   align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  justify-content: space-between;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 `;
 
 export const AddButton = styled.button`
@@ -71,6 +79,48 @@ export const FilterButton = styled.button<{ $active?: boolean }>`
   &:hover {
     background-color: ${({ $active }) => ($active ? '#0f9688' : '#f9fafb')};
     border-color: ${({ $active }) => ($active ? '#0f9688' : '#d1d5db')};
+  }
+`;
+
+export const SearchContainer = styled.div`
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+`;
+
+export const SearchIcon = styled.div`
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+`;
+
+export const SearchInput = styled.input`
+  width: 100%;
+  padding: 0.625rem 0.75rem 0.625rem 2.25rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #111827;
+  transition: all 0.2s;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    outline: none;
+    background-color: #ffffff;
+    border-color: #14b8a6;
   }
 `;
 

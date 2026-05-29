@@ -58,6 +58,8 @@ export interface Conversation {
   avatarColor: AvatarColor;
   lastMessage: string;
   lastMessageTime: string;
+  lastMessageDirection?: MessageDirection;
+  lastMessageSender?: MessageSender;
   status: ConversationStatus;
   assignedUserId?: string;
   handoffReason?: string;

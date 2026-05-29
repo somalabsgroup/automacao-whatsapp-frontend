@@ -7,6 +7,7 @@ import { ItemContainer, ItemContent, ItemFooter, ItemHeader, ItemMessage, ItemNa
 
 interface ConversationItemProps {
   conversation: Conversation;
+  onMarkAsRead?: (conversationId: string) => void;
 }
 
 const getStatusLabel = (status: Conversation['status']) => {
@@ -43,32 +44,36 @@ const getStatusVariant = (status: Conversation['status']) => {
   }
 };
 
-export default function ConversationItem({ conversation }: ConversationItemProps) {
+export default function ConversationItem({ conversation, onMarkAsRead }: ConversationItemProps) {
   const { selectedConversationId, setSelectedConversation } = useConversationStore();
   const isSelected = selectedConversationId === conversation.id;
+  const hasUnread = conversation.hasNotification;
 
   const handleClick = () => {
     setSelectedConversation(conversation.id);
+    if (hasUnread && onMarkAsRead) {
+      onMarkAsRead(conversation.id);
+    }
   };
 
   return (
-    <ItemContainer onClick={handleClick} $isSelected={isSelected}>
+    <ItemContainer onClick={handleClick} $isSelected={isSelected} $hasUnread={hasUnread}>
       <ConversationAvatar initials={conversation.initials} color={conversation.avatarColor} />
       
       <ItemContent>
         <ItemHeader>
-          <ItemName>{conversation.patientName}</ItemName>
-          <ItemTime>{conversation.lastMessageTime}</ItemTime>
+          <ItemName $hasUnread={hasUnread}>{conversation.patientName}</ItemName>
+          <ItemTime $hasUnread={hasUnread}>{conversation.lastMessageTime}</ItemTime>
         </ItemHeader>
         
-        <ItemMessage>{conversation.lastMessage}</ItemMessage>
+        <ItemMessage $hasUnread={hasUnread}>{conversation.lastMessage}</ItemMessage>
         
         <ItemFooter>
           <StatusBadge $variant={getStatusVariant(conversation.status)}>
             {getStatusLabel(conversation.status)}
           </StatusBadge>
           
-          {conversation.hasNotification && (
+          {hasUnread && (
             <NotificationBadge>
               {conversation.notificationCount || 1}
             </NotificationBadge>

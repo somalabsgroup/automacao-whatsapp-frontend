@@ -116,21 +116,30 @@ export const EmptyState = styled.div`
 `;
 
 // Item de Conversa
-export const ItemContainer = styled.button<{ $isSelected: boolean }>`
+export const ItemContainer = styled.button<{ $isSelected: boolean; $hasUnread?: boolean }>`
   width: 100%;
   display: flex;
   align-items: flex-start;
   gap: 0.625rem;
   padding: 0.75rem;
   border: none;
+  border-left: 3px solid ${({ $hasUnread }) => ($hasUnread ? '#14b8a6' : 'transparent')};
   border-bottom: 1px solid #f3f4f6;
-  background-color: ${({ $isSelected }) => ($isSelected ? '#f0fdfa' : 'transparent')};
+  background-color: ${({ $isSelected, $hasUnread }) => {
+    if ($hasUnread) return '#ccfbf1'; // Teal mais forte para mensagem não lida
+    if ($isSelected) return '#f0fdfa';
+    return 'transparent';
+  }};
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
 
   &:hover {
-    background-color: ${({ $isSelected }) => ($isSelected ? '#f0fdfa' : '#f9fafb')};
+    background-color: ${({ $isSelected, $hasUnread }) => {
+      if ($hasUnread) return '#99f6e4'; // Hover mais forte quando não lida
+      if ($isSelected) return '#f0fdfa';
+      return '#f9fafb';
+    }};
   }
 
   &:active {
@@ -153,26 +162,28 @@ export const ItemHeader = styled.div`
   margin-bottom: 0.125rem;
 `;
 
-export const ItemName = styled.h3`
+export const ItemName = styled.h3<{ $hasUnread?: boolean }>`
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #111827;
+  font-weight: ${({ $hasUnread }) => ($hasUnread ? 700 : 500)};
+  color: ${({ $hasUnread }) => ($hasUnread ? '#0f766e' : '#111827')};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1;
 `;
 
-export const ItemTime = styled.span`
+export const ItemTime = styled.span<{ $hasUnread?: boolean }>`
   font-size: 0.75rem;
-  color: #6b7280;
+  font-weight: ${({ $hasUnread }) => ($hasUnread ? 600 : 400)};
+  color: ${({ $hasUnread }) => ($hasUnread ? '#0f766e' : '#6b7280')};
   margin-left: 0.5rem;
   flex-shrink: 0;
 `;
 
-export const ItemMessage = styled.p`
+export const ItemMessage = styled.p<{ $hasUnread?: boolean }>`
   font-size: 0.875rem;
-  color: #6b7280;
+  font-weight: ${({ $hasUnread }) => ($hasUnread ? 600 : 400)};
+  color: ${({ $hasUnread }) => ($hasUnread ? '#374151' : '#6b7280')};
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;

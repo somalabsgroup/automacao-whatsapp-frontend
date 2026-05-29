@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { MoreVertical, User, Trash2 } from 'lucide-react';
+import { MoreVertical, User, Trash2, CheckCircle } from 'lucide-react';
 import { Conversation } from '@/types';
 import { ActionButton, HeaderContainer, HeaderLeft, HeaderRight, PatientAvatar, PatientInfo, PatientName, PatientPhone, StatusIndicator, DropdownMenu, DropdownItem } from './styles';
 
@@ -9,6 +9,7 @@ import { ActionButton, HeaderContainer, HeaderLeft, HeaderRight, PatientAvatar, 
 interface ChatHeaderProps {
   conversation: Conversation;
   onDeleteConversation?: () => void;
+  onCloseConversation?: () => void;
 }
 
 const getStatusText = (status: Conversation['status']) => {
@@ -45,7 +46,7 @@ const getStatusColor = (status: Conversation['status']) => {
   }
 };
 
-export default function ChatHeader({ conversation, onDeleteConversation }: ChatHeaderProps) {
+export default function ChatHeader({ conversation, onDeleteConversation, onCloseConversation }: ChatHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -68,6 +69,15 @@ export default function ChatHeader({ conversation, onDeleteConversation }: ChatH
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showMenu]);
+
+  const handleCloseClick = () => {
+    setShowMenu(false);
+    if (onCloseConversation) {
+      if (confirm('Deseja encerrar este atendimento? O cliente poderá iniciar um novo atendimento ao enviar outra mensagem.')) {
+        onCloseConversation();
+      }
+    }
+  };
 
   const handleDeleteClick = () => {
     setShowMenu(false);
@@ -105,6 +115,12 @@ export default function ChatHeader({ conversation, onDeleteConversation }: ChatH
         
         {showMenu && (
           <DropdownMenu ref={menuRef}>
+            {conversation.status !== 'closed' && onCloseConversation && (
+              <DropdownItem onClick={handleCloseClick}>
+                <CheckCircle size={16} />
+                Encerrar Atendimento
+              </DropdownItem>
+            )}
             <DropdownItem onClick={handleDeleteClick} $danger>
               <Trash2 size={16} />
               Excluir Conversa

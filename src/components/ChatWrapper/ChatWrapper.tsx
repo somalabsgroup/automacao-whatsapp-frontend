@@ -5,7 +5,7 @@ import { useConversationStore } from '@/stores/useConversationStore';
 import { Conversation, ChatMessage } from '@/types';
 import Chat from '@/components/Chat';
 import { createClient } from '@/lib/supabase/client';
-import { sendTextMessage, deleteConversation } from '@/lib/services/conversations';
+import { sendTextMessage, deleteConversation, closeConversation } from '@/lib/services/conversations';
 import { getMessagesByConversation, subscribeToMessages } from '@/lib/services/messages';
 
 interface ChatWrapperProps {
@@ -246,6 +246,23 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     }
   };
 
+  const handleCloseConversation = async () => {
+    if (!selectedConversationId) return;
+
+    try {
+      await closeConversation(supabase, selectedConversationId, tenantId);
+      
+      // Atualizar status da conversa localmente (realtime também vai atualizar)
+      if (onConversationStatusChange) {
+        onConversationStatusChange(selectedConversationId, 'closed');
+      }
+      
+    } catch (error) {
+      console.error('Error closing conversation:', error);
+      alert('Erro ao encerrar atendimento. Tente novamente.');
+    }
+  };
+
   const handleDeleteConversation = async () => {
     if (!selectedConversationId) return;
 
@@ -284,6 +301,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       onSendMessage={handleSendMessage}
       onRetryMessage={handleRetryMessage}
       onDeleteConversation={handleDeleteConversation}
+      onCloseConversation={handleCloseConversation}
     />
   );
 }

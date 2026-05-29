@@ -49,30 +49,29 @@ export default function Sidebar({ user }: SidebarProps) {
       href: '/dashboard',
       icon: <MessageSquare size={24} />,
     },
-    {
-      name: 'Follow-ups',
-      href: '/follow-ups',
-      icon: <Calendar size={24} />,
-    },
-    {
-      name: 'Pacientes',
-      href: '/pacientes',
-      icon: <Users size={24} />,
-    },
+    // {
+    //   name: 'Follow-ups',
+    //   href: '/follow-ups',
+    //   icon: <Calendar size={24} />,
+    // },
+    // {
+    //   name: 'Pacientes',
+    //   href: '/pacientes',
+    //   icon: <Users size={24} />,
+    // },
     {
       name: 'Profissionais',
       href: '/profissionais',
       icon: <UserCog size={24} />,
     },
-    {
-      name: 'Configurações',
-      href: '/configuracoes',
-      icon: <Settings size={24} />,
-    },
+    // {
+    //   name: 'Configurações',
+    //   href: '/configuracoes',
+    //   icon: <Settings size={24} />,
+    // },
   ];
 
   const handleLogout = async () => {
-    // Aqui você pode adicionar a lógica de logout do Supabase
     router.push('/login');
   };
 

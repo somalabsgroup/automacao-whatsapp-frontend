@@ -17,7 +17,7 @@ export default function DashboardContent({
   initialConversations,
   tenantId,
 }: DashboardContentProps) {
-  const { conversations, updateConversationStatusLocal, removeConversation } = useRealtimeConversations(initialConversations, tenantId);
+  const { conversations, updateConversationStatusLocal, removeConversation, markAsRead } = useRealtimeConversations(initialConversations, tenantId);
 
   const metrics: HeaderMetric[] = useMemo(() => {
     const totalConversations = conversations.length;
@@ -36,7 +36,7 @@ export default function DashboardContent({
         value: awaitingAction,
         variant: 'warning' as const,
       },
-      { label: 'Follow-ups Hoje', value: 8, variant: 'default' as const },
+      // { label: 'Follow-ups Hoje', value: 8, variant: 'default' as const },
       { label: 'Bot Ativo', value: 'Online', variant: 'success' as const },
     ];
   }, [conversations]);
@@ -49,7 +49,7 @@ export default function DashboardContent({
         metrics={metrics}
       />
       <ContentLayout 
-        conversationList={<ConversationList conversations={conversations} />}
+        conversationList={<ConversationList conversations={conversations} onMarkAsRead={markAsRead} />}
       >
         <ChatWrapper 
           conversations={conversations} 

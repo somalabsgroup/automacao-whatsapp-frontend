@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Professional, CreateProfessionalInput } from '@/types';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/lib/services/professionals';
 import ProfessionalForm from '../ProfessionalForm';
 import ProfessionalList from '../ProfessionalList';
+import Header, { HeaderMetric } from '../Header';
 
 interface ProfessionalsContentProps {
   initialProfessionals: Professional[];
@@ -63,8 +64,7 @@ export default function ProfessionalsContent({
       }
       setShowForm(false);
       setEditingProfessional(null);
-    } catch (error) {
-      console.error('Erro ao salvar profissional:', error);
+    } catch {
       alert('Erro ao salvar profissional. Tente novamente.');
     } finally {
       setIsSubmitting(false);
@@ -84,14 +84,42 @@ export default function ProfessionalsContent({
           prev.map((p) => (p.id === professional.id ? { ...p, isActive: true } : p))
         );
       }
-    } catch (error) {
-      console.error('Erro ao alterar status:', error);
+    } catch {
       alert('Erro ao alterar status do profissional. Tente novamente.');
     }
   };
 
+  const metrics: HeaderMetric[] = useMemo(() => {
+    const totalProfessionals = professionals.length;
+    const activeProfessionals = professionals.filter((p) => p.isActive).length;
+
+    return [
+      {
+        label: 'Total',
+        value: totalProfessionals,
+        variant: 'info' as const,
+      },
+      {
+        label: 'Ativos',
+        value: activeProfessionals,
+        variant: 'success' as const,
+      },
+      {
+        label: 'Inativos',
+        value: totalProfessionals - activeProfessionals,
+        variant: 'default' as const,
+      },
+    ];
+  }, [professionals]);
+
   return (
-    <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <>
+      <Header
+        title="Profissionais"
+        subtitle="Gerencie os profissionais da clínica"
+        metrics={metrics}
+      />
+      <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {showForm ? (
         <ProfessionalForm
           professional={editingProfessional || undefined}
@@ -110,5 +138,6 @@ export default function ProfessionalsContent({
         />
       )}
     </div>
+    </>
   );
 }

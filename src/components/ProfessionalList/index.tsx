@@ -1,6 +1,7 @@
 'use client';
 
-import { Plus, Edit2, UserX, UserCheck, Users } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, Edit2, UserX, UserCheck, Users, Search } from 'lucide-react';
 import { Professional } from '@/types';
 import {
   ListContainer,
@@ -9,6 +10,9 @@ import {
   HeaderActions,
   AddButton,
   FilterButton,
+  SearchContainer,
+  SearchIcon,
+  SearchInput,
   ListContent,
   Table,
   TableHead,
@@ -59,9 +63,18 @@ export default function ProfessionalList({
   showInactive,
   onToggleShowInactive,
 }: ProfessionalListProps) {
-  const filteredProfessionals = showInactive
-    ? professionals
-    : professionals.filter((p) => p.isActive);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredProfessionals = professionals
+    .filter((p) => showInactive || p.isActive)
+    .filter((p) => {
+      if (searchQuery === '') return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        p.name.toLowerCase().includes(query) ||
+        p.specialty.toLowerCase().includes(query)
+      );
+    });
 
   const formatDuration = (minutes: number): string => {
     if (minutes < 60) return `${minutes}min`;
@@ -72,9 +85,19 @@ export default function ProfessionalList({
 
   return (
     <ListContainer>
-      <ListHeader>
-        <ListTitle>Profissionais Cadastrados</ListTitle>
-        <HeaderActions>
+      <HeaderActions>
+        <SearchContainer>
+          <SearchIcon>
+            <Search size={16} />
+          </SearchIcon>
+          <SearchInput
+            type="text"
+            placeholder="Buscar por nome ou especialidade..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </SearchContainer>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
           <FilterButton $active={showInactive} onClick={onToggleShowInactive}>
             {showInactive ? 'Exibir Apenas Ativos' : 'Exibir Todos'}
           </FilterButton>
@@ -82,8 +105,8 @@ export default function ProfessionalList({
             <Plus size={18} />
             Novo Profissional
           </AddButton>
-        </HeaderActions>
-      </ListHeader>
+        </div>
+      </HeaderActions>
 
       <ListContent>
         {filteredProfessionals.length === 0 ? (
@@ -93,7 +116,7 @@ export default function ProfessionalList({
             </EmptyIcon>
             <EmptyTitle>Nenhum profissional cadastrado</EmptyTitle>
             <EmptyDescription>
-              Comece cadastrando o primeiro profissional da clínica
+              {searchQuery ? 'Nenhum profissional encontrado com esse termo' : 'Comece cadastrando o primeiro profissional da clínica'}
             </EmptyDescription>
             <AddButton onClick={onAdd}>
               <Plus size={18} />

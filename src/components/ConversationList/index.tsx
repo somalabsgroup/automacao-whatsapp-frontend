@@ -19,6 +19,7 @@ import {
 
 interface ConversationListProps {
   conversations: Conversation[];
+  onMarkAsRead?: (conversationId: string) => void;
 }
 
 const filterOptions = {
@@ -29,7 +30,7 @@ const filterOptions = {
   awaiting_close: 'Aguardando Fechamento',
 };
 
-export default function ConversationList({ conversations }: ConversationListProps) {
+export default function ConversationList({ conversations, onMarkAsRead }: ConversationListProps) {
   const { filter, searchQuery, setSearchQuery } = useConversationStore();
 
   // Filtrar conversas
@@ -76,7 +77,11 @@ export default function ConversationList({ conversations }: ConversationListProp
           </EmptyState>
         ) : (
           filteredConversations.map((conversation) => (
-            <ConversationItem key={conversation.id} conversation={conversation} />
+            <ConversationItem 
+              key={conversation.id} 
+              conversation={conversation}
+              onMarkAsRead={onMarkAsRead}
+            />
           ))
         )}
       </ConversationsList>
