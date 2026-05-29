@@ -22,6 +22,8 @@ interface ChatContainerProps {
   messages: ChatMessage[];
   onSendMessage: (content: string, attachments?: File[]) => void;
   onRetryMessage?: (messageId: string) => void;
+  onEditMessage?: (messageId: string, newContent: string) => void;
+  onDeleteMessage?: (messageId: string) => void;
   onDeleteConversation?: () => void;
   onCloseConversation?: () => void;
 }
@@ -69,6 +71,8 @@ export default function ChatContainer({
   messages,
   onSendMessage,
   onRetryMessage,
+  onEditMessage,
+  onDeleteMessage,
   onDeleteConversation,
   onCloseConversation,
 }: ChatContainerProps) {
@@ -113,10 +117,12 @@ export default function ChatContainer({
               </DateDivider>
               
               {group.messages.map((message) => (
-                <MessageBubble 
-                  key={message.id} 
-                  message={message} 
+                <MessageBubble
+                  key={message.id}
+                  message={message}
                   onRetry={onRetryMessage}
+                  onEdit={onEditMessage}
+                  onDelete={onDeleteMessage}
                 />
               ))}
             </div>

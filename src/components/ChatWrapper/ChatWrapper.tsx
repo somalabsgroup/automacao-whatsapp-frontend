@@ -1,11 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useConversationStore } from '@/stores/useConversationStore';
 import { Conversation, ChatMessage } from '@/types';
 import Chat from '@/components/Chat';
 import { createClient } from '@/lib/supabase/client';
-import { sendTextMessage, deleteConversation, closeConversation } from '@/lib/services/conversations';
+import { sendTextMessage, editMessage, deleteMessage, deleteConversation, closeConversation } from '@/lib/services/conversations';
+
+const logError = (label: string, error: unknown) => {
+  if (error && typeof error === 'object' && 'message' in error) {
+    console.error(label, (error as { message: string; code?: string; details?: string }).message, error);
+  } else {
+    console.error(label, error);
+  }
+};
 import { getMessagesByConversation, subscribeToMessages } from '@/lib/services/messages';
 
 interface ChatWrapperProps {
@@ -19,7 +27,8 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
   const { selectedConversationId } = useConversationStore();
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({});
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
+  const supabaseRef = useRef(createClient());
+  const supabase = supabaseRef.current;
 
   const selectedConversation = conversations.find((c) => c.id === selectedConversationId);
   const conversationMessages = selectedConversationId
@@ -246,6 +255,48 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     }
   };
 
+  const handleEditMessage = async (messageId: string, newContent: string) => {
+    if (!selectedConversationId) return;
+
+    const previous = messages[selectedConversationId] || [];
+
+    setMessages(prev => ({
+      ...prev,
+      [selectedConversationId]: (prev[selectedConversationId] || []).map(msg =>
+        msg.id === messageId ? { ...msg, content: newContent, editedAt: new Date() } : msg
+      ),
+    }));
+
+    try {
+      await editMessage(messageId, newContent);
+    } catch (error) {
+      logError('Error updating message:', error);
+      setMessages(prev => ({ ...prev, [selectedConversationId]: previous }));
+      alert('Erro ao editar mensagem. Tente novamente.');
+    }
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!selectedConversationId) return;
+
+    const previous = messages[selectedConversationId] || [];
+
+    setMessages(prev => ({
+      ...prev,
+      [selectedConversationId]: (prev[selectedConversationId] || []).map(msg =>
+        msg.id === messageId ? { ...msg, deletedAt: new Date() } : msg
+      ),
+    }));
+
+    try {
+      await deleteMessage(messageId);
+    } catch (error) {
+      logError('Error deleting message:', error);
+      setMessages(prev => ({ ...prev, [selectedConversationId]: previous }));
+      alert('Erro ao excluir mensagem. Tente novamente.');
+    }
+  };
+
   const handleCloseConversation = async () => {
     if (!selectedConversationId) return;
 
@@ -258,7 +309,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       }
       
     } catch (error) {
-      console.error('Error closing conversation:', error);
+      logError('Error closing conversation:', error);
       alert('Erro ao encerrar atendimento. Tente novamente.');
     }
   };
@@ -285,7 +336,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       useConversationStore.getState().setSelectedConversation(null);
       
     } catch (error) {
-      console.error('Error deleting conversation:', error);
+      logError('Error deleting conversation:', error);
       alert('Erro ao excluir conversa. Tente novamente.');
     }
   };
@@ -300,6 +351,8 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       messages={conversationMessages}
       onSendMessage={handleSendMessage}
       onRetryMessage={handleRetryMessage}
+      onEditMessage={handleEditMessage}
+      onDeleteMessage={handleDeleteMessage}
       onDeleteConversation={handleDeleteConversation}
       onCloseConversation={handleCloseConversation}
     />

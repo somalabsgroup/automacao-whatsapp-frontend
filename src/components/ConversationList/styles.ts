@@ -99,12 +99,12 @@ export const ConversationsList = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: #e5e7eb;
     border-radius: 3px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: #14b8a6;
   }
 `;
 

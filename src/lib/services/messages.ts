@@ -15,6 +15,7 @@ interface MessageRow {
   status: string;
   raw_payload?: Record<string, unknown>;
   created_at: string;
+  edited_at?: string;
   deleted_at?: string;
 }
 
@@ -45,6 +46,7 @@ export async function getMessagesByConversation(
     mediaUrl: msg.media_url,
     status: msg.status as MessageStatus,
     timestamp: new Date(msg.created_at),
+    editedAt: msg.edited_at ? new Date(msg.edited_at) : undefined,
     deletedAt: msg.deleted_at ? new Date(msg.deleted_at) : undefined,
     rawPayload: msg.raw_payload,
   }));
@@ -83,6 +85,7 @@ export async function subscribeToMessages(
           mediaUrl: msg.media_url,
           status: msg.status as MessageStatus,
           timestamp: new Date(msg.created_at),
+          editedAt: msg.edited_at ? new Date(msg.edited_at) : undefined,
           deletedAt: msg.deleted_at ? new Date(msg.deleted_at) : undefined,
           rawPayload: msg.raw_payload,
         };
@@ -112,6 +115,7 @@ export async function subscribeToMessages(
           mediaUrl: msg.media_url,
           status: msg.status as MessageStatus,
           timestamp: new Date(msg.created_at),
+          editedAt: msg.edited_at ? new Date(msg.edited_at) : undefined,
           deletedAt: msg.deleted_at ? new Date(msg.deleted_at) : undefined,
           rawPayload: msg.raw_payload,
         };

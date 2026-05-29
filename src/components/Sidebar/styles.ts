@@ -6,8 +6,8 @@ export const SidebarContainer = styled.aside<{ $isOpen: boolean }>`
   top: 0;
   height: 100vh;
   width: ${({ $isOpen }) => ($isOpen ? '256px' : '80px')};
-  background-color: #ffffff;
-  border-right: 1px solid #e5e7eb;
+  background-color: #111827;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease;
@@ -31,12 +31,12 @@ export const HamburgerButton = styled.button`
   align-items: center;
   justify-content: center;
   color: #6b7280;
-  transition: color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
   border-radius: 0.375rem;
 
   &:hover {
-    color: #111827;
-    background-color: #f3f4f6;
+    color: #f9fafb;
+    background-color: rgba(255, 255, 255, 0.08);
   }
 
   svg {
@@ -44,8 +44,6 @@ export const HamburgerButton = styled.button`
     height: 24px;
   }
 `;
-
-
 
 export const MenuList = styled.nav`
   flex: 1;
@@ -61,8 +59,12 @@ export const MenuList = styled.nav`
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
 `;
 
@@ -71,18 +73,21 @@ export const MenuItem = styled.a<{ $active?: boolean; $isOpen: boolean }>`
   align-items: center;
   padding: 0.75rem 1rem;
   margin: 0.25rem 0.75rem;
-  color: ${({ $active }) => ($active ? '#0f766e' : '#374151')};
-  background-color: ${({ $active }) => ($active ? '#f0fdfa' : 'transparent')};
+  color: ${({ $active }) => ($active ? '#14b8a6' : '#9ca3af')};
+  background-color: ${({ $active }) => ($active ? 'rgba(20, 184, 166, 0.12)' : 'transparent')};
   border-radius: 0.5rem;
+  border-left: 3px solid ${({ $active }) => ($active ? '#14b8a6' : 'transparent')};
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s;
   white-space: nowrap;
   position: relative;
-  font-weight: ${({ $active }) => ($active ? '500' : '400')};
+  font-weight: ${({ $active }) => ($active ? '600' : '400')};
 
   &:hover {
-    background-color: ${({ $active }) => ($active ? '#f0fdfa' : '#f9fafb')};
+    background-color: ${({ $active }) =>
+      $active ? 'rgba(20, 184, 166, 0.18)' : 'rgba(255, 255, 255, 0.06)'};
+    color: ${({ $active }) => ($active ? '#14b8a6' : '#e5e7eb')};
   }
 
   svg {
@@ -101,7 +106,7 @@ export const MenuItemText = styled.span<{ $isOpen: boolean }>`
 `;
 
 export const UserSection = styled.div<{ $isOpen: boolean }>`
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -123,7 +128,8 @@ export const UserAvatar = styled.img`
   min-width: 40px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #10b981;
+  background-color: #14b8a6;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.3);
 `;
 
 export const UserAvatarPlaceholder = styled.div`
@@ -131,13 +137,14 @@ export const UserAvatarPlaceholder = styled.div`
   height: 40px;
   min-width: 40px;
   border-radius: 50%;
-  background-color: #10b981;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: 600;
   font-size: 0.875rem;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.25);
 `;
 
 export const UserDetails = styled.div<{ $isOpen: boolean }>`
@@ -150,7 +157,7 @@ export const UserDetails = styled.div<{ $isOpen: boolean }>`
 export const UserName = styled.div`
   font-weight: 500;
   font-size: 0.875rem;
-  color: #111827;
+  color: #f9fafb;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -179,8 +186,8 @@ export const LogoutButton = styled.button`
   height: 32px;
 
   &:hover {
-    background-color: #f3f4f6;
-    color: #111827;
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
   }
 
   svg {
@@ -188,5 +195,3 @@ export const LogoutButton = styled.button`
     height: 20px;
   }
 `;
-
-

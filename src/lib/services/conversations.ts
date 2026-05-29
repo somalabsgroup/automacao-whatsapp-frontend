@@ -296,16 +296,20 @@ export function subscribeToConversations(
 }
 
 
-interface N8NWebhookPayload {
-  tenant_id: string;
-  conversation_id: string;
-  phone_number: string;
-  content?: string;
-  media_url?: string;
-  caption?: string;
-  media_type?: 'image' | 'video' | 'audio' | 'document';
-  sender_user_id?: string;
-}
+type N8NWebhookPayload =
+  | {
+      action: 'send';
+      tenant_id: string;
+      conversation_id: string;
+      phone_number: string;
+      content?: string;
+      media_url?: string;
+      caption?: string;
+      media_type?: 'image' | 'video' | 'audio' | 'document';
+      sender_user_id?: string;
+    }
+  | { action: 'edit'; message_id: string; content: string }
+  | { action: 'delete'; message_id: string };
 
 interface N8NWebhookResponse {
   success: boolean;
@@ -327,7 +331,7 @@ async function postToN8NWebhook(
         headers: {
           'Content-Type': 'application/json',
         },
-        timeout: payload.media_url ? 15000 : 10000, // 15s para mídia, 10s para texto
+        timeout: ('media_url' in payload && payload.media_url) ? 15000 : 10000,
       }
     );
 
@@ -355,10 +359,16 @@ async function postToN8NWebhook(
   }
 }
 
-/**
- * Envia mensagem de texto via n8n webhook
- * O n8n irá processar, enviar via Evolution API e gravar no Supabase
- */
+export async function editMessage(messageId: string, content: string): Promise<void> {
+  const { error } = await postToN8NWebhook({ action: 'edit', message_id: messageId, content });
+  if (error) throw error;
+}
+
+export async function deleteMessage(messageId: string): Promise<void> {
+  const { error } = await postToN8NWebhook({ action: 'delete', message_id: messageId });
+  if (error) throw error;
+}
+
 export async function sendTextMessage(
   tenantId: string,
   conversationId: string,
@@ -367,6 +377,7 @@ export async function sendTextMessage(
   senderUserId?: string
 ): Promise<void> {
   const payload: N8NWebhookPayload = {
+    action: 'send',
     tenant_id: tenantId,
     conversation_id: conversationId,
     phone_number: phoneNumber,

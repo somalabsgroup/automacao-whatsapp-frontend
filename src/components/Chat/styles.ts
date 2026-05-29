@@ -180,7 +180,9 @@ export const DropdownItem = styled.button<{ $danger?: boolean }>`
 export const MessagesArea = styled.div`
   flex: 1;
   overflow: hidden;
-  background: linear-gradient(to bottom, #f9fafb 0%, #f3f4f6 100%);
+  background-color: #f3f4f6;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+  background-size: 20px 20px;
 `;
 
 export const MessagesScroll = styled.div`
@@ -229,6 +231,70 @@ export const DateLabel = styled.span`
 `;
 
 // ============= MessageBubble =============
+
+export const MessageMenuTrigger = styled.button`
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s, background 0.15s;
+  z-index: 5;
+  padding: 0;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.28);
+  }
+`;
+
+export const MessageMenuDropdown = styled.div`
+  position: absolute;
+  bottom: 28px;
+  top: auto;
+  right: 6px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  border: 1px solid #f3f4f6;
+  z-index: 100;
+  overflow: hidden;
+  min-width: 136px;
+`;
+
+export const MessageMenuItem = styled.button<{ $danger?: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: none;
+  background: #ffffff;
+  color: ${({ $danger }) => ($danger ? '#ef4444' : '#374151')};
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background-color: ${({ $danger }) => ($danger ? '#fef2f2' : '#f9fafb')};
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+`;
+
 export const MessageContainer = styled.div<{ $isOwn: boolean }>`
   display: flex;
   justify-content: ${({ $isOwn }) => ($isOwn ? 'flex-end' : 'flex-start')};
@@ -268,21 +334,34 @@ export const RetryButton = styled.button`
   }
 `;
 
-export const MessageBubble = styled.div<{ $sender: MessageSender; $hasError?: boolean }>`
+export const MessageBubble = styled.div<{ $sender: MessageSender; $hasError?: boolean; $isDeleted?: boolean }>`
   max-width: 70%;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
-  background-color: ${({ $sender }) => {
+  position: relative;
+  background-color: ${({ $sender, $isDeleted }) => {
+    if ($isDeleted) return $sender === 'human' || $sender === 'ai' ? '#0d9488' : '#f3f4f6';
     if ($sender === 'human' || $sender === 'ai') return '#14b8a6';
     return '#ffffff';
   }};
-  color: ${({ $sender }) => {
+  color: ${({ $sender, $isDeleted }) => {
+    if ($isDeleted) return $sender === 'human' || $sender === 'ai' ? 'rgba(255,255,255,0.55)' : '#9ca3af';
     if ($sender === 'human' || $sender === 'ai') return '#ffffff';
     return '#111827';
   }};
+  opacity: ${({ $isDeleted }) => $isDeleted ? 0.7 : 1};
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  border: ${({ $hasError }) => $hasError ? '1px solid #ef4444' : 'none'};
+  border: ${({ $hasError, $isDeleted }) =>
+    $isDeleted ? '1px dashed rgba(0,0,0,0.15)' :
+    $hasError   ? '1px solid #ef4444' :
+    'none'};
   word-wrap: break-word;
+  transition: opacity 0.2s;
+
+  &:hover ${MessageMenuTrigger} {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
   @media (max-width: 768px) {
     max-width: 85%;
@@ -368,6 +447,21 @@ export const MessageFooter = styled.div`
 export const MessageTime = styled.span`
   font-size: 0.6875rem;
   opacity: 0.7;
+`;
+
+export const EditedLabel = styled.span`
+  font-size: 0.625rem;
+  opacity: 0.6;
+  font-style: italic;
+`;
+
+export const DeletedLabel = styled.span`
+  font-size: 0.625rem;
+  font-style: italic;
+  opacity: 0.75;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 `;
 
 export const MessageStatusIcon = styled.span<{ $status: MessageStatus }>`
@@ -551,4 +645,58 @@ export const RemoveAttachmentButton = styled.button`
 
 export const HiddenFileInput = styled.input`
   display: none;
+`;
+
+// ============= Inline Edit =============
+
+export const EditTextarea = styled.textarea`
+  width: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0.375rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  padding: 0.375rem 0.5rem;
+  resize: none;
+  font-family: inherit;
+  min-height: 56px;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.2);
+  }
+`;
+
+export const EditActions = styled.div`
+  display: flex;
+  gap: 0.375rem;
+  justify-content: flex-end;
+  margin-top: 0.375rem;
+`;
+
+export const EditButton = styled.button<{ $primary?: boolean }>`
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  ${({ $primary }) => $primary ? `
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    &:hover { background: rgba(255, 255, 255, 0.35); }
+  ` : `
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    &:hover { background: rgba(255, 255, 255, 0.1); }
+  `}
 `;

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const HeaderContainer = styled.header`
   background-color: #ffffff;
   border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
@@ -27,14 +28,15 @@ export const LogoContainer = styled.div`
   width: 36px;
   height: 36px;
   min-width: 36px;
-  border-radius: 0.5rem;
-  background: #14b8a6;
+  border-radius: 0.625rem;
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: 700;
   font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.35);
 `;
 
 export const HeaderInfo = styled.div`
@@ -73,16 +75,19 @@ export const MetricsContainer = styled.div`
 export const CardContainer = styled.div`
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   padding: 0.625rem 0.875rem;
   display: flex;
   align-items: center;
   gap: 0.625rem;
   min-width: 120px;
   transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 
   &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #d1d5db;
+    transform: translateY(-1px);
   }
 
   @media (max-width: 640px) {
