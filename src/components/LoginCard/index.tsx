@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
-import { Activity, Eye, EyeOff } from 'lucide-react';
+import { MessageSquare, Eye, EyeOff } from 'lucide-react';
+import { LoginBackground } from './LoginBackground';
 import * as S from './styles';
 
 const BASE_DOMAIN = process.env.NEXT_PUBLIC_BASE_DOMAIN || 'somaclini.com.br';
@@ -60,66 +61,71 @@ export default function LoginCard() {
   };
 
   return (
-    <S.Container>
-      <S.Card>
-        <S.Header>
-          <S.LogoContainer>
-            <Activity size={36} strokeWidth={2.5} color="white" />
-          </S.LogoContainer>
-          <S.Title>Soma Clini</S.Title>
-          <S.Subtitle>Sistema de Gestão de Atendimento</S.Subtitle>
-        </S.Header>
+    <>
+      <LoginBackground />
+      <S.Container>
+        <S.Card>
+          <S.Header>
+            <S.Logo>
+              <S.LogoIcon>
+                <MessageSquare />
+              </S.LogoIcon>
+              <S.LogoText>SomaClini</S.LogoText>
+            </S.Logo>
+            <S.Subtitle>Atendimento Inteligente via WhatsApp</S.Subtitle>
+          </S.Header>
 
-        <S.Form onSubmit={handleLogin}>
-          {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
+          <S.Form onSubmit={handleLogin}>
+            {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
 
-          <S.FormGroup>
-            <S.Label htmlFor="email">Email</S.Label>
-            <S.Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu@email.com"
-              disabled={loading}
-              required
-            />
-          </S.FormGroup>
-
-          <S.FormGroup>
-            <S.Label htmlFor="password">Senha</S.Label>
-            <S.InputWrapper>
+            <S.FormGroup>
+              <S.Label htmlFor="email">Email</S.Label>
               <S.Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="seu@email.com"
                 disabled={loading}
-                $hasIcon
                 required
               />
-              <S.TogglePasswordButton
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </S.TogglePasswordButton>
-            </S.InputWrapper>
-          </S.FormGroup>
+            </S.FormGroup>
 
-          <S.Button type="submit" disabled={loading}>
-            {loading ? 'Entrando...' : 'Entrar'}
-          </S.Button>
-        </S.Form>
-      </S.Card>
+            <S.FormGroup>
+              <S.Label htmlFor="password">Senha</S.Label>
+              <S.InputWrapper>
+                <S.Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  disabled={loading}
+                  $hasIcon
+                  required
+                />
+                <S.TogglePasswordButton
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </S.TogglePasswordButton>
+              </S.InputWrapper>
+            </S.FormGroup>
 
-      <S.Footer>
-        <S.FooterText>
-          © 2026 Soma Clini | Atendimento Inteligente
-        </S.FooterText>
-      </S.Footer>
-    </S.Container>
+            <S.Button type="submit" disabled={loading}>
+              {loading ? 'Entrando...' : 'Entrar'}
+            </S.Button>
+          </S.Form>
+        </S.Card>
+
+        <S.Footer>
+          <S.FooterText>
+            © 2026 SomaClini | Atendimento Inteligente
+          </S.FooterText>
+        </S.Footer>
+      </S.Container>
+    </>
   );
 }
