@@ -431,19 +431,11 @@ export default function HomePage() {
                   controls
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
-                  preload="none"
+                  preload="metadata"
                   poster="/assets/back-hero.png"
-                  onClick={(e) => {
-                    const video = e.currentTarget;
-                    if (video.paused) {
-                      video.play();
-                    } else {
-                      video.pause();
-                    }
-                  }}
-                  style={{ cursor: 'pointer' }}
                 >
                   <source src="/assets/videos/heroVideo.mp4" type="video/mp4" />
+                  Seu navegador não suporta a reprodução de vídeos.
                 </S.VideoPlayer>
               </S.VideoWrapper>
             </motion.div>

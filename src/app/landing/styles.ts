@@ -782,6 +782,10 @@ export const VideoPlayer = styled.video`
   display: block;
   object-fit: contain;
   background: transparent;
+  will-change: auto;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   
   &::-webkit-media-controls-fullscreen-button {
     display: none;
