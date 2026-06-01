@@ -42,9 +42,9 @@ export const Header = styled.header`
 `;
 
 export const HeaderContainer = styled.div`
-  max-width: 1450px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 12px 24px;
+  padding: 12px 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -246,11 +246,11 @@ export const HeroSection = styled.section`
   align-items: center;
   justify-content: center;
   overflow: visible;
-  padding: 0 24px 60px;
+  padding: 0 24px 40px;
   background: white;
   
   @media (max-width: 968px) {
-    padding: 80px 16px 40px;
+    padding: 60px 16px 30px;
     align-items: flex-start;
     min-height: auto;
   }
@@ -260,21 +260,21 @@ export const HeroGrid = styled.div`
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 40px;
+  gap: 24px;
   align-items: center;
-  max-width: 1400px;
+  max-width: 1280px;
   width: 100%;
   margin: 0 auto;
   grid-template-columns: 1fr;
-  overflow-x: hidden;
+  overflow: visible;
   
   @media (min-width: 968px) {
-    grid-template-columns: 1fr 2fr;
-    gap: 20px;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 24px;
   }
   
   @media (max-width: 968px) {
-    gap: 32px;
+    gap: 20px;
   }
 `;
 
@@ -283,31 +283,31 @@ export const HeroText = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   z-index: 2;
   
   @media (max-width: 968px) {
-    gap: 20px;
+    gap: 14px;
   }
 `;
 
 export const HeroTag = styled.p`
   color: white;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
   margin: 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   letter-spacing: -0.03em;
   background: #14B8A6;
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 6px 12px;
+  border-radius: 16px;
   border: none;
   
   svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     color: white;
   }
 `;
@@ -317,18 +317,18 @@ export const HeroTitle = styled.h1`
   color: #111827;
   margin: 0;
   line-height: 1.15;
-  font-size: 2.75rem;
+  font-size: 2.25rem;
   letter-spacing: -0.02em;
   word-wrap: break-word;
   overflow-wrap: break-word;
   
   @media (max-width: 768px) {
-    font-size: 2rem;
+    font-size: 1.75rem;
     line-height: 1.2;
   }
   
   @media (max-width: 480px) {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     line-height: 1.25;
   }
   
@@ -344,32 +344,33 @@ export const HeroTitle = styled.h1`
 
 export const HeroDescription = styled.p`
   color: #6B7280;
-  font-size: 17px;
-  line-height: 1.65;
+  font-size: 15px;
+  line-height: 1.6;
   margin: 0;
   font-weight: 400;
   letter-spacing: -0.01em;
   
   @media (max-width: 968px) {
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.55;
   }
 `;
 
 export const BenefitCardsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 16px;
   margin: 0;
   width: 100%;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
   
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 16px;
   }
   
   @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 16px;
   }
 `;
@@ -381,10 +382,10 @@ export const BenefitCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 3px;
   transition: all 0.3s ease;
   cursor: default;
-  width: 100%;
+  flex: 0 0 auto;
   min-width: 0;
   
   &:hover {
@@ -397,10 +398,10 @@ export const BenefitCard = styled.div`
 `;
 
 export const BenefitIconWrapper = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #CCFBF1 0%, #E0F2FE 100%);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(249, 250, 251, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -408,20 +409,20 @@ export const BenefitIconWrapper = styled.div`
   transition: transform 0.3s ease;
   
   svg {
-    width: 26px;
-    height: 26px;
-    color: #0891B2;
+    width: 22px;
+    height: 22px;
+    color: #6B7280;
     stroke-width: 2.5;
     transition: transform 0.3s ease;
   }
 `;
 
 export const BenefitCardTitle = styled.h3`
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
-  color: #111827;
+  color: #0F172A;
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.4;
   letter-spacing: -0.01em;
   width: 100%;
   word-wrap: break-word;
@@ -429,10 +430,10 @@ export const BenefitCardTitle = styled.h3`
 `;
 
 export const BenefitCardDesc = styled.p`
-  font-size: 12px;
-  color: #6B7280;
+  font-size: 10px;
+  color: #64748B;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.5;
   font-weight: 400;
   width: 100%;
   word-wrap: break-word;
@@ -450,35 +451,36 @@ export const ButtonGroup = styled.div`
     flex-direction: column;
     gap: 10px;
     
-    button {
+    a {
       width: 100%;
       justify-content: center;
     }
   }
 `;
 
-export const PrimaryButton = styled.button`
+export const PrimaryButton = styled.a`
   background: #14B8A6;
   color: white;
-  padding: 16px 28px;
-  min-height: 52px;
-  border-radius: 10px;
-  font-size: 15px;
+  padding: 12px 24px;
+  min-height: 44px;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 600;
   border: none;
   cursor: pointer;
+  text-decoration: none;
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
   letter-spacing: -0.01em;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   white-space: nowrap;
   
   svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     stroke-width: 2.5;
     flex-shrink: 0;
     transition: transform 0.2s ease;
@@ -487,9 +489,9 @@ export const PrimaryButton = styled.button`
   @media (max-width: 640px) {
     white-space: normal;
     text-align: center;
-    padding: 14px 24px;
-    min-height: 48px;
-    font-size: 14px;
+    padding: 12px 20px;
+    min-height: 44px;
+    font-size: 13px;
   }
   
   &:hover {
@@ -528,27 +530,28 @@ export const PrimaryButton = styled.button`
   }
 `;
 
-export const SecondaryButton = styled.button`
+export const SecondaryButton = styled.a`
   color: #0891B2;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   background: white;
   border: 1.5px solid #E5E7EB;
-  padding: 16px 28px;
-  min-height: 52px;
-  border-radius: 10px;
+  padding: 12px 24px;
+  min-height: 44px;
+  border-radius: 8px;
   cursor: pointer;
+  text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s ease;
   letter-spacing: -0.01em;
   white-space: nowrap;
   
   svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     stroke-width: 2.5;
     fill: currentColor;
     flex-shrink: 0;
@@ -557,9 +560,9 @@ export const SecondaryButton = styled.button`
   @media (max-width: 640px) {
     white-space: normal;
     text-align: center;
-    padding: 14px 24px;
-    min-height: 48px;
-    font-size: 14px;
+    padding: 12px 20px;
+    min-height: 44px;
+    font-size: 13px;
   }
   
   &:hover {
@@ -585,15 +588,15 @@ export const SecondaryButton = styled.button`
 export const SecurityBadge = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
   color: #6B7280;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
   width: 100%;
   
   svg {
-    width: 17px;
+    width: 16px;
     height: 17px;
     color: #10B981;
     flex-shrink: 0;
@@ -630,18 +633,219 @@ export const HeroMockup = styled.div`
 export const HeroImageWrapper = styled.div`
   position: relative;
   width: 100%;
-  max-width: 100%;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/assets/back-hero.png');
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.3;
+    z-index: 0;
+  }
   
   img {
-    width: 100%;
+    width: 70%;
     height: auto;
     display: block;
-    max-width: 100%;
+    max-width: 70%;
     image-rendering: auto;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     transform: translateZ(0);
+    position: relative;
+    z-index: 1;
   }
+  
+  @media (max-width: 968px) {
+    height: 400px;
+    
+    &::before {
+      background-position: center center;
+    }
+    
+    img {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    height: 300px;
+  }
+`;
+
+// ══════════════ VIDEO SECTION ══════════════
+export const VideoSection = styled.section`
+  background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%);
+  padding: 80px 0 100px;
+  position: relative;
+  overflow: hidden;
+  
+  @media (max-width: 768px) {
+    padding: 60px 0 80px;
+  }
+`;
+
+export const VideoContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+`;
+
+export const VideoTitle = styled.h2`
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+  
+  em {
+    font-style: italic;
+    color: #14B8A6;
+    font-weight: 700;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.75rem;
+  }
+`;
+
+export const VideoSubtitle = styled.p`
+  font-size: 1.125rem;
+  color: #6B7280;
+  margin: 0 auto 48px;
+  max-width: 600px;
+  line-height: 1.6;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin-bottom: 40px;
+  }
+`;
+
+export const VideoContentGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+`;
+
+export const VideoWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 10px 20px -5px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #0D9488 0%, #14B8A6 100%);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 30px 60px -15px rgba(0, 0, 0, 0.3),
+      0 15px 25px -7px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+  
+  @media (max-width: 768px) {
+    border-radius: 16px;
+    max-width: 100%;
+  }
+`;
+
+export const VideoPlayer = styled.video`
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: transparent;
+  
+  &::-webkit-media-controls-fullscreen-button {
+    display: none;
+  }
+  
+  &::-webkit-media-controls-download-button {
+    display: none;
+  }
+`;
+
+export const VideoFeaturesBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+export const VideoFeatureItem = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    border-color: #14B8A6;
+  }
+`;
+
+export const VideoFeatureIcon = styled.div`
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+  
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const VideoFeatureTitle = styled.h4`
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+`;
+
+export const VideoFeatureDesc = styled.p`
+  font-size: 0.8125rem;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.45;
 `;
 
 // ══════════════ STATS BAR ══════════════
@@ -728,6 +932,12 @@ export const ModernStatCard = styled.div`
   @media (max-width: 768px) {
     padding: 22px 18px;
     min-height: 190px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    
+    &:hover {
+      transform: none;
+    }
   }
   
   @media (max-width: 640px) {
@@ -749,6 +959,12 @@ export const StatBadge = styled.div`
   ${ModernStatCard}:hover & {
     color: rgba(255, 255, 255, 0.5);
     transform: scale(1.1);
+  }
+  
+  @media (max-width: 768px) {
+    ${ModernStatCard}:hover & {
+      transform: none;
+    }
   }
   
   @media (max-width: 640px) {
@@ -830,131 +1046,45 @@ export const HowItWorksSection = styled.section`
   position: relative;
   overflow: hidden;
   
-  /* Grid pattern */
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(20, 184, 166, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(20, 184, 166, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-    pointer-events: none;
-  }
-  
-  /* Top right blob */
-  &::after {
-    content: '';
-    position: absolute;
-    top: -100px;
-    right: -100px;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(20, 184, 166, 0.12) 0%, rgba(20, 184, 166, 0.05) 40%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-    animation: float 20s ease-in-out infinite;
-  }
-  
-  @keyframes float {
-    0%, 100% {
-      transform: translate(0, 0) scale(1);
+  /* Grid pattern - only desktop */
+  @media (min-width: 769px) {
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(20, 184, 166, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 184, 166, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
     }
-    50% {
-      transform: translate(-30px, 30px) scale(1.05);
+    
+    /* Top right blob */
+    &::after {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(20, 184, 166, 0.12) 0%, rgba(20, 184, 166, 0.05) 40%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      50% {
+        transform: translate(-30px, 30px) scale(1.05);
+      }
     }
   }
   
   @media (max-width: 768px) {
     padding: 64px 24px;
-    
-    &::after {
-      width: 400px;
-      height: 400px;
-      top: -50px;
-      right: -50px;
-    }
-  }
-`;
-
-export const FloatingCircle1 = styled.div`
-  position: absolute;
-  top: 15%;
-  left: 5%;
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, rgba(20, 184, 166, 0.05) 50%, transparent 100%);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: float1 18s ease-in-out infinite;
-  
-  @keyframes float1 {
-    0%, 100% {
-      transform: translate(0, 0);
-    }
-    33% {
-      transform: translate(40px, -20px);
-    }
-    66% {
-      transform: translate(-30px, 40px);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    width: 50px;
-    height: 50px;
-  }
-`;
-
-export const FloatingCircle2 = styled.div`
-  position: absolute;
-  bottom: 20%;
-  right: 8%;
-  width: 120px;
-  height: 120px;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(14, 165, 233, 0.04) 50%, transparent 100%);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: float2 22s ease-in-out infinite;
-  
-  @keyframes float2 {
-    0%, 100% {
-      transform: translate(0, 0) scale(1);
-    }
-    50% {
-      transform: translate(-50px, -30px) scale(1.1);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    width: 70px;
-    height: 70px;
-  }
-`;
-
-export const FloatingCircle3 = styled.div`
-  position: absolute;
-  top: 40%;
-  right: 15%;
-  width: 60px;
-  height: 60px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0.06) 50%, transparent 100%);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: float3 16s ease-in-out infinite;
-  
-  @keyframes float3 {
-    0%, 100% {
-      transform: translate(0, 0);
-    }
-    50% {
-      transform: translate(30px, 50px);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    width: 40px;
-    height: 40px;
   }
 `;
 
@@ -963,54 +1093,6 @@ export const HowItWorksContainer = styled.div`
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  
-  /* Bottom left accent blob */
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: -200px;
-    left: -150px;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, rgba(14, 165, 233, 0.03) 50%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-    animation: pulse 15s ease-in-out infinite;
-  }
-  
-  /* Center subtle glow */
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 800px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(16, 185, 129, 0.04) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.7;
-      transform: scale(1.1);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    &::before {
-      width: 300px;
-      height: 300px;
-      bottom: -100px;
-      left: -100px;
-    }
-  }
 `;
 
 export const HowItWorksSubtitle = styled.p`
@@ -1109,10 +1191,23 @@ export const StepCardModern = styled.div<{ $bg: string }>`
   @media (max-width: 768px) {
     padding: 24px 18px;
     height: 300px;
+    
+    &:hover {
+      transform: none;
+      box-shadow: 0 6px 16px rgba(20, 184, 166, 0.08);
+    }
   }
   
   @media (max-width: 580px) {
     height: 280px;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
   }
 `;
 
@@ -1216,14 +1311,6 @@ export const StepDescModern = styled.p`
   }
 `;
 
-export const StepConnectorLine = styled.div`
-  display: none;
-`;
-
-export const ConnectorDot = styled.div`
-  display: none;
-`;
-
 export const SectionTitle = styled.h2`
   font-size: 32px;
   font-weight: 700;
@@ -1259,51 +1346,9 @@ export const CTASection = styled.section`
   position: relative;
   overflow: hidden;
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 100px,
-        rgba(255, 255, 255, 0.02) 100px,
-        rgba(255, 255, 255, 0.02) 101px
-      ),
-      repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 100px,
-        rgba(255, 255, 255, 0.02) 100px,
-        rgba(255, 255, 255, 0.02) 101px
-      );
-    pointer-events: none;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(204, 251, 241, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-  
   @media (max-width: 768px) {
     padding: 64px 24px;
-    
-    &::after {
-      width: 400px;
-      height: 400px;
-      right: -20%;
-    }
+    background: linear-gradient(135deg, #0F766E 0%, #0D9488 100%);
   }
 `;
 

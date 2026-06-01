@@ -1,8 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Script from 'next/script';
+import { useState, useEffect } from 'react';
 import {
   MessageSquare, CheckCircle2, Calendar, Users, BarChart2,
   AlertCircle, Clock, RefreshCw, Bell, Phone,
@@ -10,10 +12,119 @@ import {
 } from 'lucide-react';
 import { 
   FaqItem,
-  AnimatedBackground,
-  CTAFeatureBadges
 } from './components';
 import * as S from './styles';
+
+// Lazy load heavy components
+const AnimatedBackground = dynamic(
+  () => import('./components').then(mod => ({ default: mod.AnimatedBackground })),
+  { ssr: false }
+);
+const CTAFeatureBadges = dynamic(
+  () => import('./components').then(mod => ({ default: mod.CTAFeatureBadges }))
+);
+
+// Static data arrays - moved outside component for performance
+const BENEFIT_CARDS = [
+  {
+    Icon: MessageCircle,
+    title: 'Atendimento 24h',
+    desc: 'todos os dias'
+  },
+  {
+    Icon: Calendar,
+    title: 'Agendamentos',
+    desc: 'automáticos'
+  },
+  {
+    Icon: Bell,
+    title: 'Lembretes',
+    desc: 'e confirmações'
+  },
+  {
+    Icon: Clock,
+    title: 'Menos faltas',
+    desc: 'mais tempo'
+  }
+] as const;
+
+const STATS_DATA = [
+  {
+    Icon: Clock,
+    title: 'Atendimento mais rápido',
+    desc: 'Responda todos os pacientes em menos de 3 minutos, sem deixar ninguém para trás.',
+    stat: '< 3min',
+  },
+  {
+    Icon: Calendar,
+    title: 'Menos faltas',
+    desc: 'Confirmação automática de consultas reduz drasticamente o número de no-shows.',
+    stat: '-70%',
+  },
+  {
+    Icon: RefreshCw,
+    title: 'Recuperação automatizada',
+    desc: 'Reative pacientes inativos automaticamente com mensagens personalizadas.',
+    stat: '+45%',
+  },
+  {
+    Icon: BarChart2,
+    title: 'Mais produtividade',
+    desc: 'Sua equipe foca no que realmente importa enquanto o bot cuida do resto.',
+    stat: '3x',
+  },
+] as const;
+
+const HOW_IT_WORKS_STEPS = [
+  {
+    Icon: MessageCircle,
+    bg: '#CCFBF1',
+    iconBg: '#14B8A6',
+    number: '1',
+    title: 'Recebe mensagem',
+    desc: 'Paciente envia mensagem no WhatsApp da clínica.',
+  },
+  {
+    Icon: Activity,
+    bg: '#D1FAE5',
+    iconBg: '#10B981',
+    number: '2',
+    title: 'IA faz triagem',
+    desc: 'Bot identifica intenção e classifica atendimento.',
+  },
+  {
+    Icon: CheckCircle2,
+    bg: '#E0F2FE',
+    iconBg: '#0EA5E9',
+    number: '3',
+    title: 'Equipe responde',
+    desc: 'Se necessário, equipe assume com contexto.',
+  },
+  {
+    Icon: Calendar,
+    bg: '#CCFBF1',
+    iconBg: '#14B8A6',
+    number: '4',
+    title: 'Agenda automático',
+    desc: 'Bot coleta dados e confirma agendamento.',
+  },
+  {
+    Icon: Bell,
+    bg: '#D1FAE5',
+    iconBg: '#10B981',
+    number: '5',
+    title: 'Lembrete enviado',
+    desc: 'Confirmação automática antes da consulta.',
+  },
+  {
+    Icon: RefreshCw,
+    bg: '#E0F2FE',
+    iconBg: '#0EA5E9',
+    number: '6',
+    title: 'Follow-up ativo',
+    desc: 'Pós-consulta e reativação sem esforço.',
+  },
+] as const;
 
 const structuredData = {
   '@context': 'https://schema.org',
@@ -113,6 +224,18 @@ const structuredData = {
 };
 
 export default function HomePage() {
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    const checkViewport = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    return () => window.removeEventListener('resize', checkViewport);
+  }, []);
+
   return (
     <>
       <Script
@@ -139,6 +262,7 @@ export default function HomePage() {
           <S.Nav role="navigation" aria-label="Menu principal">
             <S.NavLink href="#como-funciona">Como funciona</S.NavLink>
             <S.NavLink href="#beneficios">Benefícios</S.NavLink>
+            <S.NavLink href="#plataforma">Plataforma</S.NavLink>
             <S.NavLink href="#demonstracao">Demonstração</S.NavLink>
             <S.NavLink href="#faq">FAQ</S.NavLink>
           </S.Nav>
@@ -156,90 +280,50 @@ export default function HomePage() {
       {/* ══════════════ HERO ══════════════ */}
       <S.HeroSection id="inicio">
         <div id="main-content" />
-        <AnimatedBackground />
+        {isDesktop && <AnimatedBackground />}
         <S.HeroGrid>
           <S.HeroText>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.5 }}
             >
               <S.HeroTag>
                 <Activity /> Atendimento automatizado para clínicas
               </S.HeroTag>
-            </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
               <S.HeroTitle>
-                Atendimento <span>inteligente</span> que <span>agenda, confirma</span> e <span>fideliza</span> seus pacientes
+                Atendimento <span><em>inteligente</em></span> que <span><em>agenda, confirma</em></span> e <span><em>fideliza</em></span> seus pacientes
               </S.HeroTitle>
-            </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
               <S.HeroDescription>
                 Converse, agende consultas e reduza faltas com um atendimento automatizado e humanizado. Mais eficiência para sua clínica, mais tempo para o que realmente importa.
               </S.HeroDescription>
             </motion.div>
 
             <S.BenefitCardsGrid>
-              {[
-                {
-                  Icon: MessageCircle,
-                  title: 'Atendimento 24h',
-                  desc: 'todos os dias'
-                },
-                {
-                  Icon: Calendar,
-                  title: 'Agendamentos',
-                  desc: 'automáticos'
-                },
-                {
-                  Icon: Bell,
-                  title: 'Lembretes',
-                  desc: 'e confirmações'
-                },
-                {
-                  Icon: Clock,
-                  title: 'Menos faltas',
-                  desc: 'mais tempo'
-                }
-              ].map(({ Icon, title, desc }, index) => (
-                <motion.div
-                  key={title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                >
-                  <S.BenefitCard>
-                    <S.BenefitIconWrapper>
-                      <Icon />
-                    </S.BenefitIconWrapper>
-                    <S.BenefitCardTitle>{title}</S.BenefitCardTitle>
-                    <S.BenefitCardDesc>{desc}</S.BenefitCardDesc>
-                  </S.BenefitCard>
-                </motion.div>
+              {BENEFIT_CARDS.map(({ Icon, title, desc }) => (
+                <S.BenefitCard key={title}>
+                  <S.BenefitIconWrapper>
+                    <Icon />
+                  </S.BenefitIconWrapper>
+                  <S.BenefitCardTitle>{title}</S.BenefitCardTitle>
+                  <S.BenefitCardDesc>{desc}</S.BenefitCardDesc>
+                </S.BenefitCard>
               ))}
             </S.BenefitCardsGrid>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
               <S.ButtonGroup>
-                <S.PrimaryButton aria-label="Solicitar demonstração e transformar atendimento">
+                <S.PrimaryButton href="#demonstracao" aria-label="Solicitar demonstração e transformar atendimento">
                   Quero transformar meu atendimento
                   <ArrowRight aria-hidden="true" />
                 </S.PrimaryButton>
-                <S.SecondaryButton aria-label="Assistir vídeo demonstrativo">
+                <S.SecondaryButton href="#plataforma" aria-label="Assistir vídeo demonstrativo">
                   <Play aria-hidden="true" />
                   Ver como funciona
                 </S.SecondaryButton>
@@ -249,7 +333,7 @@ export default function HomePage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.9 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
             >
               <S.SecurityBadge>
                 <CheckCircle2 />
@@ -259,31 +343,26 @@ export default function HomePage() {
           </S.HeroText>
 
             <motion.div
-              initial={{ opacity: 0, x: 50, scale: 0.95 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
               <S.HeroMockup>
                 <S.HeroImageWrapper>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Image 
-                      src="/assets/hero-main.png"
-                      alt="Dashboard SomaClini - Gestão de conversas e atendimento"
-                      width={2400}
-                      height={1600}
-                      quality={100}
-                      priority
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 50vw"
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        display: 'block',
-                      }}
-                    />
-                  </motion.div>
+                  <Image 
+                    src="/assets/heroImg.png"
+                    alt="Dashboard SomaClini - Gestão de conversas e atendimento"
+                    width={1600}
+                    height={1067}
+                    quality={100}
+                    priority
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 800px"
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      display: 'block',
+                    }}
+                  />
                 </S.HeroImageWrapper>
               </S.HeroMockup>
             </motion.div>
@@ -294,32 +373,7 @@ export default function HomePage() {
       <S.StatsBarSection id="beneficios">
         <S.StatsBarContainer>
           <S.StatsGrid>
-            {[
-              {
-                Icon: Clock,
-                title: 'Atendimento mais rápido',
-                desc: 'Responda todos os pacientes em menos de 3 minutos, sem deixar ninguém para trás.',
-                stat: '< 3min',
-              },
-              {
-                Icon: Calendar,
-                title: 'Menos faltas',
-                desc: 'Confirmação automática de consultas reduz drasticamente o número de no-shows.',
-                stat: '-70%',
-              },
-              {
-                Icon: RefreshCw,
-                title: 'Recuperação automatizada',
-                desc: 'Reative pacientes inativos automaticamente com mensagens personalizadas.',
-                stat: '+45%',
-              },
-              {
-                Icon: BarChart2,
-                title: 'Mais produtividade',
-                desc: 'Sua equipe foca no que realmente importa enquanto o bot cuida do resto.',
-                stat: '3x',
-              },
-            ].map(({ Icon, title, desc, stat }, index) => (
+            {STATS_DATA.map(({ Icon, title, desc, stat }, index) => (
               <motion.div
                 key={title}
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -346,19 +400,123 @@ export default function HomePage() {
         </S.StatsBarContainer>
       </S.StatsBarSection>
 
+      {/* ══════════════ VIDEO DEMONSTRATION ══════════════ */}
+      <S.VideoSection id="plataforma">
+        <S.VideoContainer>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: isDesktop ? 0.6 : 0.3 }}
+          >
+            <S.VideoTitle>
+              Veja o SomaClini em <em>ação</em>
+            </S.VideoTitle>
+            <S.VideoSubtitle>
+              Descubra como transformamos o atendimento de clínicas em todo o Brasil
+            </S.VideoSubtitle>
+          </motion.div>
+
+          <S.VideoContentGrid>
+            {/* Vídeo à esquerda */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: isDesktop ? 0.5 : 0.3, delay: isDesktop ? 0.1 : 0 }}
+            >
+              <S.VideoWrapper>
+                <S.VideoPlayer
+                  playsInline
+                  controls
+                  controlsList="nodownload nofullscreen noremoteplayback"
+                  disablePictureInPicture
+                  preload="none"
+                  poster="/assets/back-hero.png"
+                  onClick={(e) => {
+                    const video = e.currentTarget;
+                    if (video.paused) {
+                      video.play();
+                    } else {
+                      video.pause();
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <source src="/assets/videos/heroVideo.mp4" type="video/mp4" />
+                </S.VideoPlayer>
+              </S.VideoWrapper>
+            </motion.div>
+
+            {/* Features à direita */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: isDesktop ? 0.4 : 0.2 }}
+            >
+              <S.VideoFeaturesBox>
+                <S.VideoFeatureItem>
+                  <S.VideoFeatureIcon>
+                    <MessageSquare size={24} />
+                  </S.VideoFeatureIcon>
+                  <div>
+                    <S.VideoFeatureTitle>Atendimento Inteligente</S.VideoFeatureTitle>
+                    <S.VideoFeatureDesc>
+                      IA responde automaticamente com contexto completo do histórico do paciente
+                    </S.VideoFeatureDesc>
+                  </div>
+                </S.VideoFeatureItem>
+
+                <S.VideoFeatureItem>
+                  <S.VideoFeatureIcon>
+                    <Calendar size={24} />
+                  </S.VideoFeatureIcon>
+                  <div>
+                    <S.VideoFeatureTitle>Agendamento Automático</S.VideoFeatureTitle>
+                    <S.VideoFeatureDesc>
+                      Sistema agenda consultas e envia confirmações sem intervenção humana
+                    </S.VideoFeatureDesc>
+                  </div>
+                </S.VideoFeatureItem>
+
+                <S.VideoFeatureItem>
+                  <S.VideoFeatureIcon>
+                    <Users size={24} />
+                  </S.VideoFeatureIcon>
+                  <div>
+                    <S.VideoFeatureTitle>Gestão Centralizada</S.VideoFeatureTitle>
+                    <S.VideoFeatureDesc>
+                      Todas as conversas em um único painel com métricas em tempo real
+                    </S.VideoFeatureDesc>
+                  </div>
+                </S.VideoFeatureItem>
+
+                <S.VideoFeatureItem>
+                  <S.VideoFeatureIcon>
+                    <Clock size={24} />
+                  </S.VideoFeatureIcon>
+                  <div>
+                    <S.VideoFeatureTitle>Disponível 24/7</S.VideoFeatureTitle>
+                    <S.VideoFeatureDesc>
+                      Atendimento ininterrupto que nunca perde uma oportunidade de negócio
+                    </S.VideoFeatureDesc>
+                  </div>
+                </S.VideoFeatureItem>
+              </S.VideoFeaturesBox>
+            </motion.div>
+          </S.VideoContentGrid>
+        </S.VideoContainer>
+      </S.VideoSection>
+
       {/* ══════════════ HOW IT WORKS - STEP CARDS ══════════════ */}
       <S.HowItWorksSection id="como-funciona">
-        {/* Floating decorative elements */}
-        <S.FloatingCircle1 />
-        <S.FloatingCircle2 />
-        <S.FloatingCircle3 />
-        
         <S.HowItWorksContainer>
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: isDesktop ? 0.6 : 0.3 }}
           >
             <S.SectionTitle style={{ marginBottom: '16px' }}>
               Como funciona na <em>prática</em>
@@ -397,56 +555,7 @@ export default function HomePage() {
               </motion.svg>
             </S.TimelineConnector>
             
-            {[
-              {
-                Icon: MessageCircle,
-                bg: '#CCFBF1',
-                iconBg: '#14B8A6',
-                number: '1',
-                title: 'Recebe mensagem',
-                desc: 'Paciente envia mensagem no WhatsApp da clínica.',
-              },
-              {
-                Icon: Activity,
-                bg: '#D1FAE5',
-                iconBg: '#10B981',
-                number: '2',
-                title: 'IA faz triagem',
-                desc: 'Bot identifica intenção e classifica atendimento.',
-              },
-              {
-                Icon: CheckCircle2,
-                bg: '#E0F2FE',
-                iconBg: '#0EA5E9',
-                number: '3',
-                title: 'Equipe responde',
-                desc: 'Se necessário, equipe assume com contexto.',
-              },
-              {
-                Icon: Calendar,
-                bg: '#CCFBF1',
-                iconBg: '#14B8A6',
-                number: '4',
-                title: 'Agenda automático',
-                desc: 'Bot coleta dados e confirma agendamento.',
-              },
-              {
-                Icon: Bell,
-                bg: '#D1FAE5',
-                iconBg: '#10B981',
-                number: '5',
-                title: 'Lembrete enviado',
-                desc: 'Confirmação automática antes da consulta.',
-              },
-              {
-                Icon: RefreshCw,
-                bg: '#E0F2FE',
-                iconBg: '#0EA5E9',
-                number: '6',
-                title: 'Follow-up ativo',
-                desc: 'Pós-consulta e reativação sem esforço.',
-              },
-            ].map(({ Icon, bg, iconBg, number, title, desc }, index) => (
+            {HOW_IT_WORKS_STEPS.map(({ Icon, bg, iconBg, number, title, desc }, index) => (
               <S.HorizontalStep key={number}>
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8, y: 20 }}
