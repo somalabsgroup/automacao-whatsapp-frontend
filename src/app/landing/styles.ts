@@ -238,6 +238,137 @@ export const MobileMenuButton = styled.button`
   }
 `;
 
+export const MobileMenuOverlay = styled.div<{ $isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
+  transition: opacity 0.3s ease;
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  
+  @media (min-width: 768px) {
+    display: none;
+  }
+`;
+
+export const MobileMenuContent = styled.div`
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 80%;
+  max-width: 320px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  animation: slideIn 0.3s ease-out;
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+`;
+
+export const MobileMenuHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #E5E7EB;
+`;
+
+export const MobileMenuCloseButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 24px;
+  color: #6B7280;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(20, 184, 166, 0.1);
+    color: #14B8A6;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+export const MobileMenuNav = styled.nav`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex: 1;
+`;
+
+export const MobileMenuLink = styled.a`
+  display: block;
+  padding: 12px 16px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(20, 184, 166, 0.1);
+    color: #14B8A6;
+  }
+  
+  &:active {
+    background: rgba(20, 184, 166, 0.15);
+  }
+`;
+
+export const MobileMenuCTAButton = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 24px;
+  background: #14B8A6;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 48px;
+  
+  &:hover {
+    background: #0D9488;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 // ══════════════ HERO SECTION ══════════════
 export const HeroSection = styled.section`
   position: relative;
@@ -366,12 +497,15 @@ export const BenefitCardsGrid = styled.div`
   flex-wrap: wrap;
   
   @media (max-width: 768px) {
-    gap: 16px;
+    gap: 20px;
+    justify-content: center;
   }
   
   @media (max-width: 480px) {
-    flex-direction: column;
-    gap: 16px;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 `;
 
@@ -382,11 +516,16 @@ export const BenefitCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 3px;
+  gap: 6px;
   transition: all 0.3s ease;
   cursor: default;
-  flex: 0 0 auto;
   min-width: 0;
+  
+  @media (max-width: 768px) {
+    align-items: center;
+    text-align: center;
+    width: 140px;
+  }
   
   &:hover {
     transform: translateY(-2px);
@@ -427,6 +566,10 @@ export const BenefitCardTitle = styled.h3`
   width: 100%;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 export const BenefitCardDesc = styled.p`
@@ -438,6 +581,10 @@ export const BenefitCardDesc = styled.p`
   width: 100%;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 export const ButtonGroup = styled.div`

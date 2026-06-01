@@ -225,6 +225,7 @@ const structuredData = {
 
 export default function HomePage() {
   const [isDesktop, setIsDesktop] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkViewport = () => {
@@ -235,6 +236,14 @@ export default function HomePage() {
     window.addEventListener('resize', checkViewport);
     return () => window.removeEventListener('resize', checkViewport);
   }, []);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <>
@@ -271,11 +280,42 @@ export default function HomePage() {
             Agendar demonstração
           </S.HeaderButton>
           
-          <S.MobileMenuButton aria-label="Abrir menu de navegação" aria-expanded="false">
+          <S.MobileMenuButton 
+            onClick={toggleMobileMenu}
+            aria-label={isMobileMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"} 
+            aria-expanded={isMobileMenuOpen}
+          >
             <Menu aria-hidden="true" />
           </S.MobileMenuButton>
         </S.HeaderContainer>
       </S.Header>
+
+      {/* Mobile Menu Overlay */}
+      <S.MobileMenuOverlay $isOpen={isMobileMenuOpen}>
+        <S.MobileMenuContent>
+          <S.MobileMenuHeader>
+            <S.Logo>
+              <S.LogoIcon aria-hidden="true">
+                <MessageSquare />
+              </S.LogoIcon>
+              <S.LogoText>SomaClini</S.LogoText>
+            </S.Logo>
+            <S.MobileMenuCloseButton onClick={closeMobileMenu} aria-label="Fechar menu">
+              ✕
+            </S.MobileMenuCloseButton>
+          </S.MobileMenuHeader>
+          <S.MobileMenuNav>
+            <S.MobileMenuLink href="#como-funciona" onClick={closeMobileMenu}>Como funciona</S.MobileMenuLink>
+            <S.MobileMenuLink href="#beneficios" onClick={closeMobileMenu}>Benefícios</S.MobileMenuLink>
+            <S.MobileMenuLink href="#plataforma" onClick={closeMobileMenu}>Plataforma</S.MobileMenuLink>
+            <S.MobileMenuLink href="#demonstracao" onClick={closeMobileMenu}>Demonstração</S.MobileMenuLink>
+            <S.MobileMenuLink href="#faq" onClick={closeMobileMenu}>FAQ</S.MobileMenuLink>
+          </S.MobileMenuNav>
+          <S.MobileMenuCTAButton href="#demonstracao" onClick={closeMobileMenu}>
+            Agendar demonstração
+          </S.MobileMenuCTAButton>
+        </S.MobileMenuContent>
+      </S.MobileMenuOverlay>
 
       {/* ══════════════ HERO ══════════════ */}
       <S.HeroSection id="inicio">
@@ -302,14 +342,25 @@ export default function HomePage() {
             </motion.div>
 
             <S.BenefitCardsGrid>
-              {BENEFIT_CARDS.map(({ Icon, title, desc }) => (
-                <S.BenefitCard key={title}>
-                  <S.BenefitIconWrapper>
-                    <Icon />
-                  </S.BenefitIconWrapper>
-                  <S.BenefitCardTitle>{title}</S.BenefitCardTitle>
-                  <S.BenefitCardDesc>{desc}</S.BenefitCardDesc>
-                </S.BenefitCard>
+              {BENEFIT_CARDS.map(({ Icon, title, desc }, index) => (
+                <motion.div
+                  key={title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    duration: isDesktop ? 0.5 : 0.3,
+                    delay: index * 0.1 + 0.2
+                  }}
+                  style={{ flex: '0 0 auto' }}
+                >
+                  <S.BenefitCard>
+                    <S.BenefitIconWrapper>
+                      <Icon />
+                    </S.BenefitIconWrapper>
+                    <S.BenefitCardTitle>{title}</S.BenefitCardTitle>
+                    <S.BenefitCardDesc>{desc}</S.BenefitCardDesc>
+                  </S.BenefitCard>
+                </motion.div>
               ))}
             </S.BenefitCardsGrid>
 
