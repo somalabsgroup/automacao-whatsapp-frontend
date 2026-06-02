@@ -248,6 +248,26 @@ export default function HomePage() {
     setIsMobileMenuOpen(false);
   };
 
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    
+    const target = document.querySelector(targetId);
+    if (target) {
+      const headerHeight = 80; // Altura aproximada do header fixo
+      const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+      
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+      
+      // Fechar menu mobile se estiver aberto
+      if (isMobileMenuOpen) {
+        closeMobileMenu();
+      }
+    }
+  };
+
   const handleVideoClick = () => {
     if (videoRef.current) {
       if (videoRef.current.paused) {
@@ -292,14 +312,14 @@ export default function HomePage() {
           </S.Logo>
 
           <S.Nav role="navigation" aria-label="Menu principal">
-            <S.NavLink href="#como-funciona">Como funciona</S.NavLink>
-            <S.NavLink href="#beneficios">Benefícios</S.NavLink>
-            <S.NavLink href="#plataforma">Plataforma</S.NavLink>
-            <S.NavLink href="#demonstracao">Demonstração</S.NavLink>
-            <S.NavLink href="#faq">FAQ</S.NavLink>
+            <S.NavLink href="#como-funciona" onClick={(e) => handleSmoothScroll(e, '#como-funciona')}>Como funciona</S.NavLink>
+            <S.NavLink href="#beneficios" onClick={(e) => handleSmoothScroll(e, '#beneficios')}>Benefícios</S.NavLink>
+            <S.NavLink href="#plataforma" onClick={(e) => handleSmoothScroll(e, '#plataforma')}>Plataforma</S.NavLink>
+            <S.NavLink href="#form-demonstracao" onClick={(e) => handleSmoothScroll(e, '#form-demonstracao')}>Demonstração</S.NavLink>
+            <S.NavLink href="#faq" onClick={(e) => handleSmoothScroll(e, '#faq')}>FAQ</S.NavLink>
           </S.Nav>
 
-          <S.HeaderButton href="#demonstracao">
+          <S.HeaderButton href="#form-demonstracao" onClick={(e) => handleSmoothScroll(e, '#form-demonstracao')}>
             Agendar demonstração
           </S.HeaderButton>
           
@@ -328,13 +348,13 @@ export default function HomePage() {
             </S.MobileMenuCloseButton>
           </S.MobileMenuHeader>
           <S.MobileMenuNav>
-            <S.MobileMenuLink href="#como-funciona" onClick={closeMobileMenu}>Como funciona</S.MobileMenuLink>
-            <S.MobileMenuLink href="#beneficios" onClick={closeMobileMenu}>Benefícios</S.MobileMenuLink>
-            <S.MobileMenuLink href="#plataforma" onClick={closeMobileMenu}>Plataforma</S.MobileMenuLink>
-            <S.MobileMenuLink href="#demonstracao" onClick={closeMobileMenu}>Demonstração</S.MobileMenuLink>
-            <S.MobileMenuLink href="#faq" onClick={closeMobileMenu}>FAQ</S.MobileMenuLink>
+            <S.MobileMenuLink href="#como-funciona" onClick={(e) => handleSmoothScroll(e, '#como-funciona')}>Como funciona</S.MobileMenuLink>
+            <S.MobileMenuLink href="#beneficios" onClick={(e) => handleSmoothScroll(e, '#beneficios')}>Benefícios</S.MobileMenuLink>
+            <S.MobileMenuLink href="#plataforma" onClick={(e) => handleSmoothScroll(e, '#plataforma')}>Plataforma</S.MobileMenuLink>
+            <S.MobileMenuLink href="#form-demonstracao" onClick={(e) => handleSmoothScroll(e, '#form-demonstracao')}>Demonstração</S.MobileMenuLink>
+            <S.MobileMenuLink href="#faq" onClick={(e) => handleSmoothScroll(e, '#faq')}>FAQ</S.MobileMenuLink>
           </S.MobileMenuNav>
-          <S.MobileMenuCTAButton href="#demonstracao" onClick={closeMobileMenu}>
+          <S.MobileMenuCTAButton href="#form-demonstracao" onClick={(e) => handleSmoothScroll(e, '#form-demonstracao')}>
             Agendar demonstração
           </S.MobileMenuCTAButton>
         </S.MobileMenuContent>
@@ -393,11 +413,11 @@ export default function HomePage() {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <S.ButtonGroup>
-                <S.PrimaryButton href="#demonstracao" aria-label="Solicitar demonstração e transformar atendimento">
+                <S.PrimaryButton href="#form-demonstracao" onClick={(e) => handleSmoothScroll(e, '#form-demonstracao')} aria-label="Solicitar demonstração e transformar atendimento">
                   Quero transformar meu atendimento
                   <ArrowRight aria-hidden="true" />
                 </S.PrimaryButton>
-                <S.SecondaryButton href="#plataforma" aria-label="Assistir vídeo demonstrativo">
+                <S.SecondaryButton href="#plataforma" onClick={(e) => handleSmoothScroll(e, '#plataforma')} aria-label="Assistir vídeo demonstrativo">
                   <Play aria-hidden="true" />
                   Ver como funciona
                 </S.SecondaryButton>
@@ -708,7 +728,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <S.ModernFormCard>
+            <S.ModernFormCard id="form-demonstracao">
               <S.FormHeader>
                 <S.FormTitle>Agende sua <em>demonstração</em></S.FormTitle>
                 <S.FormDescription>
@@ -912,7 +932,7 @@ export default function HomePage() {
                   links: [
                     { label: 'Como funciona', href: '#como-funciona' },
                     { label: 'Benefícios', href: '#beneficios' },
-                    { label: 'Demonstração', href: '#demonstracao' },
+                    { label: 'Demonstração', href: '#form-demonstracao' },
                     { label: 'FAQ', href: '#faq' },
                   ],
                 },
@@ -929,7 +949,7 @@ export default function HomePage() {
                   title: 'Empresa',
                   links: [
                     { label: 'Sobre nós', href: '#inicio' },
-                    { label: 'Contato', href: '#demonstracao' },
+                    { label: 'Contato', href: '#form-demonstracao' },
                   ],
                 },
               ].map(({ title, links }, colIndex) => (
@@ -945,7 +965,7 @@ export default function HomePage() {
                         transition={{ duration: 0.3, delay: colIndex * 0.1 + linkIndex * 0.05 }}
                       >
                         <S.FooterLink>
-                          <a href={link.href}>{link.label}</a>
+                          <a href={link.href} onClick={(e) => handleSmoothScroll(e, link.href)}>{link.label}</a>
                         </S.FooterLink>
                       </motion.div>
                     ))}
