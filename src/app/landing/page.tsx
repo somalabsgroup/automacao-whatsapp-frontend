@@ -562,11 +562,10 @@ export default function HomePage() {
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
                   preload="metadata"
-                  poster="/assets/back-hero.png"
                   onPlay={handleVideoPlay}
                   onPause={handleVideoPause}
                 >
-                  <source src="/assets/videos/heroVideo.mp4" type="video/mp4" />
+                  <source src="/assets/videos/heroVideo.mp4#t=0.1" type="video/mp4" />
                   Seu navegador não suporta a reprodução de vídeos.
                 </S.VideoPlayer>
               </S.VideoWrapper>
