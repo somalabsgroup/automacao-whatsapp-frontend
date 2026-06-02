@@ -386,7 +386,7 @@ export const HeroSection = styled.section`
   background: white;
   
   @media (max-width: 968px) {
-    padding: 140px 16px 30px;
+    padding: 100px 16px 30px;
     align-items: flex-start;
     min-height: auto;
   }

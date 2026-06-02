@@ -189,34 +189,50 @@ const structuredData = {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'Como funciona o atendimento automatizado?',
+          name: 'Como funciona a automação de atendimento?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'O SomaClini usa inteligência artificial para responder seus pacientes automaticamente pelo WhatsApp, 24 horas por dia. O sistema agenda consultas, confirma horários e envia lembretes.'
+            text: 'Nossa IA atende automaticamente no WhatsApp 24/7: responde dúvidas sobre procedimentos, coleta informações do paciente, verifica horários disponíveis e agenda consultas. Quando necessário, transfere para um atendente humano que assume a conversa pela nossa plataforma web.'
           }
         },
         {
           '@type': 'Question',
-          name: 'É seguro e em conformidade com a LGPD?',
+          name: 'Preciso trocar meu número de WhatsApp?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Sim! Todos os dados são criptografados e armazenados com segurança, seguindo as normas da LGPD. Você tem total controle sobre as informações dos seus pacientes.'
+            text: 'Não! Usamos o WhatsApp Business API oficial, que permite manter seu número atual. Fazemos toda a migração e configuração técnica. Seus pacientes continuam falando com o mesmo número de sempre.'
           }
         },
         {
           '@type': 'Question',
-          name: 'Quanto tempo leva para implementar?',
+          name: 'Como a IA sabe quando chamar um humano?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'A implementação é rápida e simples. Em até 48 horas, sua clínica já estará atendendo automaticamente pelo WhatsApp.'
+            text: 'A IA identifica situações que precisam de atenção humana, como dúvidas complexas, urgências ou solicitação do próprio paciente. Nesses casos, a conversa é transferida automaticamente e o atendente vê todo o histórico em tempo real no dashboard.'
           }
         },
         {
           '@type': 'Question',
-          name: 'Funciona com minha agenda atual?',
+          name: 'Quanto tempo leva para começar a usar?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Sim! O SomaClini se integra com os principais sistemas de agenda médica, mantendo tudo sincronizado em tempo real.'
+            text: 'Em média 3 a 5 dias úteis. Fazemos a integração do WhatsApp, configuração da IA com informações da sua clínica, cadastro de profissionais e horários, e treinamento da equipe.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Posso ter vários atendentes usando ao mesmo tempo?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sim! A plataforma suporta múltiplos usuários simultâneos. Cada atendente tem seu login, visualiza todas as conversas em tempo real, e pode assumir atendimentos conforme necessário.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Os dados dos meus pacientes ficam seguros?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Totalmente. Usamos criptografia de ponta a ponta, banco de dados com isolamento por tenant, backup automático e conformidade com LGPD. Os dados ficam em servidores seguros no Brasil.'
           }
         }
       ]
@@ -845,20 +861,28 @@ export default function HomePage() {
           <S.FAQList>
               {[
                 {
-                  q: 'Como o SomaClini funciona para clínicas?',
-                  a: 'O SomaClini conecta ao WhatsApp da sua clínica e automatiza o atendimento: responde dúvidas, coleta dados, agenda consultas e envia lembretes — tudo de forma automática e sem precisar de programação.',
+                  q: 'Como funciona a automação de atendimento?',
+                  a: 'Nossa IA atende automaticamente no WhatsApp 24/7: responde dúvidas sobre procedimentos, coleta informações do paciente, verifica horários disponíveis e agenda consultas. Quando necessário, transfere para um atendente humano que assume a conversa pela nossa plataforma web.',
                 },
                 {
-                  q: 'Funciona com qualquer versão do WhatsApp?',
-                  a: 'Sim! O SomaClini funciona com o WhatsApp Business API oficial, garantindo estabilidade e sem risco de banimento. Cuidamos de toda a integração para você.',
+                  q: 'Preciso trocar meu número de WhatsApp?',
+                  a: 'Não! Usamos o WhatsApp Business API oficial, que permite manter seu número atual. Fazemos toda a migração e configuração técnica. Seus pacientes continuam falando com o mesmo número de sempre.',
                 },
                 {
-                  q: 'É difícil de usar?',
-                  a: 'Não. A plataforma foi projetada para ser simples e intuitiva. Nossa equipe faz toda a configuração inicial e oferece suporte completo durante o uso.',
+                  q: 'Como a IA sabe quando chamar um humano?',
+                  a: 'A IA identifica situações que precisam de atenção humana, como dúvidas complexas, urgências ou solicitação do próprio paciente. Nesses casos, a conversa é transferida automaticamente e o atendente vê todo o histórico em tempo real no dashboard.',
                 },
                 {
-                  q: 'Posso ter suporte após a contratação?',
-                  a: 'Sim! Todos os planos incluem suporte dedicado. Temos time disponível para ajudar sua clínica a obter o máximo do SomaClini desde o primeiro dia.',
+                  q: 'Quanto tempo leva para começar a usar?',
+                  a: 'Em média 3 a 5 dias úteis. Fazemos a integração do WhatsApp, configuração da IA com informações da sua clínica, cadastro de profissionais e horários, e treinamento da equipe. Você acompanha tudo pelo nosso suporte dedicado.',
+                },
+                {
+                  q: 'Posso ter vários atendentes usando ao mesmo tempo?',
+                  a: 'Sim! A plataforma suporta múltiplos usuários simultâneos. Cada atendente tem seu login, visualiza todas as conversas em tempo real, e pode assumir atendimentos conforme necessário. Ideal para clínicas com equipe de recepção.',
+                },
+                {
+                  q: 'Os dados dos meus pacientes ficam seguros?',
+                  a: 'Totalmente. Usamos criptografia de ponta a ponta, banco de dados com isolamento por tenant (sua clínica não vê dados de outras), backup automático e conformidade com LGPD. Os dados ficam em servidores seguros no Brasil.',
                 },
               ].map((item, index) => (
                 <motion.div
