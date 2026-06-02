@@ -1,20 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useConversationStore } from '@/stores/useConversationStore';
-import { Conversation, ChatMessage } from '@/types';
-import Chat from '@/components/Chat';
-import { createClient } from '@/lib/supabase/client';
-import { sendTextMessage, editMessage, deleteMessage, deleteConversation, closeConversation } from '@/lib/services/conversations';
+import { useState, useEffect, useRef } from "react";
+import { useConversationStore } from "@/stores/useConversationStore";
+import { Conversation, ChatMessage } from "@/types";
+import Chat from "@/components/Chat";
+import { createClient } from "@/lib/supabase/client";
+import {
+  sendTextMessage,
+  editMessage,
+  deleteMessage,
+  deleteConversation,
+  closeConversation,
+} from "@/lib/services/conversations";
 
 const logError = (label: string, error: unknown) => {
-  if (error && typeof error === 'object' && 'message' in error) {
+  if (error && typeof error === "object" && "message" in error) {
     console.error(label, (error as { message: string; code?: string; details?: string }).message, error);
   } else {
     console.error(label, error);
   }
 };
-import { getMessagesByConversation, subscribeToMessages } from '@/lib/services/messages';
+import { getMessagesByConversation, subscribeToMessages } from "@/lib/services/messages";
+import ChatSkeleton from "@/components/Chat/ChatSkeleton";
 
 interface PaginationState {
   hasMore: boolean;
@@ -25,11 +32,16 @@ interface PaginationState {
 interface ChatWrapperProps {
   conversations: Conversation[];
   tenantId: string;
-  onConversationStatusChange?: (conversationId: string, status: Conversation['status']) => void;
+  onConversationStatusChange?: (conversationId: string, status: Conversation["status"]) => void;
   onConversationDeleted?: (conversationId: string) => void;
 }
 
-export default function ChatWrapper({ conversations, tenantId, onConversationStatusChange, onConversationDeleted }: ChatWrapperProps) {
+export default function ChatWrapper({
+  conversations,
+  tenantId,
+  onConversationStatusChange,
+  onConversationDeleted,
+}: ChatWrapperProps) {
   const { selectedConversationId } = useConversationStore();
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({});
   const [pagination, setPagination] = useState<Record<string, PaginationState>>({});
@@ -38,9 +50,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
   const supabase = supabaseRef.current;
 
   const selectedConversation = conversations.find((c) => c.id === selectedConversationId);
-  const conversationMessages = selectedConversationId
-    ? messages[selectedConversationId] || []
-    : [];
+  const conversationMessages = selectedConversationId ? messages[selectedConversationId] || [] : [];
 
   const currentPagination = selectedConversationId ? pagination[selectedConversationId] : undefined;
 
@@ -89,7 +99,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
       const { messages: older, hasMore } = await getMessagesByConversation(
         supabase,
         selectedConversationId,
-        pag.oldestTimestamp
+        pag.oldestTimestamp,
       );
 
       setMessages((prev) => ({
@@ -120,42 +130,37 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     let unsubscribe: (() => void) | null = null;
 
     const setupSubscription = async () => {
-      unsubscribe = await subscribeToMessages(
-        supabase,
-        selectedConversationId,
-        (newMessage: ChatMessage) => {
-          setMessages((prev) => {
-            const currentMessages = prev[selectedConversationId] || [];
-            
-            // Procurar por ID ou por whatsapp_message_id (para evitar duplicatas)
-            const existingIndex = currentMessages.findIndex(
-              msg => msg.id === newMessage.id || 
-              (msg.whatsappMessageId && msg.whatsappMessageId === newMessage.whatsappMessageId)
-            );
-            
-            // Se existe, atualiza (UPDATE do n8n)
-            if (existingIndex >= 0) {
-              const updated = [...currentMessages];
-              updated[existingIndex] = newMessage;
-              return {
-                ...prev,
-                [selectedConversationId]: updated,
-              };
-            }
-            
-            // Remover mensagem otimística se a mensagem real chegou
-            const optimisticMessages = currentMessages.filter(
-              msg => !msg.isOptimistic || msg.status === 'failed'
-            );
-            
-            // Se não existe, adiciona (INSERT)
+      unsubscribe = await subscribeToMessages(supabase, selectedConversationId, (newMessage: ChatMessage) => {
+        setMessages((prev) => {
+          const currentMessages = prev[selectedConversationId] || [];
+
+          // Procurar por ID ou por whatsapp_message_id (para evitar duplicatas)
+          const existingIndex = currentMessages.findIndex(
+            (msg) =>
+              msg.id === newMessage.id ||
+              (msg.whatsappMessageId && msg.whatsappMessageId === newMessage.whatsappMessageId),
+          );
+
+          // Se existe, atualiza (UPDATE do n8n)
+          if (existingIndex >= 0) {
+            const updated = [...currentMessages];
+            updated[existingIndex] = newMessage;
             return {
               ...prev,
-              [selectedConversationId]: [...optimisticMessages, newMessage],
+              [selectedConversationId]: updated,
             };
-          });
-        }
-      );
+          }
+
+          // Remover mensagem otimística se a mensagem real chegou
+          const optimisticMessages = currentMessages.filter((msg) => !msg.isOptimistic || msg.status === "failed");
+
+          // Se não existe, adiciona (INSERT)
+          return {
+            ...prev,
+            [selectedConversationId]: [...optimisticMessages, newMessage],
+          };
+        });
+      });
     };
 
     setupSubscription();
@@ -171,30 +176,30 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     if (!selectedConversationId || !selectedConversation) return;
 
     if (attachments && attachments.length > 0) {
-      alert('Upload de arquivos ainda não implementado');
+      alert("Upload de arquivos ainda não implementado");
       return;
     }
 
     const patientPhone = selectedConversation.patientPhone;
     if (!patientPhone) {
-      alert('Telefone do paciente não encontrado');
+      alert("Telefone do paciente não encontrado");
       return;
     }
 
     const { data: user } = await supabase.auth.getUser();
-    
+
     // Criar mensagem otimista (ID temporário com prefixo "temp-")
     const tempId = `temp-${Date.now()}`;
     const optimisticMessage: ChatMessage = {
       id: tempId,
       conversationId: selectedConversationId,
       tenantId,
-      direction: 'outbound',
-      sender: 'human',
+      direction: "outbound",
+      sender: "human",
       senderUserId: user.user?.id,
-      type: 'text',
+      type: "text",
       content,
-      status: 'pending',
+      status: "pending",
       timestamp: new Date(),
       isOptimistic: true,
     };
@@ -207,32 +212,22 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
     // Atualizar status da conversa para "em atendimento humano" (apenas visual)
     if (onConversationStatusChange) {
-      onConversationStatusChange(selectedConversationId, 'human_active');
+      onConversationStatusChange(selectedConversationId, "human_active");
     }
 
     try {
-      await sendTextMessage(
-        tenantId,
-        selectedConversationId,
-        patientPhone,
-        content,
-        user.user?.id
-      );
-
-      
+      await sendTextMessage(tenantId, selectedConversationId, patientPhone, content, user.user?.id);
     } catch (error) {
-      let errorMsg = 'Erro ao enviar mensagem';
+      let errorMsg = "Erro ao enviar mensagem";
       if (error instanceof Error) {
         errorMsg = error.message;
       }
-      
+
       // Atualizar mensagem otimista para mostrar erro
       setMessages((prev) => {
         const currentMessages = prev[selectedConversationId] || [];
         const updatedMessages = currentMessages.map((msg) =>
-          msg.id === tempId
-            ? { ...msg, status: 'failed' as const, error: errorMsg }
-            : msg
+          msg.id === tempId ? { ...msg, status: "failed" as const, error: errorMsg } : msg,
         );
         return {
           ...prev,
@@ -250,7 +245,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
     const patientPhone = selectedConversation.patientPhone;
     if (!patientPhone) {
-      alert('Telefone do paciente não encontrado');
+      alert("Telefone do paciente não encontrado");
       return;
     }
 
@@ -258,9 +253,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     setMessages((prev) => {
       const currentMessages = prev[selectedConversationId] || [];
       const updatedMessages = currentMessages.map((msg) =>
-        msg.id === messageId
-          ? { ...msg, status: 'pending' as const, error: undefined }
-          : msg
+        msg.id === messageId ? { ...msg, status: "pending" as const, error: undefined } : msg,
       );
       return {
         ...prev,
@@ -271,13 +264,7 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
     try {
       const { data: user } = await supabase.auth.getUser();
 
-      await sendTextMessage(
-        tenantId,
-        selectedConversationId,
-        patientPhone,
-        message.content,
-        user.user?.id
-      );
+      await sendTextMessage(tenantId, selectedConversationId, patientPhone, message.content, user.user?.id);
 
       setMessages((prev) => {
         const currentMessages = prev[selectedConversationId] || [];
@@ -287,20 +274,17 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
           [selectedConversationId]: updatedMessages,
         };
       });
-      
     } catch (error) {
-      let errorMsg = 'Erro ao reenviar mensagem';
+      let errorMsg = "Erro ao reenviar mensagem";
       if (error instanceof Error) {
         errorMsg = error.message;
       }
-      
+
       // Atualizar mensagem para mostrar erro novamente
       setMessages((prev) => {
         const currentMessages = prev[selectedConversationId] || [];
         const updatedMessages = currentMessages.map((msg) =>
-          msg.id === messageId
-            ? { ...msg, status: 'failed' as const, error: errorMsg }
-            : msg
+          msg.id === messageId ? { ...msg, status: "failed" as const, error: errorMsg } : msg,
         );
         return {
           ...prev,
@@ -315,19 +299,19 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
     const previous = messages[selectedConversationId] || [];
 
-    setMessages(prev => ({
+    setMessages((prev) => ({
       ...prev,
-      [selectedConversationId]: (prev[selectedConversationId] || []).map(msg =>
-        msg.id === messageId ? { ...msg, content: newContent, editedAt: new Date() } : msg
+      [selectedConversationId]: (prev[selectedConversationId] || []).map((msg) =>
+        msg.id === messageId ? { ...msg, content: newContent, editedAt: new Date() } : msg,
       ),
     }));
 
     try {
       await editMessage(messageId, newContent);
     } catch (error) {
-      logError('Error updating message:', error);
-      setMessages(prev => ({ ...prev, [selectedConversationId]: previous }));
-      alert('Erro ao editar mensagem. Tente novamente.');
+      logError("Error updating message:", error);
+      setMessages((prev) => ({ ...prev, [selectedConversationId]: previous }));
+      alert("Erro ao editar mensagem. Tente novamente.");
     }
   };
 
@@ -336,19 +320,19 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
     const previous = messages[selectedConversationId] || [];
 
-    setMessages(prev => ({
+    setMessages((prev) => ({
       ...prev,
-      [selectedConversationId]: (prev[selectedConversationId] || []).map(msg =>
-        msg.id === messageId ? { ...msg, deletedAt: new Date() } : msg
+      [selectedConversationId]: (prev[selectedConversationId] || []).map((msg) =>
+        msg.id === messageId ? { ...msg, deletedAt: new Date() } : msg,
       ),
     }));
 
     try {
       await deleteMessage(messageId);
     } catch (error) {
-      logError('Error deleting message:', error);
-      setMessages(prev => ({ ...prev, [selectedConversationId]: previous }));
-      alert('Erro ao excluir mensagem. Tente novamente.');
+      logError("Error deleting message:", error);
+      setMessages((prev) => ({ ...prev, [selectedConversationId]: previous }));
+      alert("Erro ao excluir mensagem. Tente novamente.");
     }
   };
 
@@ -357,15 +341,14 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
     try {
       await closeConversation(supabase, selectedConversationId, tenantId);
-      
+
       // Atualizar status da conversa localmente (realtime também vai atualizar)
       if (onConversationStatusChange) {
-        onConversationStatusChange(selectedConversationId, 'closed');
+        onConversationStatusChange(selectedConversationId, "closed");
       }
-      
     } catch (error) {
-      logError('Error closing conversation:', error);
-      alert('Erro ao encerrar atendimento. Tente novamente.');
+      logError("Error closing conversation:", error);
+      alert("Erro ao encerrar atendimento. Tente novamente.");
     }
   };
 
@@ -374,12 +357,12 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
     try {
       await deleteConversation(supabase, selectedConversationId, tenantId);
-      
+
       // Remover da lista imediatamente (não espera realtime)
       if (onConversationDeleted) {
         onConversationDeleted(selectedConversationId);
       }
-      
+
       // Limpar mensagens locais
       setMessages((prev) => {
         const newMessages = { ...prev };
@@ -389,15 +372,14 @@ export default function ChatWrapper({ conversations, tenantId, onConversationSta
 
       // Desselecionar conversa
       useConversationStore.getState().setSelectedConversation(null);
-      
     } catch (error) {
-      logError('Error deleting conversation:', error);
-      alert('Erro ao excluir conversa. Tente novamente.');
+      logError("Error deleting conversation:", error);
+      alert("Erro ao excluir conversa. Tente novamente.");
     }
   };
 
   if (loading) {
-    return <div>Carregando mensagens...</div>;
+    return <ChatSkeleton />;
   }
 
   return (

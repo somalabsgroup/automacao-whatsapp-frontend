@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { AvatarColor, MessageSender, MessageStatus } from '@/types';
 
 // ============= ChatContainer =============
@@ -913,9 +913,58 @@ export const EditButton = styled.button<{ $primary?: boolean }>`
     background: transparent;
     color: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.25);
-    &:hover { 
+    &:hover {
       background: rgba(255, 255, 255, 0.1);
       color: rgba(255, 255, 255, 0.95);
     }
   `}
+`;
+
+// ============= Skeleton =============
+
+const skeletonShimmer = keyframes`
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+`;
+
+export const SkeletonBlock = styled.div`
+  background: linear-gradient(
+    90deg,
+    ${({ theme }) => theme.bg.secondary} 0%,
+    ${({ theme }) => theme.bg.tertiary} 50%,
+    ${({ theme }) => theme.bg.secondary} 100%
+  );
+  background-size: 200% 100%;
+  animation: ${skeletonShimmer} 1.5s ease-in-out infinite;
+  border-radius: 0.375rem;
+`;
+
+export const SkeletonCircle = styled(SkeletonBlock)<{ $size?: string }>`
+  width: ${({ $size }) => $size ?? '36px'};
+  height: ${({ $size }) => $size ?? '36px'};
+  min-width: ${({ $size }) => $size ?? '36px'};
+  border-radius: 50%;
+`;
+
+export const SkeletonText = styled(SkeletonBlock)<{ $w: string; $h?: string }>`
+  width: ${({ $w }) => $w};
+  height: ${({ $h }) => $h ?? '12px'};
+`;
+
+export const SkeletonBubbleRow = styled.div<{ $align: 'left' | 'right' }>`
+  display: flex;
+  justify-content: ${({ $align }) => ($align === 'right' ? 'flex-end' : 'flex-start')};
+  padding: 0.125rem 0.5rem;
+`;
+
+export const SkeletonBubbleBlock = styled(SkeletonBlock)<{ $w: string; $h?: string }>`
+  width: ${({ $w }) => $w};
+  height: ${({ $h }) => $h ?? '36px'};
+  border-radius: 0.5rem;
+`;
+
+export const SkeletonInputField = styled(SkeletonBlock)`
+  flex: 1;
+  height: 40px;
+  border-radius: 1.25rem;
 `;
