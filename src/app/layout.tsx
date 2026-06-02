@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     description: 'Automatize o atendimento da sua clínica com IA. Agende consultas, confirme horários e reduza faltas pelo WhatsApp. Atendimento 24h inteligente e humanizado.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/assets/hero.png',
         width: 1200,
         height: 630,
         alt: 'SomaClini - Atendimento via WhatsApp para Clínicas',
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'SomaClini - Atendimento Inteligente via WhatsApp',
     description: 'Automatize agendamentos e reduza faltas com atendimento 24h pelo WhatsApp. Mais eficiência para sua clínica.',
-    images: ['/og-image.png'],
+    images: ['/assets/hero.png'],
     creator: '@somaclini',
   },
   robots: {
