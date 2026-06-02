@@ -488,100 +488,97 @@ export const HeroDescription = styled.p`
 `;
 
 export const BenefitCardsGrid = styled.div`
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
   margin: 0;
   width: 100%;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  
+
   @media (max-width: 768px) {
-    gap: 20px;
-    justify-content: center;
-  }
-  
-  @media (max-width: 480px) {
-    flex-direction: row;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
 export const BenefitCard = styled.div`
-  background: transparent;
-  border: none;
-  padding: 0;
+  background: white;
+  border: 1px solid #E0F7F4;
+  border-radius: 14px;
+  padding: 14px 14px;
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.06);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
-  transition: all 0.3s ease;
+  gap: 7px;
+  transition: all 0.25s ease;
   cursor: default;
+  height: 100%;
   min-width: 0;
-  
+
   @media (max-width: 768px) {
     align-items: center;
     text-align: center;
-    width: 140px;
   }
-  
+
   &:hover {
-    transform: translateY(-2px);
-    
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(20, 184, 166, 0.13);
+    border-color: #A7E9E3;
+
     svg {
-      transform: scale(1.1);
+      transform: scale(1.08);
     }
   }
 `;
 
 export const BenefitIconWrapper = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 10px;
-  background: rgba(249, 250, 251, 0.2);
+  background: #F0FDFA;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0;
-  transition: transform 0.3s ease;
-  
+  transition: transform 0.25s ease;
+
   svg {
-    width: 22px;
-    height: 22px;
-    color: #6B7280;
-    stroke-width: 2.5;
-    transition: transform 0.3s ease;
+    width: 20px;
+    height: 20px;
+    color: #14B8A6;
+    stroke-width: 2;
+    transition: transform 0.25s ease;
   }
 `;
 
 export const BenefitCardTitle = styled.h3`
-  font-size: 11px;
-  font-weight: 600;
-  color: #0F172A;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  color: #111827;
   margin: 0;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
   width: 100%;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  
+
   @media (max-width: 768px) {
     text-align: center;
   }
 `;
 
 export const BenefitCardDesc = styled.p`
-  font-size: 10px;
-  color: #64748B;
+  font-size: 11px;
+  color: #6B7280;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.45;
   font-weight: 400;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  letter-spacing: -0.01em;
   width: 100%;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  
+
   @media (max-width: 768px) {
     text-align: center;
   }
@@ -591,7 +588,7 @@ export const ButtonGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   width: 100%;
   
   @media (max-width: 640px) {
@@ -761,6 +758,12 @@ export const SecurityBadge = styled.div`
       width: 15px;
       height: 15px;
     }
+  }
+`;
+
+export const HeroImageSection = styled.div`
+  @media (max-width: 968px) {
+    display: none;
   }
 `;
 
@@ -1099,29 +1102,35 @@ export const ModernStatCard = styled.div`
 
 export const StatBadge = styled.div`
   position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.3);
+  top: 14px;
+  right: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: white;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 20px;
+  padding: 3px 10px;
   transition: all 0.3s ease;
-  
+
   ${ModernStatCard}:hover & {
-    color: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.42);
+    transform: scale(1.04);
   }
-  
+
   @media (max-width: 768px) {
     ${ModernStatCard}:hover & {
       transform: none;
     }
   }
-  
+
   @media (max-width: 640px) {
-    font-size: 16px;
+    font-size: 12px;
     top: 12px;
     right: 12px;
+    padding: 2px 9px;
   }
 `;
 
@@ -1678,6 +1687,7 @@ export const ModernFormLabel = styled.label`
 `;
 
 export const ModernFormInput = styled.input`
+  width: 100%;
   padding: 14px 16px;
   border: 2px solid #E5E7EB;
   border-radius: 12px;
@@ -1703,6 +1713,7 @@ export const ModernFormInput = styled.input`
 `;
 
 export const ModernFormSelect = styled.select`
+  width: 100%;
   padding: 14px 16px;
   border: 2px solid #E5E7EB;
   border-radius: 12px;

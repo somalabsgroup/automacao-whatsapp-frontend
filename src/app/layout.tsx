@@ -1,6 +1,13 @@
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import StyledComponentsRegistry from '@/lib/registry'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://somaclini.com.br'),
@@ -85,7 +92,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+      <body className={inter.variable} suppressHydrationWarning>
         <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
       </body>
     </html>

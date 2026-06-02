@@ -351,7 +351,7 @@ export default function HomePage() {
                     duration: isDesktop ? 0.5 : 0.3,
                     delay: index * 0.1 + 0.2
                   }}
-                  style={{ flex: '0 0 auto' }}
+                  style={{ height: '100%' }}
                 >
                   <S.BenefitCard>
                     <S.BenefitIconWrapper>
@@ -393,6 +393,7 @@ export default function HomePage() {
             </motion.div>
           </S.HeroText>
 
+            <S.HeroImageSection>
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -417,6 +418,7 @@ export default function HomePage() {
                 </S.HeroImageWrapper>
               </S.HeroMockup>
             </motion.div>
+            </S.HeroImageSection>
         </S.HeroGrid>
       </S.HeroSection>
 
