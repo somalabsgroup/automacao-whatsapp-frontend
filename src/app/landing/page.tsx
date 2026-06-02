@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Script from 'next/script';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   MessageSquare, CheckCircle2, Calendar, Users, BarChart2,
   AlertCircle, Clock, RefreshCw, Bell, Phone,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { 
   FaqItem,
+  CustomSelect,
 } from './components';
 import * as S from './styles';
 
@@ -226,6 +227,8 @@ const structuredData = {
 export default function HomePage() {
   const [isDesktop, setIsDesktop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const checkViewport = () => {
@@ -243,6 +246,26 @@ export default function HomePage() {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const handleVideoClick = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+        setIsVideoPlaying(true);
+      } else {
+        videoRef.current.pause();
+        setIsVideoPlaying(false);
+      }
+    }
+  };
+
+  const handleVideoPlay = () => {
+    setIsVideoPlaying(true);
+  };
+
+  const handleVideoPause = () => {
+    setIsVideoPlaying(false);
   };
 
   return (
@@ -478,14 +501,22 @@ export default function HomePage() {
               viewport={{ once: true }}
               transition={{ duration: isDesktop ? 0.5 : 0.3, delay: isDesktop ? 0.1 : 0 }}
             >
-              <S.VideoWrapper>
+              <S.VideoWrapper onClick={handleVideoClick}>
+                <S.VideoPlayOverlay $isVisible={!isVideoPlaying}>
+                  <S.VideoPlayButton $isVisible={!isVideoPlaying}>
+                    <Play />
+                  </S.VideoPlayButton>
+                </S.VideoPlayOverlay>
                 <S.VideoPlayer
+                  ref={videoRef}
                   playsInline
                   controls
                   controlsList="nodownload nofullscreen noremoteplayback"
                   disablePictureInPicture
                   preload="metadata"
                   poster="/assets/back-hero.png"
+                  onPlay={handleVideoPlay}
+                  onPause={handleVideoPause}
                 >
                   <source src="/assets/videos/heroVideo.mp4" type="video/mp4" />
                   Seu navegador não suporta a reprodução de vídeos.
@@ -737,14 +768,16 @@ export default function HomePage() {
                     <AlertCircle style={{ width: '16px', height: '16px' }} />
                     Principal desafio
                   </S.ModernFormLabel>
-                  <S.ModernFormSelect defaultValue="">
-                    <option value="" disabled>Selecione um desafio</option>
-                    <option>Muitas faltas e cancelamentos</option>
-                    <option>Atendimento lento no WhatsApp</option>
-                    <option>Falta de follow-up com pacientes</option>
-                    <option>Equipe sobrecarregada</option>
-                    <option>Dificuldade em reativar pacientes</option>
-                  </S.ModernFormSelect>
+                  <CustomSelect
+                    placeholder="Selecione um desafio"
+                    options={[
+                      'Muitas faltas e cancelamentos',
+                      'Atendimento lento no WhatsApp',
+                      'Falta de follow-up com pacientes',
+                      'Equipe sobrecarregada',
+                      'Dificuldade em reativar pacientes',
+                    ]}
+                  />
                 </S.ModernFormGroup>
 
                 <S.ModernSubmitButton type="button">

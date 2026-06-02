@@ -426,7 +426,7 @@ export const HeroTag = styled.p`
   color: white;
   font-size: 11px;
   font-weight: 500;
-  margin: 0;
+  margin: 16px 0;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -490,33 +490,34 @@ export const HeroDescription = styled.p`
 export const BenefitCardsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: 10px;
   margin: 0;
   width: 100%;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 `;
 
 export const BenefitCard = styled.div`
   background: white;
   border: 1px solid #E0F7F4;
-  border-radius: 14px;
-  padding: 14px 14px;
+  border-radius: 12px;
+  padding: 10px;
   box-shadow: 0 2px 8px rgba(20, 184, 166, 0.06);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 7px;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
   transition: all 0.25s ease;
   cursor: default;
   height: 100%;
   min-width: 0;
 
   @media (max-width: 768px) {
-    align-items: center;
-    text-align: center;
+    padding: 12px 8px;
   }
 
   &:hover {
@@ -531,9 +532,9 @@ export const BenefitCard = styled.div`
 `;
 
 export const BenefitIconWrapper = styled.div`
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: #F0FDFA;
   display: flex;
   align-items: center;
@@ -542,8 +543,8 @@ export const BenefitIconWrapper = styled.div`
   transition: transform 0.25s ease;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     color: #14B8A6;
     stroke-width: 2;
     transition: transform 0.25s ease;
@@ -551,7 +552,7 @@ export const BenefitIconWrapper = styled.div`
 `;
 
 export const BenefitCardTitle = styled.h3`
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   font-family: var(--font-inter), system-ui, sans-serif;
   color: #111827;
@@ -561,27 +562,21 @@ export const BenefitCardTitle = styled.h3`
   width: 100%;
   word-wrap: break-word;
   overflow-wrap: break-word;
-
-  @media (max-width: 768px) {
-    text-align: center;
-  }
+  text-align: center;
 `;
 
 export const BenefitCardDesc = styled.p`
-  font-size: 11px;
+  font-size: 10px;
   color: #6B7280;
   margin: 0;
-  line-height: 1.45;
+  line-height: 1.4;
   font-weight: 400;
   font-family: var(--font-inter), system-ui, sans-serif;
   letter-spacing: -0.01em;
   width: 100%;
   word-wrap: break-word;
   overflow-wrap: break-word;
-
-  @media (max-width: 768px) {
-    text-align: center;
-  }
+  text-align: center;
 `;
 
 export const ButtonGroup = styled.div`
@@ -911,6 +906,7 @@ export const VideoWrapper = styled.div`
     0 0 0 1px rgba(0, 0, 0, 0.05);
   background: linear-gradient(135deg, #0D9488 0%, #14B8A6 100%);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
   
   &:hover {
     transform: translateY(-4px);
@@ -923,6 +919,52 @@ export const VideoWrapper = styled.div`
   @media (max-width: 768px) {
     border-radius: 16px;
     max-width: 100%;
+  }
+`;
+
+export const VideoPlayOverlay = styled.div<{ $isVisible: boolean }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: ${({ $isVisible }) => ($isVisible ? '1' : '0')};
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+`;
+
+export const VideoPlayButton = styled.div<{ $isVisible: boolean }>`
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: ${({ $isVisible }) => ($isVisible ? 'scale(1)' : 'scale(0.8)')};
+  transition: all 0.3s ease;
+  
+  svg {
+    width: 32px;
+    height: 32px;
+    color: #14B8A6;
+    margin-left: 4px;
+  }
+  
+  @media (max-width: 768px) {
+    width: 64px;
+    height: 64px;
+    
+    svg {
+      width: 28px;
+      height: 28px;
+    }
   }
 `;
 
@@ -950,6 +992,10 @@ export const VideoFeaturesBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const VideoFeatureItem = styled.div`
@@ -1726,6 +1772,8 @@ export const ModernFormSelect = styled.select`
   background-repeat: no-repeat;
   background-position: right 16px center;
   padding-right: 40px;
+  color: #111827;
+  font-weight: 500;
   
   &:focus {
     outline: none;
@@ -1734,10 +1782,40 @@ export const ModernFormSelect = styled.select`
     box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.08);
   }
   
+  option {
+    padding: 12px 16px;
+    background: white;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+    
+    &:hover {
+      background: #F0FDFA;
+      color: #0D9488;
+    }
+    
+    &:checked {
+      background: linear-gradient(135deg, #14B8A6 0%, #0891B2 100%);
+      color: white;
+      font-weight: 600;
+    }
+    
+    &:disabled {
+      color: #9CA3AF;
+      font-weight: 500;
+    }
+  }
+  
   @media (max-width: 640px) {
     padding: 12px 14px;
     padding-right: 36px;
     font-size: 14px;
+    
+    option {
+      font-size: 14px;
+      padding: 10px 14px;
+    }
   }
 `;
 
@@ -1858,7 +1936,7 @@ export const Footer = styled.footer`
   border-top: 1px solid #E5E7EB;
   
   @media (max-width: 768px) {
-    padding: 48px 24px 24px;
+    padding: 40px 20px 24px;
   }
 `;
 
@@ -1878,22 +1956,30 @@ export const FooterGrid = styled.div`
   }
   
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 16px;
+    margin-bottom: 32px;
+    
+    /* Primeira coluna (logo/social) ocupa as duas colunas */
+    > div:first-child {
+      grid-column: 1 / -1;
+    }
   }
 `;
 
 export const FooterColumn = styled.div`
-  @media (max-width: 768px) {
-    &:first-child {
-      margin-bottom: 16px;
-    }
-  }
+  /* Estilos específicos se necessário */
 `;
 
 export const SocialLinks = styled.div`
   display: flex;
   gap: 12px;
   margin-top: 16px;
+  
+  @media (max-width: 768px) {
+    margin-top: 12px;
+    gap: 10px;
+  }
 `;
 
 export const SocialLink = styled.a<{ $color?: string }>`
@@ -1929,6 +2015,11 @@ export const FooterTitle = styled.h4`
   font-weight: 600;
   color: #111827;
   margin-bottom: 12px;
+  
+  @media (max-width: 768px) {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
 `;
 
 export const FooterText = styled.p`
@@ -1936,6 +2027,11 @@ export const FooterText = styled.p`
   color: #6B7280;
   line-height: 1.6;
   margin-bottom: 12px;
+  
+  @media (max-width: 768px) {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
 `;
 
 export const FooterLinks = styled.ul`
@@ -1945,6 +2041,10 @@ export const FooterLinks = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  
+  @media (max-width: 768px) {
+    gap: 6px;
+  }
 `;
 
 export const FooterLink = styled.li`
@@ -1957,6 +2057,10 @@ export const FooterLink = styled.li`
     &:hover {
       color: #14B8A6;
     }
+    
+    @media (max-width: 768px) {
+      font-size: 12px;
+    }
   }
 `;
 
@@ -1964,6 +2068,10 @@ export const FooterBottom = styled.div`
   padding-top: 24px;
   border-top: 1px solid #E5E7EB;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    padding-top: 20px;
+  }
 `;
 
 export const Copyright = styled.p`
