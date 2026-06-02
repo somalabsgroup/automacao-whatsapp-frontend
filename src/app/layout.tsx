@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     url: 'https://somaclini.com.br',
     siteName: 'SomaClini',
-    title: 'SomaClini - Atendimento Inteligente via WhatsApp para Clínicas',
+    title: 'SomaClini - Atendimento Inteligente via WhatsApp',
     description: 'Automatize o atendimento da sua clínica com IA. Agende consultas, confirme horários e reduza faltas pelo WhatsApp. Atendimento 24h inteligente e humanizado.',
     images: [
       {
