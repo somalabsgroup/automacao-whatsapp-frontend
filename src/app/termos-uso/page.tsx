@@ -182,14 +182,14 @@ export default function TermosUsoPage() {
           </S.SectionTitle>
           
           <S.Text>
-            O SomaClini utiliza a WhatsApp Business API oficial. Você reconhece que:
+            O SomaClini utiliza a Evolution API para integração com WhatsApp. Você reconhece que:
           </S.Text>
           <S.List>
             <li>Está sujeito também aos Termos de Serviço do WhatsApp/Meta</li>
             <li>A SomaClini não controla a disponibilidade ou performance do WhatsApp</li>
             <li>Mudanças nas políticas do WhatsApp podem afetar funcionalidades</li>
             <li>É responsável por seguir as políticas de uso comercial do WhatsApp</li>
-            <li>Custos de API do WhatsApp (se aplicável) são de sua responsabilidade</li>
+            <li>A Evolution API é uma solução de terceiros para conexão com WhatsApp</li>
           </S.List>
         </S.Section>
 
