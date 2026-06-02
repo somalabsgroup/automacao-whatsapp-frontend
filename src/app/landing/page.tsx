@@ -137,7 +137,7 @@ const structuredData = {
       '@id': 'https://somaclini.com.br/#organization',
       name: 'SomaClini',
       url: 'https://somaclini.com.br',
-      logo: 'https://somaclini.com.br/logo.png',
+      logo: 'https://somaclini.com.br/assets/somaclini-logo.png',
       sameAs: [
         'https://instagram.com/somaclini',
         'https://linkedin.com/company/somaclini',
@@ -333,10 +333,11 @@ export default function HomePage() {
       <S.Header role="banner" $isScrolled={isScrolled}>
         <S.HeaderContainer>
           <S.Logo>
-            <S.LogoIcon>
-              <MessageSquare />
-            </S.LogoIcon>
-            <S.LogoText>SomaClini</S.LogoText>
+            <img 
+              src="/assets/somaclini-logo.png" 
+              alt="SomaClini Logo" 
+              style={{ height: '40px', width: 'auto', imageRendering: '-webkit-optimize-contrast', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+            />
           </S.Logo>
 
           <S.Nav role="navigation" aria-label="Menu principal">
@@ -366,10 +367,11 @@ export default function HomePage() {
         <S.MobileMenuContent>
           <S.MobileMenuHeader>
             <S.Logo>
-              <S.LogoIcon aria-hidden="true">
-                <MessageSquare />
-              </S.LogoIcon>
-              <S.LogoText>SomaClini</S.LogoText>
+              <img 
+                src="/assets/somaclini-logo.png" 
+                alt="SomaClini Logo" 
+                style={{ height: '36px', width: 'auto', imageRendering: '-webkit-optimize-contrast', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+              />
             </S.Logo>
             <S.MobileMenuCloseButton onClick={closeMobileMenu} aria-label="Fechar menu">
               ✕
@@ -913,10 +915,11 @@ export default function HomePage() {
               {/* Brand */}
               <S.FooterColumn>
                 <S.Logo style={{ marginBottom: '16px' }}>
-                  <S.LogoIcon>
-                    <MessageSquare />
-                  </S.LogoIcon>
-                  <S.LogoText>SomaClini</S.LogoText>
+                  <img 
+                    src="/assets/somaclini-logo.png" 
+                    alt="SomaClini Logo" 
+                    style={{ height: '40px', width: 'auto', imageRendering: '-webkit-optimize-contrast', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+                  />
                 </S.Logo>
                 <S.FooterText>
                   Atendimento e Agendamento via WhatsApp para Clínicas.

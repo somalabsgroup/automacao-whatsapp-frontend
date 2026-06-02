@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useSearchParams } from 'next/navigation';
-import { MessageSquare, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { LoginBackground } from './LoginBackground';
 import * as S from './styles';
 
@@ -67,10 +67,11 @@ export default function LoginCard() {
         <S.Card>
           <S.Header>
             <S.Logo>
-              <S.LogoIcon>
-                <MessageSquare />
-              </S.LogoIcon>
-              <S.LogoText>SomaClini</S.LogoText>
+              <img 
+                src="/assets/somaclini-logo.png" 
+                alt="SomaClini Logo" 
+                style={{ height: '48px', width: 'auto', imageRendering: '-webkit-optimize-contrast', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+              />
             </S.Logo>
             <S.Subtitle>Atendimento Inteligente via WhatsApp</S.Subtitle>
           </S.Header>

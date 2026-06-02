@@ -6,8 +6,6 @@ import {
   HeaderContainer,
   HeaderLeft,
   Logo,
-  LogoIcon,
-  LogoText,
   HeaderInfo,
   HeaderTitle,
   HeaderSubtitle,
@@ -23,7 +21,6 @@ export interface HeaderMetric {
 interface HeaderProps {
   title: string;
   subtitle?: string;
-  logoText?: string;
   metrics?: HeaderMetric[];
 }
 
@@ -37,17 +34,17 @@ const metricIcons = {
 export default function Header({
   title,
   subtitle,
-  logoText = 'SomaClini',
   metrics = [],
 }: HeaderProps) {
   return (
     <HeaderContainer>
       <HeaderLeft>
         <Logo>
-          <LogoIcon>
-            <MessageSquare />
-          </LogoIcon>
-          <LogoText>{logoText}</LogoText>
+          <img 
+            src="/assets/somaclini-logo.png" 
+            alt="SomaClini Logo" 
+            style={{ height: '32px', width: 'auto', imageRendering: '-webkit-optimize-contrast', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+          />
         </Logo>
         <HeaderInfo>
           <HeaderTitle>{title}</HeaderTitle>
