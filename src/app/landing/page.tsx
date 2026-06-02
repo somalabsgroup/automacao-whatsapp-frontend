@@ -228,6 +228,7 @@ export default function HomePage() {
   const [isDesktop, setIsDesktop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -238,6 +239,15 @@ export default function HomePage() {
     checkViewport();
     window.addEventListener('resize', checkViewport);
     return () => window.removeEventListener('resize', checkViewport);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const toggleMobileMenu = () => {
@@ -302,7 +312,7 @@ export default function HomePage() {
       </S.SkipLink>
 
       {/* ══════════════ HEADER ══════════════ */}
-      <S.Header role="banner">
+      <S.Header role="banner" $isScrolled={isScrolled}>
         <S.HeaderContainer>
           <S.Logo>
             <S.LogoIcon>

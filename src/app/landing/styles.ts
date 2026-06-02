@@ -29,15 +29,20 @@ export const PageContainer = styled.div`
 `;
 
 // ══════════════ HEADER ══════════════
-export const Header = styled.header`
-  position: sticky;
+export const Header = styled.header<{ $isScrolled?: boolean }>`
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.85);
+  background: ${({ $isScrolled }) => 
+    $isScrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.85)'};
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow: ${({ $isScrolled }) => 
+    $isScrolled ? '0 4px 12px rgba(0, 0, 0, 0.08)' : '0 1px 3px rgba(0, 0, 0, 0.02)'};
   transition: all 0.3s ease;
 `;
 
@@ -377,11 +382,11 @@ export const HeroSection = styled.section`
   align-items: center;
   justify-content: center;
   overflow: visible;
-  padding: 0 24px 40px;
+  padding: 80px 24px 40px;
   background: white;
   
   @media (max-width: 968px) {
-    padding: 60px 16px 30px;
+    padding: 140px 16px 30px;
     align-items: flex-start;
     min-height: auto;
   }
