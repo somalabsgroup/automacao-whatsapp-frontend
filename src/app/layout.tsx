@@ -72,11 +72,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/assets/iconweb.webp', type: 'image/webp', sizes: '32x32' },
-      { url: '/assets/iconweb.webp', type: 'image/webp', sizes: '192x192' },
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/favicon.ico', sizes: '192x192' },
     ],
     apple: [
-      { url: '/assets/iconweb.webp', sizes: '180x180', type: 'image/webp' },
+      { url: '/favicon.ico', sizes: '180x180' },
     ],
   },
   manifest: '/manifest.json',

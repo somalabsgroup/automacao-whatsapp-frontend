@@ -9,15 +9,15 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/assets/iconweb.webp",
+      "src": "/favicon.ico",
       "sizes": "192x192",
-      "type": "image/webp",
+      "type": "image/x-icon",
       "purpose": "any maskable"
     },
     {
-      "src": "/assets/iconweb.webp",
+      "src": "/favicon.ico",
       "sizes": "512x512",
-      "type": "image/webp",
+      "type": "image/x-icon",
       "purpose": "any maskable"
     }
   ],
