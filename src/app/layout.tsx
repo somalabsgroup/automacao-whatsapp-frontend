@@ -12,10 +12,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://somaclini.com.br'),
   title: {
-    default: 'SomaClini - Atendimento Inteligente via WhatsApp para Clínicas',
+    default: 'SomaClini - Atendimento Inteligente via WhatsApp + IA',
     template: '%s | SomaClini'
   },
-  description: 'Automatize o atendimento da sua clínica com IA. Agende consultas, confirme horários e reduza faltas pelo WhatsApp. Atendimento 24h, mais eficiência e tempo para o que importa.',
+  description: 'Automatize o atendimento da sua clínica com IA. Agende consultas, confirme horários e reduza faltas pelo WhatsApp. Atendimento 24h inteligente e humanizado.',
   keywords: [
     'atendimento whatsapp clínicas',
     'agendamento automático consultas',
@@ -54,8 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SomaClini - Atendimento Inteligente via WhatsApp',
-    description: 'Automatize agendamentos e reduza faltas com atendimento 24h pelo WhatsApp. Mais eficiência para sua clínica.',
+    title: 'SomaClini - Atendimento Inteligente via WhatsApp + IA',
+    description: 'Automatize o atendimento da sua clínica com IA. Agende consultas, confirme horários e reduza faltas pelo WhatsApp. Atendimento 24h inteligente e humanizado.',
     images: ['/assets/hero.png'],
     creator: '@somaclini',
   },
