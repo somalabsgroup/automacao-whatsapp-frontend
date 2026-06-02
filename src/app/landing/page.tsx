@@ -14,6 +14,8 @@ import {
   FaqItem,
   CustomSelect,
 } from './components';
+import CookieBanner from '@/components/CookieBanner';
+import ManageCookiesButton from '@/components/ManageCookiesButton';
 import * as S from './styles';
 
 // Lazy load heavy components
@@ -986,23 +988,37 @@ export default function HomePage() {
                     { label: 'Contato', href: '#form-demonstracao' },
                   ],
                 },
+                {
+                  title: 'Legal',
+                  links: [
+                    { label: 'Política de Privacidade', href: '/politica-privacidade', external: true },
+                    { label: 'Termos de Uso', href: '/termos-uso', external: true },
+                  ],
+                },
               ].map(({ title, links }, colIndex) => (
                 <S.FooterColumn key={title}>
                   <S.FooterTitle>{title}</S.FooterTitle>
                   <S.FooterLinks>
-                    {links.map((link, linkIndex) => (
-                      <motion.div
-                        key={link.label}
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.3, delay: colIndex * 0.1 + linkIndex * 0.05 }}
-                      >
-                        <S.FooterLink>
-                          <a href={link.href} onClick={(e) => handleSmoothScroll(e, link.href)}>{link.label}</a>
-                        </S.FooterLink>
-                      </motion.div>
-                    ))}
+                    {links.map((link, linkIndex) => {
+                      const isExternal = 'external' in link && link.external;
+                      return (
+                        <motion.div
+                          key={link.label}
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.3, delay: colIndex * 0.1 + linkIndex * 0.05 }}
+                        >
+                          <S.FooterLink>
+                            {isExternal ? (
+                              <a href={link.href} target="_blank" rel="noopener noreferrer">{link.label}</a>
+                            ) : (
+                              <a href={link.href} onClick={(e) => handleSmoothScroll(e, link.href)}>{link.label}</a>
+                            )}
+                          </S.FooterLink>
+                        </motion.div>
+                      );
+                    })}
                   </S.FooterLinks>
                 </S.FooterColumn>
               ))}
@@ -1010,10 +1026,21 @@ export default function HomePage() {
           </motion.div>
 
           <S.FooterBottom>
-            <S.Copyright>© 2026 SomaClini. Todos os direitos reservados.</S.Copyright>
+            <S.Copyright>
+              © 2026 SomaClini. Todos os direitos reservados.
+              <span style={{ margin: '0 12px', color: '#9ca3af' }}>|</span>
+              <a href="/politica-privacidade" target="_blank" rel="noopener noreferrer" style={{ color: '#14B8A6', textDecoration: 'none' }}>Privacidade</a>
+              <span style={{ margin: '0 12px', color: '#9ca3af' }}>|</span>
+              <a href="/termos-uso" target="_blank" rel="noopener noreferrer" style={{ color: '#14B8A6', textDecoration: 'none' }}>Termos</a>
+              <span style={{ margin: '0 12px', color: '#9ca3af' }}>|</span>
+              <ManageCookiesButton />
+            </S.Copyright>
           </S.FooterBottom>
         </S.FooterContainer>
       </S.Footer>
+      
+      {/* ══════════════ COOKIE BANNER ══════════════ */}
+      <CookieBanner />
     </S.PageContainer>
     </>
   );

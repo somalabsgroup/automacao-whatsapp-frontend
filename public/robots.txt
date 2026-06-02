@@ -4,6 +4,9 @@
 # Allow all crawlers
 User-agent: *
 Allow: /
+Allow: /landing
+Allow: /politica-privacidade
+Allow: /termos-uso
 
 # Disallow admin/auth pages
 Disallow: /dashboard
