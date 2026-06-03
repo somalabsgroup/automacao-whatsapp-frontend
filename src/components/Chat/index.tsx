@@ -88,6 +88,8 @@ export default function ChatContainer({
   const prevConversationIdRef = useRef<string | null>(null);
   const prevScrollHeightRef = useRef(0);
   const prevIsLoadingMoreRef = useRef(false);
+  // Exige que o usuário role para longe do topo antes de permitir novo carregamento
+  const canLoadMoreRef = useRef(true);
 
   // Scroll to bottom on new conversation (instant) or new message (smooth)
   useEffect(() => {
@@ -112,13 +114,24 @@ export default function ChatContainer({
     prevIsLoadingMoreRef.current = isLoadingMore;
   }, [isLoadingMore]);
 
+  // Reset canLoadMore quando conversa muda
+  useEffect(() => {
+    canLoadMoreRef.current = true;
+  }, [conversation?.id]);
+
   const handleScroll = useCallback(() => {
     const container = scrollRef.current;
     if (!container || !hasMore || isLoadingMore) return;
 
     if (container.scrollTop < 80) {
+      // Só carrega se o usuário já rolou para longe do topo após o último carregamento
+      if (!canLoadMoreRef.current) return;
+      canLoadMoreRef.current = false;
       prevScrollHeightRef.current = container.scrollHeight;
       onLoadMore?.();
+    } else if (container.scrollTop > 200) {
+      // Usuário rolou para longe — libera próximo carregamento
+      canLoadMoreRef.current = true;
     }
   }, [hasMore, isLoadingMore, onLoadMore]);
 

@@ -71,7 +71,7 @@ export async function getMessagesByConversation(
   return { messages, hasMore: data.length === PAGE_SIZE };
 }
 
-export async function subscribeToMessages(
+export function subscribeToMessages(
   supabase: SupabaseClient,
   conversationId: string,
   onNewMessage: (message: ChatMessage) => void

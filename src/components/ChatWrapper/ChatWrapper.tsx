@@ -46,8 +46,9 @@ export default function ChatWrapper({
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>({});
   const [pagination, setPagination] = useState<Record<string, PaginationState>>({});
   const [loading, setLoading] = useState(false);
-  const supabaseRef = useRef(createClient());
-  const supabase = supabaseRef.current;
+  const [supabase] = useState(() => createClient());
+  const loadedConversationsRef = useRef<Set<string>>(new Set());
+  const isLoadingMoreRef = useRef(false);
 
   const selectedConversation = conversations.find((c) => c.id === selectedConversationId);
   const conversationMessages = selectedConversationId ? messages[selectedConversationId] || [] : [];
@@ -58,8 +59,9 @@ export default function ChatWrapper({
   useEffect(() => {
     if (!selectedConversationId) return;
 
-    // Se já temos as mensagens em cache, não buscar novamente
-    if (messages[selectedConversationId]) return;
+    // Guard via Set — não dispara novamente quando `messages` state atualiza por realtime
+    if (loadedConversationsRef.current.has(selectedConversationId)) return;
+    loadedConversationsRef.current.add(selectedConversationId);
 
     const loadMessages = async () => {
       setLoading(true);
@@ -77,18 +79,24 @@ export default function ChatWrapper({
             isLoadingMore: false,
           },
         }));
+      } catch {
+        loadedConversationsRef.current.delete(selectedConversationId);
       } finally {
         setLoading(false);
       }
     };
 
     loadMessages();
-  }, [selectedConversationId, supabase, messages]);
+  }, [selectedConversationId, supabase]);
 
   const handleLoadMore = async () => {
     if (!selectedConversationId) return;
     const pag = pagination[selectedConversationId];
-    if (!pag?.hasMore || pag.isLoadingMore || !pag.oldestTimestamp) return;
+    if (!pag?.hasMore || !pag.oldestTimestamp) return;
+
+    // Guard síncrono: bloqueia chamadas concorrentes antes do React processar o state
+    if (isLoadingMoreRef.current) return;
+    isLoadingMoreRef.current = true;
 
     setPagination((prev) => ({
       ...prev,
@@ -120,6 +128,8 @@ export default function ChatWrapper({
         ...prev,
         [selectedConversationId]: { ...prev[selectedConversationId], isLoadingMore: false },
       }));
+    } finally {
+      isLoadingMoreRef.current = false;
     }
   };
 
@@ -127,48 +137,29 @@ export default function ChatWrapper({
   useEffect(() => {
     if (!selectedConversationId) return;
 
-    let unsubscribe: (() => void) | null = null;
+    const unsubscribe = subscribeToMessages(supabase, selectedConversationId, (newMessage: ChatMessage) => {
+      setMessages((prev) => {
+        const currentMessages = prev[selectedConversationId] || [];
 
-    const setupSubscription = async () => {
-      unsubscribe = await subscribeToMessages(supabase, selectedConversationId, (newMessage: ChatMessage) => {
-        setMessages((prev) => {
-          const currentMessages = prev[selectedConversationId] || [];
+        const existingIndex = currentMessages.findIndex(
+          (msg) =>
+            msg.id === newMessage.id ||
+            (msg.whatsappMessageId && msg.whatsappMessageId === newMessage.whatsappMessageId),
+        );
 
-          // Procurar por ID ou por whatsapp_message_id (para evitar duplicatas)
-          const existingIndex = currentMessages.findIndex(
-            (msg) =>
-              msg.id === newMessage.id ||
-              (msg.whatsappMessageId && msg.whatsappMessageId === newMessage.whatsappMessageId),
-          );
+        if (existingIndex >= 0) {
+          const updated = [...currentMessages];
+          updated[existingIndex] = newMessage;
+          return { ...prev, [selectedConversationId]: updated };
+        }
 
-          // Se existe, atualiza (UPDATE do n8n)
-          if (existingIndex >= 0) {
-            const updated = [...currentMessages];
-            updated[existingIndex] = newMessage;
-            return {
-              ...prev,
-              [selectedConversationId]: updated,
-            };
-          }
-
-          // Remover mensagem otimística se a mensagem real chegou
-          const optimisticMessages = currentMessages.filter((msg) => !msg.isOptimistic || msg.status === "failed");
-
-          // Se não existe, adiciona (INSERT)
-          return {
-            ...prev,
-            [selectedConversationId]: [...optimisticMessages, newMessage],
-          };
-        });
+        const withoutOptimistic = currentMessages.filter((msg) => !msg.isOptimistic || msg.status === "failed");
+        return { ...prev, [selectedConversationId]: [...withoutOptimistic, newMessage] };
       });
-    };
-
-    setupSubscription();
+    });
 
     return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
+      unsubscribe();
     };
   }, [selectedConversationId, supabase]);
 
