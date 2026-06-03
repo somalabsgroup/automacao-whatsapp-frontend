@@ -267,16 +267,56 @@ export const MessagesArea = styled.div`
 export const MessagesScroll = styled.div`
   height: 100%;
   overflow-y: auto;
+  overflow-anchor: none;
   padding: 1rem;
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 
   @media (max-width: 768px) {
     padding: 0.75rem;
   }
+`;
+
+export const NewMessageButton = styled.button`
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: #14B8A6;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 16px 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.45);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+
+  svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: #0D9488;
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 18px rgba(20, 184, 166, 0.55);
+  }
+
+  &:active {
+    transform: translateX(-50%) translateY(0);
+  }
 `;
 
 export const LoadMoreIndicator = styled.div`

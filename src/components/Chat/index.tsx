@@ -1,11 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Conversation, ChatMessage } from '@/types';
 import ChatHeader from './ChatHeader';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, ArrowDown } from 'lucide-react';
 import {
   ChatContainer as Container,
   EmptyState,
@@ -15,7 +15,8 @@ import {
   MessagesScroll,
   LoadMoreIndicator,
   DateDivider,
-  DateLabel
+  DateLabel,
+  NewMessageButton,
 } from './styles';
 
 interface ChatContainerProps {
@@ -88,20 +89,82 @@ export default function ChatContainer({
   const prevConversationIdRef = useRef<string | null>(null);
   const prevScrollHeightRef = useRef(0);
   const prevIsLoadingMoreRef = useRef(false);
-  // Exige que o usuário role para longe do topo antes de permitir novo carregamento
   const canLoadMoreRef = useRef(true);
+  // Rastreia o ID da última mensagem para detectar novas mensagens vs. load-more (prepend)
+  const prevLastMessageIdRef = useRef<string | null>(null);
+  // Conversas cujo carregamento inicial já foi processado — separa init de realtime
+  const initializedConversationsRef = useRef<Set<string>>(new Set());
 
-  // Scroll to bottom on new conversation (instant) or new message (smooth)
+  // isNearBottom como state controla visibilidade do botão; ref para uso síncrono no scroll
+  const [isNearBottom, setIsNearBottom] = useState(true);
+  const isNearBottomRef = useRef(true);
+  const [newMessageCount, setNewMessageCount] = useState(0);
+  // Bloqueia handleScroll durante animação de scrollToBottom — impede botão de reaparecer
+  const isScrollingToBottomRef = useRef(false);
+
+  const scrollToBottom = useCallback(() => {
+    isScrollingToBottomRef.current = true;
+    isNearBottomRef.current = true;
+    setIsNearBottom(true);
+    setNewMessageCount(0);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   useEffect(() => {
     const isNewConversation = conversation?.id !== prevConversationIdRef.current;
     prevConversationIdRef.current = conversation?.id ?? null;
 
-    messagesEndRef.current?.scrollIntoView({
-      behavior: isNewConversation ? 'instant' : 'smooth',
-    });
+    const convId = conversation?.id;
+    const lastMessage = messages[messages.length - 1];
+    const lastMessageId = lastMessage?.id ?? null;
+
+    if (isNewConversation || !convId) {
+      // Troca de conversa: reseta tudo
+      setIsNearBottom(true);
+      isNearBottomRef.current = true;
+      setNewMessageCount(0);
+      initializedConversationsRef.current.delete(convId ?? '');
+
+      if (messages.length > 0) {
+        // Mensagens já disponíveis: inicializa baseline imediatamente
+        initializedConversationsRef.current.add(convId!);
+        prevLastMessageIdRef.current = lastMessageId;
+      } else {
+        prevLastMessageIdRef.current = null;
+      }
+
+      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+      return;
+    }
+
+    const isInitialized = initializedConversationsRef.current.has(convId);
+
+    if (!isInitialized) {
+      // Primeira chegada de mensagens após mudança de conversa com messages=[]
+      // (caso onde ChatSkeleton é mostrado e Chat remonta)
+      if (messages.length > 0) {
+        initializedConversationsRef.current.add(convId);
+        prevLastMessageIdRef.current = lastMessageId;
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+      return;
+    }
+
+    // Fase realtime: detecta mensagem nova pelo ID da última mensagem
+    // Load-more (prepend) não muda a última mensagem → isNewMessageArrived = false
+    const isNewMessageArrived = lastMessageId !== null && lastMessageId !== prevLastMessageIdRef.current;
+    prevLastMessageIdRef.current = lastMessageId;
+
+    if (isNewMessageArrived) {
+      if (isNearBottomRef.current) {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        setNewMessageCount((prev) => prev + 1);
+      }
+    }
   }, [messages, conversation?.id]);
 
-  // Restore scroll position after older messages are prepended
+  // Restaura posição de scroll após prepend de mensagens antigas
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -114,23 +177,49 @@ export default function ChatContainer({
     prevIsLoadingMoreRef.current = isLoadingMore;
   }, [isLoadingMore]);
 
-  // Reset canLoadMore quando conversa muda
+  // Reset ao trocar de conversa — NÃO reseta prevLastMessageIdRef (feito no efeito principal)
   useEffect(() => {
     canLoadMoreRef.current = true;
+    isNearBottomRef.current = true;
+    setIsNearBottom(true);
+    setNewMessageCount(0);
   }, [conversation?.id]);
 
   const handleScroll = useCallback(() => {
     const container = scrollRef.current;
-    if (!container || !hasMore || isLoadingMore) return;
+    if (!container) return;
 
-    if (container.scrollTop < 80) {
-      // Só carrega se o usuário já rolou para longe do topo após o último carregamento
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    const nearBottom = distanceFromBottom < 100;
+
+    if (isScrollingToBottomRef.current) {
+      if (nearBottom) {
+        // Animação chegou ao fim — libera o controle
+        isScrollingToBottomRef.current = false;
+      } else {
+        // Ainda animando: ignora eventos intermediários que reverteriam o botão
+        return;
+      }
+    }
+
+    if (nearBottom !== isNearBottomRef.current) {
+      isNearBottomRef.current = nearBottom;
+      setIsNearBottom(nearBottom);
+    }
+
+    if (nearBottom) {
+      setNewMessageCount(0);
+    }
+
+    if (!hasMore || isLoadingMore) return;
+
+    if (scrollTop < 80) {
       if (!canLoadMoreRef.current) return;
       canLoadMoreRef.current = false;
-      prevScrollHeightRef.current = container.scrollHeight;
+      prevScrollHeightRef.current = scrollHeight;
       onLoadMore?.();
-    } else if (container.scrollTop > 200) {
-      // Usuário rolou para longe — libera próximo carregamento
+    } else if (scrollTop > 200) {
       canLoadMoreRef.current = true;
     }
   }, [hasMore, isLoadingMore, onLoadMore]);
@@ -161,6 +250,17 @@ export default function ChatContainer({
       />
 
       <MessagesArea>
+        {!isNearBottom && (
+          <NewMessageButton onClick={scrollToBottom}>
+            <ArrowDown />
+            {newMessageCount > 1
+              ? `${newMessageCount} novas mensagens`
+              : newMessageCount === 1
+              ? 'Nova mensagem'
+              : 'Ver mensagens recentes'}
+          </NewMessageButton>
+        )}
+
         <MessagesScroll ref={scrollRef} onScroll={handleScroll}>
           {isLoadingMore && (
             <LoadMoreIndicator>Carregando mensagens anteriores...</LoadMoreIndicator>
