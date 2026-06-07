@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, MessageSquare, UserCog, LogOut, Sun, Moon, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageSquare, UserCog, Settings, LogOut, Sun, Moon, ChevronDown } from "lucide-react";
 import { useSidebarStore } from "@/stores/useSidebarStore";
 import { useThemeStore } from "@/stores/useThemeStore";
 import {
@@ -66,6 +66,11 @@ export default function Sidebar({ user }: SidebarProps) {
       name: "Profissionais",
       href: "/profissionais",
       icon: <UserCog size={24} />,
+    },
+    {
+      name: "Configurações",
+      href: "/configuracoes",
+      icon: <Settings size={24} />,
     },
   ];
 

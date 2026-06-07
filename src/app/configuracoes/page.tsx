@@ -1,21 +1,31 @@
 import Sidebar from '@/components/Sidebar';
 import DashboardLayout from '@/components/DashboardLayout';
 import Header from '@/components/Header';
+import ConfiguracoesContent from '@/components/ConfiguracoesContent';
 import { getPageAuthData } from '@/lib/page-auth';
+import { getTenantSettings, getGoogleCalendarId } from '@/lib/services/tenantSettings';
 
 export default async function Configuracoes() {
-  const { user } = await getPageAuthData();
+  const { user, tenant, supabase } = await getPageAuthData();
+
+  const [settings, calendarId] = await Promise.all([
+    getTenantSettings(supabase, tenant.id),
+    getGoogleCalendarId(supabase, tenant.id),
+  ]);
 
   return (
     <>
       <Sidebar user={user} />
       <DashboardLayout>
-        <Header title="Configurações" subtitle="Configure o sistema e preferências" />
-        <div className="p-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <p className="text-gray-600">Ajuste as configurações do sistema.</p>
-          </div>
-        </div>
+        <Header
+          title="Configurações"
+          subtitle="Ajuste o comportamento da clínica no WhatsApp"
+        />
+        <ConfiguracoesContent
+          initialSettings={settings}
+          initialCalendarId={calendarId}
+          tenantId={tenant.id}
+        />
       </DashboardLayout>
     </>
   );

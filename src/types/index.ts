@@ -153,3 +153,12 @@ export interface CreateProfessionalInput {
 export interface UpdateProfessionalInput extends Partial<CreateProfessionalInput> {
   isActive?: boolean;
 }
+
+// Subset of tenants.settings JSONB managed by the Configurações screen.
+// Other keys in the JSONB object (e.g. evolution config) are always preserved on write.
+export interface TenantSettings {
+  custom_prompt?: string;
+  business_hours?: string;
+  followup_message?: string;
+  followup_days?: number;
+}
