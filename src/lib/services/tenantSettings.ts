@@ -1,9 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { TenantSettings } from '@/types';
 
-// Only these 4 keys are touched by this service.
+// Only these keys are touched by this service.
 // Any other key already in tenants.settings (e.g. evolution config) is always preserved.
-const MANAGED_KEYS = ['custom_prompt', 'business_hours', 'followup_message', 'followup_days'] as const;
+const MANAGED_KEYS = ['custom_prompt', 'business_hours', 'followup_message', 'followup_days', 'ai_enabled'] as const;
 
 export async function getTenantSettings(
   supabase: SupabaseClient,
@@ -30,14 +30,16 @@ export async function getTenantSettings(
         : typeof s.followup_days === 'string'
         ? parseInt(s.followup_days, 10) || undefined
         : undefined,
+    ai_enabled: typeof s.ai_enabled === 'boolean' ? s.ai_enabled : true,
   };
 }
 
-// Merges the 4 managed keys into tenants.settings without touching any other key.
+// Merges the managed keys into tenants.settings without touching any other key.
 // Convention for empty values:
 //   - string fields: empty/whitespace-only → key removed from JSONB (flow fallback takes over)
 //   - followup_days: undefined or < 1 → key removed (flow falls back to 1 day)
 //   - followup_days: valid integer ≥ 1 → stored as JSON integer (not string)
+//   - ai_enabled: always stored as boolean; defaults to true unless explicitly false
 export async function updateTenantSettings(
   supabase: SupabaseClient,
   tenantId: string,
@@ -65,6 +67,8 @@ export async function updateTenantSettings(
       } else {
         delete next.followup_days;
       }
+    } else if (key === 'ai_enabled') {
+      next.ai_enabled = patch.ai_enabled !== false;
     } else {
       const val = typeof patch[key] === 'string' ? (patch[key] as string).trim() : '';
       if (val) {

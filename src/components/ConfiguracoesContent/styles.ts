@@ -84,6 +84,69 @@ export const SectionTitle = styled.h3`
   border-bottom: 1px solid ${({ theme }) => theme.border.default};
 `;
 
+export const SectionHeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.875rem;
+  margin-bottom: 0.125rem;
+  border-bottom: 1px solid ${({ theme }) => theme.border.default};
+`;
+
+export const SectionTitlePlain = styled.h3`
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.text.primary};
+  margin: 0;
+`;
+
+export const ToggleWrap = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  flex-shrink: 0;
+`;
+
+export const ToggleText = styled.span`
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.text.secondary};
+  white-space: nowrap;
+`;
+
+export const Switch = styled.button<{ $checked: boolean }>`
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  background-color: ${({ $checked, theme }) => ($checked ? theme.brand.primary : theme.border.default)};
+  transition: background-color 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: ${({ $checked }) => ($checked ? '20px' : '2px')};
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: left 0.2s;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
 export const FormGroup = styled.div`
   display: flex;
   flex-direction: column;

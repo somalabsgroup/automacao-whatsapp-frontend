@@ -25,6 +25,7 @@ type FormState = {
   business_hours: string;
   followup_message: string;
   followup_days: string;
+  ai_enabled: boolean;
 };
 
 export default function ConfiguracoesContent({ initialSettings, initialCalendarId, tenantId }: ConfiguracoesContentProps) {
@@ -35,6 +36,7 @@ export default function ConfiguracoesContent({ initialSettings, initialCalendarI
     business_hours: initialSettings.business_hours ?? '',
     followup_message: initialSettings.followup_message ?? '',
     followup_days: initialSettings.followup_days?.toString() ?? '',
+    ai_enabled: initialSettings.ai_enabled ?? true,
   });
 
   const initialFormRef = useRef<FormState>({
@@ -42,6 +44,7 @@ export default function ConfiguracoesContent({ initialSettings, initialCalendarI
     business_hours: initialSettings.business_hours ?? '',
     followup_message: initialSettings.followup_message ?? '',
     followup_days: initialSettings.followup_days?.toString() ?? '',
+    ai_enabled: initialSettings.ai_enabled ?? true,
   });
 
   const [calendarIsDirty, setCalendarIsDirty] = useState(false);
@@ -50,7 +53,8 @@ export default function ConfiguracoesContent({ initialSettings, initialCalendarI
     form.custom_prompt !== initialFormRef.current.custom_prompt ||
     form.business_hours !== initialFormRef.current.business_hours ||
     form.followup_message !== initialFormRef.current.followup_message ||
-    form.followup_days !== initialFormRef.current.followup_days;
+    form.followup_days !== initialFormRef.current.followup_days ||
+    form.ai_enabled !== initialFormRef.current.ai_enabled;
 
   // Único ponto do guarda — cobre os dois formulários da página
   useUnsavedWarning(isDirty || calendarIsDirty);
@@ -66,6 +70,11 @@ export default function ConfiguracoesContent({ initialSettings, initialCalendarI
       setSaveStatus('idle');
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
+
+  const toggleAiEnabled = () => {
+    setSaveStatus('idle');
+    setForm((prev) => ({ ...prev, ai_enabled: !prev.ai_enabled }));
+  };
 
   const validate = (): boolean => {
     if (form.followup_days.trim() !== '') {
@@ -92,6 +101,7 @@ export default function ConfiguracoesContent({ initialSettings, initialCalendarI
         business_hours: form.business_hours,
         followup_message: form.followup_message,
         followup_days: daysRaw !== '' ? parseInt(daysRaw, 10) : undefined,
+        ai_enabled: form.ai_enabled,
       };
 
       await updateTenantSettings(supabase, tenantId, patch);
@@ -128,7 +138,28 @@ export default function ConfiguracoesContent({ initialSettings, initialCalendarI
 
         <S.SectionsGrid>
           <S.Section>
-            <S.SectionTitle>Comportamento da IA</S.SectionTitle>
+            <S.SectionHeaderRow>
+              <S.SectionTitlePlain>Comportamento da IA</S.SectionTitlePlain>
+              <S.ToggleWrap>
+                <S.ToggleText>{form.ai_enabled ? 'Ativada' : 'Desativada'}</S.ToggleText>
+                <S.Switch
+                  type="button"
+                  role="switch"
+                  aria-checked={form.ai_enabled}
+                  aria-label="Ativar ou desativar respostas automáticas da IA"
+                  $checked={form.ai_enabled}
+                  onClick={toggleAiEnabled}
+                  disabled={isSaving}
+                />
+              </S.ToggleWrap>
+            </S.SectionHeaderRow>
+
+            {!form.ai_enabled && (
+              <S.ImpactNote>
+                Com a IA desativada, o sistema <strong>não responde automaticamente</strong> às mensagens —
+                as conversas seguem apenas via atendimento humano e a integração com o WhatsApp.
+              </S.ImpactNote>
+            )}
 
             <S.FormGroup style={{ flex: 1 }}>
               <S.LabelRow>

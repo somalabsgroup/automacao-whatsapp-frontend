@@ -161,4 +161,5 @@ export interface TenantSettings {
   business_hours?: string;
   followup_message?: string;
   followup_days?: number;
+  ai_enabled?: boolean;
 }
