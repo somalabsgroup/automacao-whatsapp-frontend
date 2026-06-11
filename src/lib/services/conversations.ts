@@ -201,19 +201,27 @@ interface ConversationListUpdateCallback {
  * Delete a conversation and all its messages
  * Note: Messages will be automatically deleted via CASCADE DELETE if foreign key is configured
  */
-export async function closeConversation(
+export async function updateConversationStatus(
   supabase: SupabaseClient,
   conversationId: string,
   tenantId: string,
+  status: ConversationStatus,
   reason?: string
 ): Promise<void> {
+  const update: Record<string, unknown> = { status };
+
+  // closed_at/close_reason só fazem sentido para 'closed' — limpos ao reabrir
+  if (status === 'closed') {
+    update.closed_at = new Date().toISOString();
+    update.close_reason = reason || 'Atendimento encerrado pelo atendente';
+  } else {
+    update.closed_at = null;
+    update.close_reason = null;
+  }
+
   const { error } = await supabase
     .from('conversations')
-    .update({
-      status: 'closed',
-      closed_at: new Date().toISOString(),
-      close_reason: reason || 'Atendimento encerrado pelo atendente',
-    })
+    .update(update)
     .eq('id', conversationId)
     .eq('tenant_id', tenantId);
 

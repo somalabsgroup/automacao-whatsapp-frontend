@@ -1,16 +1,24 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { MoreVertical, User, Trash2, CheckCircle } from 'lucide-react';
+import { MoreVertical, User, Trash2, ChevronDown, Check } from 'lucide-react';
 import { Conversation } from '@/types';
-import { ActionButton, HeaderContainer, HeaderLeft, HeaderRight, PatientAvatar, PatientInfo, PatientName, PatientPhone, StatusIndicator, DropdownMenu, DropdownItem } from './styles';
+import { ActionButton, HeaderContainer, HeaderLeft, HeaderRight, PatientAvatar, PatientInfo, PatientName, PatientPhone, StatusIndicator, StatusButton, StatusDropdown, StatusDropdownItem, DropdownMenu, DropdownItem } from './styles';
 
 
 interface ChatHeaderProps {
   conversation: Conversation;
   onDeleteConversation?: () => void;
-  onCloseConversation?: () => void;
+  onChangeStatus?: (status: Conversation['status']) => void;
 }
+
+const STATUS_OPTIONS: Conversation['status'][] = [
+  'ai_handling',
+  'human_requested',
+  'human_active',
+  'awaiting_close',
+  'closed',
+];
 
 const getStatusText = (status: Conversation['status']) => {
   switch (status) {
@@ -46,10 +54,13 @@ const getStatusColor = (status: Conversation['status']) => {
   }
 };
 
-export default function ChatHeader({ conversation, onDeleteConversation, onCloseConversation }: ChatHeaderProps) {
+export default function ChatHeader({ conversation, onDeleteConversation, onChangeStatus }: ChatHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const statusMenuRef = useRef<HTMLDivElement>(null);
+  const statusButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,21 +73,36 @@ export default function ChatHeader({ conversation, onDeleteConversation, onClose
       ) {
         setShowMenu(false);
       }
+
+      if (
+        showStatusMenu &&
+        statusMenuRef.current &&
+        !statusMenuRef.current.contains(event.target as Node) &&
+        statusButtonRef.current &&
+        !statusButtonRef.current.contains(event.target as Node)
+      ) {
+        setShowStatusMenu(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showMenu]);
+  }, [showMenu, showStatusMenu]);
 
-  const handleCloseClick = () => {
-    setShowMenu(false);
-    if (onCloseConversation) {
-      if (confirm('Deseja encerrar este atendimento? O cliente poderá iniciar um novo atendimento ao enviar outra mensagem.')) {
-        onCloseConversation();
-      }
+  const handleStatusSelect = (status: Conversation['status']) => {
+    setShowStatusMenu(false);
+    if (status === conversation.status) return;
+
+    if (
+      status === 'closed' &&
+      !confirm('Deseja encerrar este atendimento? O cliente poderá iniciar um novo atendimento ao enviar outra mensagem.')
+    ) {
+      return;
     }
+
+    onChangeStatus?.(status);
   };
 
   const handleDeleteClick = () => {
@@ -97,30 +123,52 @@ export default function ChatHeader({ conversation, onDeleteConversation, onClose
         
         <PatientInfo>
           <PatientName>{conversation.patientName}</PatientName>
-          <PatientPhone>
-            <StatusIndicator $color={getStatusColor(conversation.status)} />
-            {getStatusText(conversation.status)}
-          </PatientPhone>
+          {onChangeStatus ? (
+            <StatusButton
+              ref={statusButtonRef}
+              type="button"
+              onClick={() => setShowStatusMenu((v) => !v)}
+            >
+              <StatusIndicator $color={getStatusColor(conversation.status)} />
+              {getStatusText(conversation.status)}
+              <ChevronDown size={14} />
+            </StatusButton>
+          ) : (
+            <PatientPhone>
+              <StatusIndicator $color={getStatusColor(conversation.status)} />
+              {getStatusText(conversation.status)}
+            </PatientPhone>
+          )}
+
+          {showStatusMenu && (
+            <StatusDropdown ref={statusMenuRef}>
+              {STATUS_OPTIONS.map((status) => (
+                <StatusDropdownItem
+                  key={status}
+                  $active={status === conversation.status}
+                  onClick={() => handleStatusSelect(status)}
+                >
+                  <StatusIndicator $color={getStatusColor(status)} />
+                  {getStatusText(status)}
+                  {status === conversation.status && <Check size={14} />}
+                </StatusDropdownItem>
+              ))}
+            </StatusDropdown>
+          )}
         </PatientInfo>
       </HeaderLeft>
 
       <HeaderRight>
-        <ActionButton 
+        <ActionButton
           ref={buttonRef}
-          onClick={() => setShowMenu(!showMenu)} 
+          onClick={() => setShowMenu(!showMenu)}
           title="Mais opções"
         >
           <MoreVertical size={20} />
         </ActionButton>
-        
+
         {showMenu && (
           <DropdownMenu ref={menuRef}>
-            {conversation.status !== 'closed' && onCloseConversation && (
-              <DropdownItem onClick={handleCloseClick}>
-                <CheckCircle size={16} />
-                Encerrar Atendimento
-              </DropdownItem>
-            )}
             <DropdownItem onClick={handleDeleteClick} $danger>
               <Trash2 size={16} />
               Excluir Conversa

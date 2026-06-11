@@ -100,6 +100,7 @@ export const PatientInfo = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
+  position: relative;
 `;
 
 export const PatientName = styled.h2`
@@ -115,6 +116,78 @@ export const PatientPhone = styled.span`
   display: flex;
   align-items: center;
   gap: 0.375rem;
+`;
+
+export const StatusButton = styled.button`
+  font: inherit;
+  font-size: 0.8125rem;
+  color: ${({ theme }) => theme.text.muted};
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover:not(:disabled) {
+    color: ${({ theme }) => theme.brand.primary};
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+`;
+
+export const StatusDropdown = styled.div`
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: ${({ theme }) => theme.dropdown.bg};
+  border: 1px solid ${({ theme }) => theme.dropdown.border};
+  border-radius: 12px;
+  box-shadow: ${({ theme }) => theme.dropdown.shadow};
+  min-width: 220px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: slideDown 0.2s ease;
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+export const StatusDropdownItem = styled.button<{ $active?: boolean }>`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  background: ${({ $active, theme }) => ($active ? theme.dropdown.hoverBg : theme.dropdown.bg)};
+  color: ${({ theme }) => theme.dropdown.text};
+  font-size: 0.8125rem;
+  font-weight: ${({ $active }) => ($active ? 600 : 500)};
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.dropdown.hoverBg};
+  }
+
+  svg:last-child {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
 `;
 
 export const StatusIndicator = styled.span<{ $color: string }>`

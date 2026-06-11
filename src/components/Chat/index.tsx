@@ -27,7 +27,7 @@ interface ChatContainerProps {
   onEditMessage?: (messageId: string, newContent: string) => void;
   onDeleteMessage?: (messageId: string) => void;
   onDeleteConversation?: () => void;
-  onCloseConversation?: () => void;
+  onChangeStatus?: (status: Conversation['status']) => void;
   hasMore?: boolean;
   isLoadingMore?: boolean;
   onLoadMore?: () => void;
@@ -79,7 +79,7 @@ export default function ChatContainer({
   onEditMessage,
   onDeleteMessage,
   onDeleteConversation,
-  onCloseConversation,
+  onChangeStatus,
   hasMore = false,
   isLoadingMore = false,
   onLoadMore,
@@ -246,7 +246,7 @@ export default function ChatContainer({
       <ChatHeader
         conversation={conversation}
         onDeleteConversation={onDeleteConversation}
-        onCloseConversation={onCloseConversation}
+        onChangeStatus={onChangeStatus}
       />
 
       <MessagesArea>

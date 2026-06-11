@@ -10,7 +10,7 @@ import {
   editMessage,
   deleteMessage,
   deleteConversation,
-  closeConversation,
+  updateConversationStatus,
 } from "@/lib/services/conversations";
 
 const logError = (label: string, error: unknown) => {
@@ -327,19 +327,19 @@ export default function ChatWrapper({
     }
   };
 
-  const handleCloseConversation = async () => {
+  const handleChangeStatus = async (status: Conversation["status"]) => {
     if (!selectedConversationId) return;
 
     try {
-      await closeConversation(supabase, selectedConversationId, tenantId);
+      await updateConversationStatus(supabase, selectedConversationId, tenantId, status);
 
       // Atualizar status da conversa localmente (realtime também vai atualizar)
       if (onConversationStatusChange) {
-        onConversationStatusChange(selectedConversationId, "closed");
+        onConversationStatusChange(selectedConversationId, status);
       }
     } catch (error) {
-      logError("Error closing conversation:", error);
-      alert("Erro ao encerrar atendimento. Tente novamente.");
+      logError("Error updating conversation status:", error);
+      alert("Erro ao atualizar status da conversa. Tente novamente.");
     }
   };
 
@@ -382,7 +382,7 @@ export default function ChatWrapper({
       onEditMessage={handleEditMessage}
       onDeleteMessage={handleDeleteMessage}
       onDeleteConversation={handleDeleteConversation}
-      onCloseConversation={handleCloseConversation}
+      onChangeStatus={handleChangeStatus}
       hasMore={currentPagination?.hasMore ?? false}
       isLoadingMore={currentPagination?.isLoadingMore ?? false}
       onLoadMore={handleLoadMore}
