@@ -1,11 +1,20 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 import {
-  Check, CheckCheck, Clock, AlertCircle, Download, FileText,
-  RefreshCw, MoreVertical, Pencil, Trash2, Trash
-} from 'lucide-react';
-import { ChatMessage } from '@/types';
+  Check,
+  CheckCheck,
+  Clock,
+  AlertCircle,
+  Download,
+  FileText,
+  RefreshCw,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Trash,
+} from "lucide-react";
+import { ChatMessage } from "@/types";
 import {
   MessageContainer,
   MessageMenuTrigger,
@@ -30,7 +39,7 @@ import {
   EditTextarea,
   EditActions,
   EditButton,
-} from './styles';
+} from "./styles";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -40,51 +49,53 @@ interface MessageBubbleProps {
 }
 
 const formatTime = (date: Date) =>
-  new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date(date));
+  new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date(date));
 
 const formatFileSize = (bytes: number) => {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 };
 
-const getStatusIcon = (status: ChatMessage['status']) => {
+const getStatusIcon = (status: ChatMessage["status"]) => {
   switch (status) {
-    case 'pending':   return <Clock size={14} />;
-    case 'sent':      return <Check size={14} />;
-    case 'delivered':
-    case 'read':      return <CheckCheck size={14} />;
-    case 'failed':    return <AlertCircle size={14} />;
-    default:          return null;
+    case "pending":
+      return <Clock size={14} />;
+    case "sent":
+      return <Check size={14} />;
+    case "delivered":
+    case "read":
+      return <CheckCheck size={14} />;
+    case "failed":
+      return <AlertCircle size={14} />;
+    default:
+      return null;
   }
 };
 
 export default function MessageBubble({ message, onRetry, onDelete, onEdit }: MessageBubbleProps) {
-  const isOwn      = message.sender === 'human';
-  const isAi       = message.sender === 'ai';
-  const hasError   = message.status === 'failed' && message.error;
-  const isDeleted  = !!message.deletedAt;
+  const isOwn = message.sender === "human";
+  const isAi = message.sender === "ai";
+  const hasError = message.status === "failed" && message.error;
+  const isDeleted = !!message.deletedAt;
 
-  const [menuOpen,  setMenuOpen]  = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(message.content ?? '');
+  const [editContent, setEditContent] = useState(message.content ?? "");
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef  = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Close menu on outside click
   useEffect(() => {
     if (!menuOpen) return;
     const handler = (e: MouseEvent) => {
-      if (
-        dropdownRef.current?.contains(e.target as Node) ||
-        triggerRef.current?.contains(e.target as Node)
-      ) return;
+      if (dropdownRef.current?.contains(e.target as Node) || triggerRef.current?.contains(e.target as Node)) return;
       setMenuOpen(false);
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, [menuOpen]);
 
   // Auto-focus textarea when editing starts
@@ -97,17 +108,17 @@ export default function MessageBubble({ message, onRetry, onDelete, onEdit }: Me
     }
   }, [isEditing]);
 
-  const handleToggleMenu = () => setMenuOpen(v => !v);
+  const handleToggleMenu = () => setMenuOpen((v) => !v);
 
   const handleStartEdit = () => {
-    setEditContent(message.content ?? '');
+    setEditContent(message.content ?? "");
     setIsEditing(true);
     setMenuOpen(false);
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditContent(message.content ?? '');
+    setEditContent(message.content ?? "");
   };
 
   const handleSaveEdit = () => {
@@ -121,11 +132,11 @@ export default function MessageBubble({ message, onRetry, onDelete, onEdit }: Me
   };
 
   const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSaveEdit();
     }
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       handleCancelEdit();
     }
   };
@@ -135,62 +146,75 @@ export default function MessageBubble({ message, onRetry, onDelete, onEdit }: Me
       <EditTextarea
         ref={textareaRef}
         value={editContent}
-        onChange={e => setEditContent(e.target.value)}
+        onChange={(e) => setEditContent(e.target.value)}
         onKeyDown={handleTextareaKeyDown}
         rows={2}
       />
       <EditActions>
         <EditButton onClick={handleCancelEdit}>Cancelar</EditButton>
-        <EditButton $primary onClick={handleSaveEdit}>Salvar</EditButton>
+        <EditButton $primary onClick={handleSaveEdit}>
+          Salvar
+        </EditButton>
       </EditActions>
     </MessageContent>
   ) : (
     <>
       <MessageContent>
-        {message.mediaUrl && (message.type === 'image' || message.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
+        {message.mediaUrl && (message.type === "image" || message.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
           <MessageAttachmentContainer>
             <MessageImage src={message.mediaUrl} alt="Image" />
           </MessageAttachmentContainer>
         )}
-        {message.mediaUrl && message.type !== 'image' && !message.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) && (
+        {message.mediaUrl && message.type !== "image" && !message.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) && (
           <MessageAttachmentContainer>
             <MessageDocument href={message.mediaUrl} download>
-              <DocumentIcon><FileText size={24} /></DocumentIcon>
-              <DocumentInfo><DocumentName>Documento</DocumentName></DocumentInfo>
-              <Download size={20} />
-            </MessageDocument>
-          </MessageAttachmentContainer>
-        )}
-        {message.attachments?.filter(a => a.type === 'image').map(a => (
-          <MessageAttachmentContainer key={a.id}>
-            <MessageImage src={a.url} alt={a.fileName || 'Image'} />
-          </MessageAttachmentContainer>
-        ))}
-        {message.attachments?.filter(a => a.type === 'document').map(a => (
-          <MessageAttachmentContainer key={a.id}>
-            <MessageDocument href={a.url} download={a.fileName}>
-              <DocumentIcon><FileText size={24} /></DocumentIcon>
+              <DocumentIcon>
+                <FileText size={24} />
+              </DocumentIcon>
               <DocumentInfo>
-                <DocumentName>{a.fileName || 'Documento'}</DocumentName>
-                {a.fileSize && <DocumentSize>{formatFileSize(a.fileSize)}</DocumentSize>}
+                <DocumentName>Documento</DocumentName>
               </DocumentInfo>
               <Download size={20} />
             </MessageDocument>
           </MessageAttachmentContainer>
-        ))}
+        )}
+        {message.attachments
+          ?.filter((a) => a.type === "image")
+          .map((a) => (
+            <MessageAttachmentContainer key={a.id}>
+              <MessageImage src={a.url} alt={a.fileName || "Image"} />
+            </MessageAttachmentContainer>
+          ))}
+        {message.attachments
+          ?.filter((a) => a.type === "document")
+          .map((a) => (
+            <MessageAttachmentContainer key={a.id}>
+              <MessageDocument href={a.url} download={a.fileName}>
+                <DocumentIcon>
+                  <FileText size={24} />
+                </DocumentIcon>
+                <DocumentInfo>
+                  <DocumentName>{a.fileName || "Documento"}</DocumentName>
+                  {a.fileSize && <DocumentSize>{formatFileSize(a.fileSize)}</DocumentSize>}
+                </DocumentInfo>
+                <Download size={20} />
+              </MessageDocument>
+            </MessageAttachmentContainer>
+          ))}
         {message.content && <MessageText>{message.content}</MessageText>}
       </MessageContent>
 
       <MessageFooter>
         {isDeleted && (
-          <DeletedLabel><Trash size={9} />excluída</DeletedLabel>
+          <DeletedLabel>
+            <Trash size={9} />
+            excluída
+          </DeletedLabel>
         )}
         {!isDeleted && message.editedAt && <EditedLabel>editado</EditedLabel>}
         <MessageTime>{formatTime(message.timestamp)}</MessageTime>
         {isOwn && !isDeleted && (
-          <MessageStatusIcon $status={message.status}>
-            {getStatusIcon(message.status)}
-          </MessageStatusIcon>
+          <MessageStatusIcon $status={message.status}>{getStatusIcon(message.status)}</MessageStatusIcon>
         )}
       </MessageFooter>
     </>
@@ -199,7 +223,7 @@ export default function MessageBubble({ message, onRetry, onDelete, onEdit }: Me
   return (
     <MessageContainer $isOwn={isOwn || isAi}>
       {hasError && onRetry && (
-        <RetryButton onClick={() => onRetry(message.id)} title={message.error || 'Tentar novamente'}>
+        <RetryButton onClick={() => onRetry(message.id)} title={message.error || "Tentar novamente"}>
           <RefreshCw size={14} />
         </RetryButton>
       )}
@@ -207,11 +231,7 @@ export default function MessageBubble({ message, onRetry, onDelete, onEdit }: Me
       <Bubble $sender={message.sender} $hasError={!!hasError} $isDeleted={isDeleted}>
         {isOwn && !isEditing && !isDeleted && (
           <>
-            <MessageMenuTrigger
-              ref={triggerRef}
-              onClick={handleToggleMenu}
-              aria-label="Opções da mensagem"
-            >
+            <MessageMenuTrigger ref={triggerRef} onClick={handleToggleMenu} aria-label="Opções da mensagem">
               <MoreVertical size={11} />
             </MessageMenuTrigger>
 
@@ -223,7 +243,10 @@ export default function MessageBubble({ message, onRetry, onDelete, onEdit }: Me
                 </MessageMenuItem>
                 <MessageMenuItem
                   $danger
-                  onClick={() => { setMenuOpen(false); onDelete?.(message.id); }}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onDelete?.(message.id);
+                  }}
                 >
                   <Trash2 size={14} />
                   Excluir
