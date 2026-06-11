@@ -11,11 +11,13 @@ import Header, { HeaderMetric } from '../Header';
 interface DashboardContentProps {
   initialConversations: Conversation[];
   tenantId: string;
+  aiEnabled: boolean;
 }
 
 export default function DashboardContent({
   initialConversations,
   tenantId,
+  aiEnabled,
 }: DashboardContentProps) {
   const { conversations, updateConversationStatusLocal, removeConversation, markAsRead } = useRealtimeConversations(initialConversations, tenantId);
 
@@ -37,9 +39,13 @@ export default function DashboardContent({
         variant: 'warning' as const,
       },
       // { label: 'Follow-ups Hoje', value: 8, variant: 'default' as const },
-      { label: 'Bot Ativo', value: 'Online', variant: 'success' as const },
+      {
+        label: 'Bot Ativo',
+        value: aiEnabled ? 'Online' : 'Offline',
+        variant: aiEnabled ? ('success' as const) : ('default' as const),
+      },
     ];
-  }, [conversations]);
+  }, [conversations, aiEnabled]);
 
   return (
     <>
