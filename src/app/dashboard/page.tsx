@@ -6,6 +6,9 @@ import { getTenantSettings } from '@/lib/services/tenantSettings';
 import { getPageAuthData } from '@/lib/page-auth';
 import { Conversation } from '@/types';
 
+// Garante que o Supabase sempre busca dados frescos, sem cache do Next.js
+export const fetchCache = 'force-no-store';
+
 export default async function Dashboard() {
   const { user, tenant, supabase } = await getPageAuthData();
 

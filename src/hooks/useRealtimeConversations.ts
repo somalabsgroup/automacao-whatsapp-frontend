@@ -42,7 +42,13 @@ const playNotificationSound = () => {
 };
 
 export function useRealtimeConversations(initialConversations: Conversation[], tenantId: string) {
-  const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
+  const [conversations, setConversations] = useState<Conversation[]>(() =>
+    initialConversations.map((c) => ({
+      ...c,
+      lastMessageAt: c.lastMessageAt instanceof Date ? c.lastMessageAt : new Date(c.lastMessageAt as unknown as string),
+      createdAt: c.createdAt instanceof Date ? c.createdAt : new Date(c.createdAt as unknown as string),
+    }))
+  );
   const { selectedConversationId } = useConversationStore();
 
   const supabaseRef = useRef(createClient());
@@ -133,11 +139,22 @@ export function useRealtimeConversations(initialConversations: Conversation[], t
 
               return newConversations;
             } else {
-              // Conversa nova: adiciona à lista
-              const newConversations = [{ ...updated, hasNotification: hasUnread || false }, ...prev];
+              // Conversa nova: notifica se for mensagem inbound e não estiver selecionada
+              const isInbound =
+                updated.lastMessageDirection === "inbound" || updated.lastMessageSender === "patient";
+              const newHasUnread = isInbound && conversationId !== currentSelectedId;
 
+              if (newHasUnread) {
+                const messageKey = `${conversationId}-${updated.lastMessageAt.getTime()}`;
+                if (!hasPlayedSound.current.has(messageKey)) {
+                  playNotificationSound();
+                  hasPlayedSound.current.add(messageKey);
+                  setTimeout(() => { hasPlayedSound.current.delete(messageKey); }, 5 * 60 * 1000);
+                }
+              }
+
+              const newConversations = [{ ...updated, hasNotification: newHasUnread }, ...prev];
               newConversations.sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime());
-
               return newConversations;
             }
           });

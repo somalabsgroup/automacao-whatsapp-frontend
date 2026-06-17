@@ -23,7 +23,6 @@ export async function getConversations(
   supabase: SupabaseClient,
   tenantId: string
 ): Promise<Conversation[]> {
-  // Buscar conversas com última mensagem
   const { data: conversationsData, error } = await supabase
     .from('conversations')
     .select(`
@@ -47,10 +46,8 @@ export async function getConversations(
     .order('last_message_at', { ascending: false });
 
   if (error) throw error;
-
   if (!conversationsData) return [];
 
-  // Buscar última mensagem de cada conversa
   const conversationsWithMessages = await Promise.all(
     conversationsData.map(async (conv: Record<string, unknown>) => {
       const { data: lastMessage } = await supabase
@@ -61,7 +58,7 @@ export async function getConversations(
         .limit(1)
         .single();
 
-      const patient = Array.isArray((conv as { patients: unknown }).patients) 
+      const patient = Array.isArray((conv as { patients: unknown }).patients)
         ? ((conv as { patients: unknown[] }).patients[0] as { name?: string; phone?: string })
         : (conv as { patients: { name?: string; phone?: string } }).patients;
       const patientName = patient?.name || 'Desconhecido';
@@ -80,6 +77,8 @@ export async function getConversations(
         context?: Record<string, unknown>;
       };
 
+      const lastMessageAt = new Date(convData.last_message_at);
+
       return {
         id: convData.id,
         patientId: convData.patient_id,
@@ -88,18 +87,16 @@ export async function getConversations(
         initials: getInitials(patientName),
         avatarColor: getAvatarColor(convData.id),
         lastMessage: lastMessage?.content || 'Sem mensagens',
-        lastMessageTime: lastMessage?.created_at 
-          ? new Date(lastMessage.created_at).toLocaleTimeString('pt-BR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-          : '',
+        lastMessageTime: lastMessageAt.toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
         lastMessageDirection: lastMessage?.direction as 'inbound' | 'outbound' | undefined,
         lastMessageSender: lastMessage?.sender as 'patient' | 'ai' | 'human' | undefined,
         status: convData.status as ConversationStatus,
         assignedUserId: convData.assigned_user_id,
         handoffReason: convData.handoff_reason,
-        lastMessageAt: new Date(convData.last_message_at),
+        lastMessageAt,
         createdAt: new Date(convData.created_at),
         closedAt: convData.closed_at ? new Date(convData.closed_at) : undefined,
         closeReason: convData.close_reason,
@@ -156,6 +153,8 @@ export async function getConversationById(
   const patientName = patient?.name || 'Desconhecido';
   const patientPhone = patient?.phone;
 
+  const lastMessageAt = new Date(data.last_message_at);
+
   return {
     id: data.id,
     patientId: data.patient_id,
@@ -164,18 +163,16 @@ export async function getConversationById(
     initials: getInitials(patientName),
     avatarColor: getAvatarColor(data.id),
     lastMessage: lastMessage?.content || 'Sem mensagens',
-    lastMessageTime: lastMessage?.created_at 
-      ? new Date(lastMessage.created_at).toLocaleTimeString('pt-BR', {
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      : '',
+    lastMessageTime: lastMessageAt.toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
     lastMessageDirection: lastMessage?.direction as 'inbound' | 'outbound' | undefined,
     lastMessageSender: lastMessage?.sender as 'patient' | 'ai' | 'human' | undefined,
     status: data.status as ConversationStatus,
     assignedUserId: data.assigned_user_id,
     handoffReason: data.handoff_reason,
-    lastMessageAt: new Date(data.last_message_at),
+    lastMessageAt,
     createdAt: new Date(data.created_at),
     closedAt: data.closed_at ? new Date(data.closed_at) : undefined,
     closeReason: data.close_reason,

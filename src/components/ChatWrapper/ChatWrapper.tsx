@@ -160,6 +160,9 @@ export default function ChatWrapper({
 
     return () => {
       unsubscribe();
+      // Remove da cache para forçar re-fetch na próxima vez que for selecionada,
+      // garantindo que mensagens recebidas enquanto outra conversa estava ativa sejam carregadas.
+      loadedConversationsRef.current.delete(selectedConversationId);
     };
   }, [selectedConversationId, supabase]);
 
